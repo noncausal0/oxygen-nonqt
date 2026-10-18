@@ -1,8 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-  <g fill="#bebebe">
-    <circle cx="4.2" cy="7.6" r="1"/>
-    <circle cx="6.8" cy="10.2" r="1"/>
-    <circle cx="9.1" cy="7.6" r="1"/>
-    <circle cx="11.4" cy="5" r="1"/>
-  </g>
+  <circle cx="4.2" cy="7.6" r="1" class="error" fill="#bebebe"/>
+  <circle cx="6.8" cy="10.2" r="1" class="error" fill="#bebebe"/>
+  <circle cx="9.1" cy="7.6" r="1" class="error" fill="#bebebe"/>
+  <circle cx="11.4" cy="5" r="1" class="error" fill="#bebebe"/>
 </svg>

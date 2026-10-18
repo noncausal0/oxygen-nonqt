@@ -71,3 +71,27 @@ $win_bottom: shade($bg, 0.92);
   background-image: linear-gradient(to bottom, shade($c, 1.22), $c);
   color: $sel_fg;
 }
+
+// Check and radio marks. Their shapes carry the symbolic "error" class, so the
+// colour comes from the recolour palette and each colour is its own image. An
+// empty box holds an empty image rather than none (and rather than a
+// transparent mark: the palette ignores alpha). GTK cross-fades images, so
+// toggling fades the mark in and out the way Oxygen does; switching `color` or
+// going from no image to an image would just pop.
+@function mark($name, $c) {
+  @return -gtk-recolor(url("assets/#{$name}-symbolic.svg"), error #{$c});
+}
+
+@mixin check-marks($c) {
+  -gtk-icon-source: mark(mark-none, $c);
+  &:checked { -gtk-icon-source: mark(check, $c); }
+  &:indeterminate { -gtk-icon-source: mark(check-mixed, $c); }
+}
+
+@mixin radio-marks($c) {
+  -gtk-icon-source: mark(mark-none, $c);
+  &:checked, &:indeterminate { -gtk-icon-source: mark(radio, $c); }
+}
+
+// Oxygen fades hover and focus glows and toggled marks over the same time.
+$fade: 150ms ease-out;

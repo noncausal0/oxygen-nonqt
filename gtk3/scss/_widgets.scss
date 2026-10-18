@@ -241,24 +241,21 @@ spinbutton {
 
 // --- Check boxes, radio buttons and switches --------------------------------
 
-// Oxygen draws check boxes and radio buttons as small raised buttons. The
-// marks are recoloured from symbolic assets, so they follow `color`.
+// Oxygen draws check boxes and radio buttons as small raised buttons, whose
+// marks and hover glow fade in and out.
 check, radio {
   @include raised($btn_bg);
   color: $btn_fg;
   min-width: 15px;
   min-height: 15px;
   margin: 0 5px 0 0;
-  -gtk-icon-source: none;
+  transition: -gtk-icon-source $fade, border-color $fade, box-shadow $fade;
 
   &:hover { @include glow($hover); }
   &:disabled { @include raised($bg); box-shadow: none; color: $dis_fg; }
 }
-check { border-radius: 3px; }
-radio { border-radius: 9999px; }
-check:checked { -gtk-icon-source: -gtk-recolor(url("assets/check-symbolic.svg")); }
-check:indeterminate { -gtk-icon-source: -gtk-recolor(url("assets/check-mixed-symbolic.svg")); }
-radio:checked, radio:indeterminate { -gtk-icon-source: -gtk-recolor(url("assets/radio-symbolic.svg")); }
+check { border-radius: 3px; @include check-marks($btn_fg); &:disabled { @include check-marks($dis_fg); } }
+radio { border-radius: 9999px; @include radio-marks($btn_fg); &:disabled { @include radio-marks($dis_fg); } }
 
 checkbutton.text-button, radiobutton.text-button { padding: 2px 0; outline: none; }
 
@@ -269,7 +266,12 @@ menu check, menu radio, treeview check, treeview radio, modelbutton check, model
   box-shadow: none;
   &:hover { border: none; box-shadow: none; }
 }
-menu menuitem:hover check, menu menuitem:hover radio, treeview:selected check, treeview:selected radio { color: $sel_fg; }
+menu check, modelbutton check { @include check-marks($fg); }
+menu radio, modelbutton radio { @include radio-marks($fg); }
+treeview check { @include check-marks($text); }
+treeview radio { @include radio-marks($text); }
+menu menuitem:hover check, treeview:selected check, modelbutton:hover check { @include check-marks($sel_fg); }
+menu menuitem:hover radio, treeview:selected radio, modelbutton:hover radio { @include radio-marks($sel_fg); }
 
 switch {
   @include groove;
