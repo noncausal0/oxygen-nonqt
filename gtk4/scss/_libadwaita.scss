@@ -1,0 +1,211 @@
+// libadwaita.
+//
+// libadwaita apps ignore GTK themes and only add the user's gtk.css on top of
+// their own stylesheet. That CSS has a higher priority than libadwaita's, so
+// whatever is set here wins regardless of selector specificity. Plain GTK 4
+// widgets are already covered by _widgets.scss; this file maps libadwaita's
+// palette onto KDE's and restyles the widgets that only libadwaita has.
+
+:root {
+  --window-bg-color: #{$bg};
+  --window-fg-color: #{$fg};
+  --view-bg-color: #{$base};
+  --view-fg-color: #{$text};
+  --accent-bg-color: #{$sel_bg};
+  --accent-fg-color: #{$sel_fg};
+
+  // Oxygen's titlebar is the window itself, so headerbars are see-through
+  // and show the window gradient.
+  --headerbar-bg-color: transparent;
+  --headerbar-fg-color: #{$fg};
+  --headerbar-backdrop-color: transparent;
+  --headerbar-border-color: #{shade($bg, 0.8)};
+  --headerbar-shade-color: transparent;
+  --headerbar-darker-shade-color: transparent;
+
+  --sidebar-bg-color: #{$base};
+  --sidebar-fg-color: #{$text};
+  --sidebar-backdrop-color: #{$base};
+  --sidebar-border-color: #{shade($bg, 0.8)};
+  --sidebar-shade-color: transparent;
+  --secondary-sidebar-bg-color: #{$base};
+  --secondary-sidebar-fg-color: #{$text};
+  --secondary-sidebar-backdrop-color: #{$base};
+  --secondary-sidebar-border-color: #{shade($bg, 0.8)};
+  --secondary-sidebar-shade-color: transparent;
+
+  --card-bg-color: #{$base};
+  --card-fg-color: #{$text};
+  --card-shade-color: #{galpha(black, 0.1)};
+  --dialog-bg-color: #{$bg};
+  --dialog-fg-color: #{$fg};
+  --popover-bg-color: #{$bg};
+  --popover-fg-color: #{$fg};
+  --popover-shade-color: #{galpha(black, 0.1)};
+  --thumbnail-bg-color: #{$base};
+  --thumbnail-fg-color: #{$text};
+
+  --border-color: #{shade($bg, 0.8)};
+  --shade-color: #{galpha(black, 0.08)};
+  --scrollbar-outline-color: transparent;
+
+  --destructive-bg-color: #{$error};
+  --destructive-fg-color: white;
+  --destructive-color: #{$error};
+  --error-bg-color: #{$error};
+  --error-fg-color: white;
+  --error-color: #{$error};
+  --warning-bg-color: #{$warning};
+  --warning-fg-color: white;
+  --warning-color: #{$warning};
+  --success-bg-color: #{$success};
+  --success-fg-color: white;
+  --success-color: #{$success};
+}
+
+// Older libadwaita releases and apps read the named colours instead.
+@define-color accent_bg_color @theme_selected_bg_color_breeze;
+@define-color accent_fg_color @theme_selected_fg_color_breeze;
+@define-color accent_color @theme_selected_bg_color_breeze;
+@define-color window_bg_color @theme_bg_color_breeze;
+@define-color window_fg_color @theme_fg_color_breeze;
+@define-color view_bg_color @theme_base_color_breeze;
+@define-color view_fg_color @theme_text_color_breeze;
+@define-color headerbar_bg_color @theme_bg_color_breeze;
+@define-color headerbar_fg_color @theme_fg_color_breeze;
+@define-color card_bg_color @theme_base_color_breeze;
+@define-color card_fg_color @theme_text_color_breeze;
+@define-color popover_bg_color @theme_bg_color_breeze;
+@define-color popover_fg_color @theme_fg_color_breeze;
+@define-color dialog_bg_color @theme_bg_color_breeze;
+@define-color dialog_fg_color @theme_fg_color_breeze;
+
+// --- Toolbar views and headerbars -------------------------------------------
+
+toolbarview {
+  > .top-bar, > .bottom-bar {
+    background: none;
+    box-shadow: none;
+    &.raised, &.raised-border { box-shadow: none; }
+  }
+  > .bottom-bar { border-top: 1px solid shade($bg, 0.8); }
+}
+
+// libadwaita draws headerbar buttons flat only through context, so the same
+// has to be spelled out for every place it does that.
+.toolbar, headerbar, toolbarview > .top-bar, toolbarview > .bottom-bar, actionbar, searchbar,
+row, .osd, tabbar, banner, splitbutton.flat, menubutton.flat, .navigation-sidebar {
+  button:not(.raised):not(.suggested-action):not(.destructive-action):not(.opaque):not(.pill):not(.card):not(.minimize):not(.maximize):not(.close),
+  menubutton:not(.raised) > button, splitbutton:not(.raised) > button, splitbutton:not(.raised) > menubutton > button {
+    background: none;
+    border-color: transparent;
+    box-shadow: none;
+    &:hover { @include raised; @include glow($hover); }
+    &:active, &:checked { @include sunken; }
+    &:disabled { background: none; border-color: transparent; box-shadow: none; }
+  }
+}
+row button.flat:not(:hover):not(:active):not(:checked) { background: none; border-color: transparent; box-shadow: none; }
+
+// A row's own suffix controls (switches, check boxes) stay normal.
+row switch { margin: 6px 0; }
+
+// --- Boxed lists and cards --------------------------------------------------
+
+// A boxed list is a content hole with rounded corners, like a Qt item view.
+.boxed-list, .boxed-list-separate > row, .card {
+  @include hole;
+  border-radius: $radius;
+  color: $text;
+}
+.boxed-list {
+  > row { border-radius: 0; &:not(:last-child) { border-bottom: 1px solid galpha($text, 0.1); } }
+  > row:first-child { border-top-left-radius: $radius; border-top-right-radius: $radius; }
+  > row:last-child { border-bottom-left-radius: $radius; border-bottom-right-radius: $radius; }
+}
+.boxed-list-separate { border-spacing: 6px; }
+
+.card {
+  &.activatable:hover { @include glow($hover); }
+  &.activatable:active { box-shadow: inset 0 1px 1px galpha(black, 0.12); }
+}
+
+button.card:hover { @include glow($hover); }
+
+row.activatable:hover:not(:selected) { background-color: galpha($hover, 0.18); }
+row.activatable:active { background-color: galpha($hover, 0.3); }
+row.expander > list > row { background-color: shade($base, 0.98); }
+row label.subtitle { opacity: 0.6; }
+
+preferencesgroup > box > box.header > box.labels > label.heading,
+preferencesgroup > box > box.header label.title { font-weight: bold; }
+
+// --- Navigation and sidebars ------------------------------------------------
+
+.navigation-sidebar > row {
+  border-radius: 3px;
+  margin: 1px 4px;
+  &:selected { @include selection; }
+}
+navigation-view, navigation-split-view > widget, overlay-split-view > widget { background: none; }
+navigation-split-view > widget.sidebar-pane, overlay-split-view > widget.sidebar-pane {
+  background-color: $base;
+  border-right: 1px solid shade($bg, 0.8);
+}
+
+// --- Tab bars ---------------------------------------------------------------
+
+// libadwaita tabs get the same treatment as notebook tabs.
+tabbar {
+  > revealer > box { background: none; box-shadow: none; border-bottom: 1px solid shade($bg, 0.8); padding: 0 4px; }
+  tab {
+    color: $fg;
+    background-color: shade($bg, 0.88);
+    border: 1px solid shade($bg, 0.8);
+    border-bottom: none;
+    border-radius: $radius $radius 0 0;
+    min-height: 26px;
+    margin-top: 3px;
+    &:hover:not(:selected) { background-color: shade($bg, 0.93); }
+    &:selected {
+      background-color: $bg;
+      background-image: linear-gradient(to bottom, shade($bg, 1.08), shade($bg, 0.98));
+      box-shadow: inset 0 1px shade($bg, 1.15);
+      margin-top: 0;
+    }
+  }
+}
+tabbox > tabboxchild > tab { border-radius: $radius $radius 0 0; }
+tabbox > separator, tabbar tabbox > separator { background: none; }
+
+// --- Toasts, banners, dialogs -----------------------------------------------
+
+toast {
+  background-color: galpha($tip_bg, 0.92);
+  color: $tip_fg;
+  border: 1px solid $tip_border;
+  border-radius: $radius;
+  box-shadow: 0 2px 6px galpha(black, 0.3);
+}
+
+banner > revealer > widget {
+  background-color: gmix($bg, $sel_bg, 0.2);
+  color: $fg;
+  border-bottom: 1px solid shade($bg, 0.8);
+}
+
+dialog.floating > sheet, window.dialog.message, dialog.alert > sheet, floating-sheet > sheet {
+  border-radius: $radius;
+  box-shadow: 0 3px 12px 1px galpha(black, 0.45), 0 0 0 1px galpha(black, 0.25);
+  background-color: $win_bottom;
+  background-image: linear-gradient(to bottom, $win_top, $win_bottom 300px);
+}
+bottom-sheet > sheet { border-radius: $radius $radius 0 0; }
+
+// --- Misc -------------------------------------------------------------------
+
+statuspage > scrolledwindow > viewport > box > clamp > box > .title { font-weight: bold; }
+.pill { font-weight: normal; }
+.heading { font-weight: bold; }
+.title-1, .title-2, .title-3, .title-4 { font-weight: bold; }
+.caption, .caption-heading { font-size: smaller; }

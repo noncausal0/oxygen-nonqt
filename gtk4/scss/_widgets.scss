@@ -1,0 +1,670 @@
+// GTK 4 widgets. The recipes are shared with GTK 3; only node structure differs.
+$radius: 4px;
+
+* {
+  outline-style: solid;
+  outline-width: 0;
+  outline-color: transparent;
+  outline-offset: 0;
+  -gtk-secondary-caret-color: $sel_bg;
+}
+
+*:disabled { -gtk-icon-filter: opacity(0.5); }
+
+// --- Windows ----------------------------------------------------------------
+
+// Oxygen lights the top of the window and darkens towards the bottom. GTK 4
+// paints the window background under its titlebar too, so one gradient
+// covers both, the way Oxygen's frame blends into the window.
+window.background, window.dialog {
+  background-color: $win_bottom;
+  background-image: linear-gradient(to bottom, $win_top, $win_bottom 300px);
+  color: $fg;
+}
+
+.background { color: $fg; }
+
+window.csd {
+  border-radius: $radius $radius 0 0;
+  box-shadow: 0 3px 12px 1px galpha(black, 0.45), 0 0 0 1px galpha(black, 0.25);
+  &:backdrop { box-shadow: 0 2px 8px galpha(black, 0.3), 0 0 0 1px galpha(black, 0.2); }
+  &.maximized, &.fullscreen, &.tiled, &.tiled-top, &.tiled-bottom, &.tiled-left, &.tiled-right { border-radius: 0; }
+}
+window.solid-csd { border-radius: 0; box-shadow: inset 0 0 0 1px shade($bg, 0.72); }
+window.popup { background: none; box-shadow: none; }
+
+// --- Titlebars --------------------------------------------------------------
+
+// Oxygen's window decoration is the window colour, never the accent, and the
+// title area runs straight into the window body without a dividing line.
+headerbar {
+  background: none;
+  color: $fg;
+  border: none;
+  box-shadow: none;
+  min-height: 32px;
+  padding: 0 4px;
+
+  &:backdrop { color: $backdrop_fg; }
+  .title { font-weight: bold; padding: 0 12px; }
+  .subtitle { font-size: smaller; opacity: 0.75; }
+}
+
+// Oxygen's title buttons: small round raised buttons with the glyph inside.
+// Plain GTK 4 stretches them to the headerbar's height, so the margin keeps
+// them round in a 32px titlebar.
+windowcontrols {
+  border-spacing: 4px;
+  margin: 5px 0;
+  > button.image-button {
+    @include raised($bg);
+    border-radius: 9999px;
+    min-width: 18px;
+    min-height: 18px;
+    padding: 1px;
+    margin: 0;
+    color: $fg;
+    &:hover { @include glow($hover); }
+    &:active { @include sunken($bg); }
+    image { -gtk-icon-size: 12px; }
+  }
+  &:backdrop button { color: $backdrop_fg; }
+}
+
+// --- Labels and selection ---------------------------------------------------
+
+label {
+  &:disabled { color: $dis_fg; }
+  &.dim-label, &.subtitle { opacity: 0.6; }
+  selection { background-color: $sel_bg; color: $sel_fg; }
+}
+.dim-label { opacity: 0.6; }
+
+selection { background-color: $sel_bg; color: $sel_fg; }
+
+link, label > link, button.link { color: $link; }
+link:visited, label > link:visited { color: $visited; }
+
+.error { color: $error; }
+.warning { color: $warning; }
+.success { color: $success; }
+.accent { color: $sel_bg; }
+
+// --- Buttons ----------------------------------------------------------------
+
+button {
+  @include raised;
+  color: $btn_fg;
+  font-weight: normal;
+  border-radius: $radius;
+  padding: 3px 9px;
+  min-height: 20px;
+  min-width: 18px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+
+  &:focus-visible { @include glow($focus); }
+  &:hover { @include glow($hover); }
+  &:active, &:checked { @include sunken; }
+  &:checked:hover, &:active:hover { border-color: $hover; }
+
+  // Oxygen keeps disabled buttons raised and only fades them.
+  &:disabled {
+    @include raised($bg);
+    box-shadow: inset 0 1px shade($bg, 1.12);
+    color: $dis_fg;
+  }
+  &:disabled:checked { @include sunken($bg); color: $dis_fg; }
+
+  &.flat {
+    background: none;
+    border-color: transparent;
+    box-shadow: none;
+    &:hover { @include raised; @include glow($hover); }
+    &:active, &:checked { @include sunken; }
+    &:disabled { background: none; border-color: transparent; box-shadow: none; }
+  }
+
+  // Qt has no coloured default button, so suggested actions look like any
+  // other button and destructive ones only colour their label.
+  &.suggested-action { color: $btn_fg; }
+  &.destructive-action { color: $error; }
+
+  &.image-button { padding: 3px 5px; }
+  &.circular { border-radius: 9999px; padding: 3px; min-width: 22px; }
+  &.pill { border-radius: 9999px; padding: 6px 24px; }
+  &.link, &.link:hover { background: none; border-color: transparent; box-shadow: none; padding: 0; color: $link; }
+  &.link:hover { text-decoration: underline; }
+}
+
+// Toolbar and headerbar buttons are flat until hovered, like Oxygen tool buttons.
+.toolbar button, headerbar button, actionbar button.flat, searchbar button.flat {
+  &:not(.suggested-action):not(.destructive-action):not(.minimize):not(.maximize):not(.close) {
+    background: none;
+    border-color: transparent;
+    box-shadow: none;
+    &:hover { @include raised; @include glow($hover); }
+    &:active, &:checked { @include sunken; }
+    &:disabled { background: none; border-color: transparent; box-shadow: none; }
+  }
+}
+
+menubutton > button, dropdown > button, splitbutton > button, splitbutton > menubutton > button { min-height: 20px; }
+
+// Grouped buttons share one frame.
+.linked:not(.vertical) > button, .linked:not(.vertical) > entry,
+.linked:not(.vertical) > menubutton > button, .linked:not(.vertical) > dropdown > button { border-radius: 0; }
+.linked:not(.vertical) > :first-child, .linked:not(.vertical) > :first-child > button {
+  border-top-left-radius: $radius; border-bottom-left-radius: $radius;
+}
+.linked:not(.vertical) > :last-child, .linked:not(.vertical) > :last-child > button {
+  border-top-right-radius: $radius; border-bottom-right-radius: $radius;
+}
+.linked:not(.vertical) > :not(:first-child), .linked:not(.vertical) > :not(:first-child) > button { border-left-width: 0; }
+.linked.vertical > button, .linked.vertical > entry { border-radius: 0; }
+.linked.vertical > :first-child { border-radius: $radius $radius 0 0; }
+.linked.vertical > :last-child { border-radius: 0 0 $radius $radius; }
+.linked.vertical > :not(:first-child) { border-top-width: 0; }
+
+splitbutton > button:dir(ltr) { border-radius: $radius 0 0 $radius; }
+splitbutton > menubutton > button:dir(ltr) { border-radius: 0 $radius $radius 0; border-left-width: 0; }
+
+// --- Arrows -----------------------------------------------------------------
+
+arrow, dropdown arrow, combobox arrow, menubutton arrow {
+  min-width: 16px;
+  min-height: 16px;
+  -gtk-icon-source: -gtk-recolor(url("assets/arrow-down-symbolic.svg"));
+  &.up { -gtk-icon-source: -gtk-recolor(url("assets/arrow-up-symbolic.svg")); }
+  &.left { -gtk-icon-source: -gtk-recolor(url("assets/arrow-left-symbolic.svg")); }
+  &.right { -gtk-icon-source: -gtk-recolor(url("assets/arrow-right-symbolic.svg")); }
+}
+
+expander {
+  min-width: 16px;
+  min-height: 16px;
+  -gtk-icon-source: -gtk-recolor(url("assets/arrow-right-symbolic.svg"));
+  &:dir(rtl) { -gtk-icon-source: -gtk-recolor(url("assets/arrow-left-symbolic.svg")); }
+  &:checked { -gtk-icon-source: -gtk-recolor(url("assets/arrow-down-symbolic.svg")); }
+  &:hover { color: $hover; }
+}
+expander-widget > box > title { border-radius: $radius; }
+
+// --- Combo boxes and drop downs ---------------------------------------------
+
+combobox {
+  button.combo { padding: 3px 6px 3px 8px; }
+
+  // An editable combo is one text field with the arrow inside, as in Qt.
+  > box.linked {
+    > entry.combo { border-radius: $radius 0 0 $radius; border-right-width: 0; }
+    > entry.combo + button.combo {
+      @include hole;
+      border-left-width: 0;
+      border-radius: 0 $radius $radius 0;
+      color: $text;
+      padding: 0 4px;
+      &:hover { color: $hover; }
+      &:disabled { background-color: $dis_base; color: $dis_fg; }
+    }
+  }
+}
+
+dropdown > button, dropdown > .linked > button { padding: 3px 6px 3px 8px; }
+
+// --- Entries ----------------------------------------------------------------
+
+entry, spinbutton:not(.vertical) {
+  @include hole;
+  color: $text;
+  border-radius: $radius;
+  padding: 0 6px;
+  min-height: 26px;
+  caret-color: $text;
+
+  &:focus-within { @include glow($focus); }
+  &:disabled { background-color: $dis_base; color: $dis_fg; box-shadow: none; }
+  &.error { border-color: $error; color: $error; }
+  &.warning { border-color: $warning; }
+  &.flat { border-color: transparent; background: none; box-shadow: none; }
+
+  > text { background: none; color: inherit; }
+  > image { color: shade($text, 1.4); &:hover { color: $text; } }
+  > progress { margin: 0 -4px -2px; border-bottom: 2px solid $sel_bg; background: none; }
+  > text > placeholder { color: galpha($text, 0.5); }
+  > text > selection { background-color: $sel_bg; color: $sel_fg; }
+}
+
+// The step buttons sit inside the field like Qt's spin box arrows.
+spinbutton {
+  &:not(.vertical) {
+    padding: 0;
+    > text { padding: 0 6px; min-width: 32px; }
+    > button {
+      background: none;
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      color: $text;
+      padding: 0 3px;
+      min-width: 16px;
+      min-height: 16px;
+      &:hover { color: $hover; background: none; border: none; box-shadow: none; }
+      &:active { color: $focus; background: none; border: none; box-shadow: none; }
+      &:disabled { color: $dis_fg; background: none; border: none; box-shadow: none; }
+    }
+  }
+  &.vertical {
+    > text { @include hole; border-radius: 0; min-width: 32px; padding: 3px; color: $text; }
+    > button.up { border-radius: $radius $radius 0 0; border-bottom-width: 0; }
+    > button.down { border-radius: 0 0 $radius $radius; border-top-width: 0; }
+  }
+}
+
+// --- Check boxes, radio buttons and switches --------------------------------
+
+// Oxygen draws check boxes and radio buttons as small raised buttons. The
+// marks are recoloured from symbolic assets, so they follow `color`.
+check, radio {
+  @include raised($btn_bg);
+  color: $btn_fg;
+  min-width: 15px;
+  min-height: 15px;
+  -gtk-icon-source: none;
+  -gtk-icon-size: 16px;
+
+  &:hover { @include glow($hover); }
+  &:disabled { @include raised($bg); box-shadow: none; color: $dis_fg; }
+}
+check { border-radius: 3px; }
+radio { border-radius: 9999px; }
+check:checked { -gtk-icon-source: -gtk-recolor(url("assets/check-symbolic.svg")); }
+check:indeterminate { -gtk-icon-source: -gtk-recolor(url("assets/check-mixed-symbolic.svg")); }
+radio:checked, radio:indeterminate { -gtk-icon-source: -gtk-recolor(url("assets/radio-symbolic.svg")); }
+
+checkbutton { padding: 2px; border-spacing: 5px; outline: none; }
+
+// Menu marks have no box of their own.
+popover.menu check, popover.menu radio {
+  background: none;
+  border: none;
+  box-shadow: none;
+  &:hover { border: none; box-shadow: none; }
+}
+
+switch {
+  @include groove;
+  border-radius: 11px;
+  min-width: 44px;
+  min-height: 18px;
+  color: transparent;
+
+  &:checked { @include accent-bar; }
+  &:disabled { opacity: 0.55; }
+  > image { color: transparent; -gtk-icon-source: none; }
+
+  > slider {
+    @include raised;
+    border-radius: 10px;
+    min-width: 18px;
+    min-height: 18px;
+    margin: -1px;
+  }
+  &:hover > slider { @include glow($hover); }
+}
+
+// --- Scales, progress bars, level bars --------------------------------------
+
+// Oxygen sliders are a thin groove with a round knob and no fill.
+scale {
+  min-height: 18px;
+  min-width: 18px;
+  padding: 6px;
+
+  > trough {
+    @include groove;
+    border-radius: 3px;
+    min-height: 4px;
+    min-width: 4px;
+    > highlight, > fill { background: none; border: none; box-shadow: none; }
+    > slider {
+      @include raised;
+      border-radius: 9999px;
+      min-width: 18px;
+      min-height: 18px;
+      margin: -8px;
+      &:hover { @include glow($hover); }
+      &:active { @include glow($focus); }
+    }
+  }
+  &:disabled > trough > slider { @include raised($bg); box-shadow: none; }
+
+  > marks, > value { color: shade($fg, 1.6); font-size: smaller; }
+  marks mark indicator { min-height: 4px; min-width: 4px; background-color: currentColor; }
+}
+
+progressbar {
+  font-size: smaller;
+  color: $fg;
+
+  > trough {
+    @include groove;
+    border-radius: 3px;
+    min-height: 14px;
+    min-width: 14px;
+    > progress {
+      @include accent-bar;
+      border-radius: 3px;
+      margin: -1px;
+      min-height: 14px;
+      min-width: 14px;
+    }
+  }
+  &.osd > trough { border: none; background: none; box-shadow: none; min-height: 3px;
+    > progress { border: none; border-radius: 0; margin: 0; min-height: 3px; } }
+}
+
+levelbar {
+  > trough { padding: 0; }
+  block {
+    min-width: 32px;
+    min-height: 6px;
+    border-radius: 2px;
+    &.empty { @include groove; }
+    &.filled, &.high { @include accent-bar; }
+    &.low { @include accent-bar($warning); }
+    &.full { @include accent-bar($success); }
+  }
+  &.discrete block { min-width: 24px; margin: 0 1px; }
+  &.vertical block { min-width: 6px; min-height: 32px; }
+}
+
+// --- Scrollbars -------------------------------------------------------------
+
+// Oxygen scrollbars: a sunken groove holding a raised handle that fills it.
+// GTK 4 has no stepper buttons.
+scrollbar {
+  background: none;
+  padding: 1px;
+
+  trough { @include groove; border-radius: 6px; }
+  slider {
+    @include raised($bg);
+    border-radius: 6px;
+    min-width: 10px;
+    min-height: 10px;
+    margin: -1px;
+    &:hover { @include glow($hover); }
+    &:active { @include glow($focus); }
+  }
+  &.vertical slider { min-height: 30px; }
+  &.horizontal slider { min-width: 30px; }
+
+  // Overlay scrollbars only show the handle until hovered.
+  &.overlay-indicator:not(.dragging):not(.hovering) {
+    trough { background: none; border-color: transparent; box-shadow: none; }
+    slider { min-width: 4px; min-height: 4px; margin: 1px; border-radius: 3px; background-image: none; background-color: galpha($fg, 0.45); border-color: transparent; box-shadow: none; }
+    &.vertical slider { min-height: 30px; }
+    &.horizontal slider { min-width: 30px; }
+  }
+}
+
+scrolledwindow {
+  &.frame, > .frame { @include hole; border-radius: 3px; }
+  > undershoot, > overshoot { background: none; box-shadow: none; }
+  > junction { background: none; }
+}
+
+// --- Views ------------------------------------------------------------------
+
+.view, textview > text, iconview, gridview, listview, columnview, treeview.view {
+  background-color: $base;
+  color: $text;
+}
+.view:disabled { color: $dis_fg; }
+
+.view:selected, gridview > child:selected, listview > row:selected, columnview > listview > row:selected,
+treeview.view:selected, list > row:selected, row:selected {
+  @include selection;
+}
+.view:selected:backdrop, listview > row:selected:backdrop, treeview.view:selected:backdrop, row:selected:backdrop {
+  @include selection($backdrop_sel_bg);
+  color: $backdrop_sel_fg;
+}
+
+listview > row, columnview > listview > row, list > row { padding: 2px 4px; }
+listview > row:hover:not(:selected), list > row.activatable:hover:not(:selected), gridview > child:hover:not(:selected),
+columnview > listview > row:hover:not(:selected) {
+  background-color: galpha($hover, 0.18);
+}
+list, .list { background-color: $base; color: $text; }
+list.separators > row:not(:last-child), listview.separators > row:not(:last-child) { border-bottom: 1px solid galpha($text, 0.1); }
+row:disabled { color: $dis_fg; }
+
+treeview.view {
+  border-left-color: galpha($text, 0.12);
+  border-top-color: galpha($text, 0.12);
+  &:hover:not(:selected) { background-color: galpha($hover, 0.18); }
+  &.expander:selected { color: $sel_fg; }
+}
+
+// Column headers.
+columnview > header > button, treeview.view > header > button {
+  @include raised($bg);
+  border-radius: 0;
+  border-width: 0 1px 1px 0;
+  box-shadow: none;
+  padding: 2px 6px;
+  font-weight: normal;
+  color: $fg;
+  &:hover { border-width: 0 1px 1px 0; color: $hover; box-shadow: none; border-color: shade($bg, 0.8); }
+  &:active { @include sunken($bg); border-width: 0 1px 1px 0; }
+  &:last-child { border-right-width: 0; }
+  sort-indicator { min-width: 16px; min-height: 16px;
+    &.ascending { -gtk-icon-source: -gtk-recolor(url("assets/arrow-up-symbolic.svg")); }
+    &.descending { -gtk-icon-source: -gtk-recolor(url("assets/arrow-down-symbolic.svg")); } }
+}
+
+textview { > text > selection { background-color: $sel_bg; color: $sel_fg; } > border { background-color: shade($base, 0.96); } }
+
+// --- Frames, separators, panes ----------------------------------------------
+
+// Oxygen group boxes: a rounded panel slightly lighter than the window, with
+// a light edge rather than a dark outline. GTK 4 draws the frame on the node
+// itself; there is no separate border node.
+frame {
+  background-image: linear-gradient(to bottom, galpha(shade($bg, 1.2), 0.45), galpha(shade($bg, 1.2), 0.08));
+  border: 1px solid galpha(shade($bg, 1.25), 0.8);
+  border-bottom-color: galpha(shade($bg, 0.8), 0.6);
+  border-radius: 5px;
+  box-shadow: 0 1px 1px galpha(black, 0.08);
+  > label { margin: 2px 6px; }
+  &.flat { background: none; border: none; box-shadow: none; }
+}
+.frame { border: 1px solid shade($bg, 0.8); }
+
+separator { background-color: galpha(shade($bg, 0.7), 0.6); min-width: 1px; min-height: 1px; }
+separator.spacer { background: none; }
+
+paned > separator {
+  background: none;
+  min-width: 1px;
+  min-height: 1px;
+  &.wide { min-width: 6px; min-height: 6px; }
+}
+
+// --- Notebooks --------------------------------------------------------------
+
+// The active tab is a lit surface that opens into its page; inactive tabs are
+// a flat, darker strip, as in Oxygen.
+notebook {
+  > header {
+    background: none;
+    padding: 0;
+
+    tab {
+      color: $fg;
+      background-color: shade($bg, 0.88);
+      border: 1px solid shade($bg, 0.8);
+      padding: 4px 14px;
+      min-height: 20px;
+
+      &:hover:not(:checked) { background-color: shade($bg, 0.93); }
+      &:checked {
+        background-color: $bg;
+        background-image: linear-gradient(to bottom, shade($bg, 1.08), shade($bg, 0.98));
+        box-shadow: inset 0 1px shade($bg, 1.15);
+      }
+      &:disabled { color: $dis_fg; }
+      button.flat { padding: 0; min-width: 16px; min-height: 16px; margin: 0 -6px 0 4px; }
+    }
+
+    &.top {
+      border-bottom: 1px solid shade($bg, 0.8);
+      tab { border-radius: $radius $radius 0 0; border-bottom: none; margin-top: 3px;
+        &:not(:first-child) { border-left: none; }
+        &:checked { margin-top: 0; margin-bottom: -1px; border-left: 1px solid shade($bg, 0.8); } }
+    }
+    &.bottom {
+      border-top: 1px solid shade($bg, 0.8);
+      tab { border-radius: 0 0 $radius $radius; border-top: none; margin-bottom: 3px;
+        &:not(:first-child) { border-left: none; }
+        &:checked { margin-bottom: 0; margin-top: -1px; border-left: 1px solid shade($bg, 0.8);
+          background-image: linear-gradient(to top, shade($bg, 1.04), $bg); } }
+    }
+    &.left {
+      border-right: 1px solid shade($bg, 0.8);
+      tab { border-radius: $radius 0 0 $radius; border-right: none; margin-left: 3px;
+        &:not(:first-child) { border-top: none; }
+        &:checked { margin-left: 0; margin-right: -1px; border-top: 1px solid shade($bg, 0.8); } }
+    }
+    &.right {
+      border-left: 1px solid shade($bg, 0.8);
+      tab { border-radius: 0 $radius $radius 0; border-left: none; margin-right: 3px;
+        &:not(:first-child) { border-top: none; }
+        &:checked { margin-right: 0; margin-left: -1px; border-top: 1px solid shade($bg, 0.8); } }
+    }
+  }
+
+  &.frame { border: 1px solid shade($bg, 0.8); border-radius: 0 0 $radius $radius; > header { border: none; } }
+  > stack:not(:only-child) { background: none; }
+}
+
+// --- Menus and popovers -----------------------------------------------------
+
+menubar {
+  padding: 0;
+  item {
+    padding: 4px 8px;
+    border-radius: $radius;
+    &:selected, &:hover { @include selection; }
+  }
+}
+
+popover {
+  background: none;
+
+  > contents {
+    background-color: $bg;
+    background-image: linear-gradient(to bottom, $win_top, $bg);
+    border: 1px solid shade($bg, 0.72);
+    border-radius: $radius;
+    box-shadow: 0 2px 6px galpha(black, 0.3);
+    padding: 4px;
+    color: $fg;
+    > list, > .view, > toolbar { border-radius: $radius; }
+    separator { margin: 3px 0; }
+  }
+  > arrow { background-color: $win_top; border: 1px solid shade($bg, 0.72); }
+
+  &.menu > contents { padding: 3px; }
+}
+
+modelbutton, popover.menu modelbutton {
+  padding: 4px 8px;
+  min-height: 22px;
+  border-radius: 3px;
+  background: none;
+  border: none;
+  box-shadow: none;
+  color: $fg;
+  &:hover, &:selected { @include selection; border: none; box-shadow: none; }
+  &:disabled { color: $dis_fg; }
+  accelerator { color: galpha($fg, 0.55); margin-left: 12px; }
+  &:hover accelerator, &:selected accelerator { color: galpha($sel_fg, 0.75); }
+  arrow.left { -gtk-icon-source: -gtk-recolor(url("assets/arrow-left-symbolic.svg")); }
+  arrow.right { -gtk-icon-source: -gtk-recolor(url("assets/arrow-right-symbolic.svg")); }
+  &:hover check, &:hover radio, &:selected check, &:selected radio { color: $sel_fg; }
+}
+
+// --- Tooltips ---------------------------------------------------------------
+
+tooltip {
+  background-color: galpha($tip_bg, 0.95);
+  color: $tip_fg;
+  border: 1px solid $tip_border;
+  border-radius: $radius;
+  padding: 4px;
+  box-shadow: none;
+  > * { color: $tip_fg; }
+}
+
+// --- Toolbars, action bars, status bars, info bars --------------------------
+
+.toolbar { background: none; padding: 3px; border-spacing: 3px; separator { margin: 4px 2px; } }
+
+actionbar > revealer > box { border-top: 1px solid shade($bg, 0.8); padding: 4px; }
+searchbar > revealer > box { border-bottom: 1px solid shade($bg, 0.8); padding: 4px; }
+statusbar { padding: 2px 6px; }
+
+infobar > revealer > box {
+  border: 1px solid shade($bg, 0.75);
+  padding: 6px;
+  border-spacing: 12px;
+}
+infobar.info > revealer > box { background-color: gmix($bg, $sel_bg, 0.2); }
+infobar.question > revealer > box { background-color: gmix($bg, $sel_bg, 0.35); }
+infobar.warning > revealer > box { background-color: gmix($bg, $warning, 0.25); }
+infobar.error > revealer > box { background-color: gmix($bg, $error, 0.25); }
+
+// --- Sidebars, calendars, misc ----------------------------------------------
+
+placessidebar, stacksidebar, .sidebar, .navigation-sidebar {
+  background-color: $base;
+  color: $text;
+  row { padding: 3px 6px; }
+}
+
+calendar {
+  @include hole;
+  color: $text;
+  padding: 2px;
+  > header { border-bottom: 1px solid galpha($text, 0.1); > button { background: none; border: none; box-shadow: none; color: $text; &:hover { color: $hover; } } }
+  > grid > label.day-number { border-radius: 3px; padding: 2px 4px;
+    &:selected { @include selection; }
+    &.other-month { color: $dis_fg; }
+    &.today { color: $sel_bg; font-weight: bold; } }
+  > grid > label.day-name, > grid > label.week-number { color: galpha($text, 0.6); }
+}
+
+colorswatch {
+  border-radius: 3px;
+  &.light > overlay, &.dark > overlay { border: 1px solid galpha(black, 0.25); border-radius: 3px; }
+  &:hover > overlay { box-shadow: 0 0 2px galpha($hover, 0.9); }
+}
+
+.osd, .app-notification {
+  background-color: galpha($tip_bg, 0.9);
+  color: $tip_fg;
+  border: 1px solid $tip_border;
+  border-radius: $radius;
+}
+
+spinner { color: $sel_bg; }
+.monospace { font-family: monospace; }
+
+rubberband, .rubberband {
+  border: 1px solid $sel_bg;
+  background-color: galpha($sel_bg, 0.25);
+}
+
+.dnd { border: 1px solid $focus; }

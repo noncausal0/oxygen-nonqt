@@ -1,0 +1,234 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+"""GTK 4 counterpart of qt_window.py, plus a libadwaita page.
+
+--adw loads the built libadwaita.css from build/Oxygen as user CSS on top of
+libadwaita, so nothing has to be installed. Without it the window uses the
+GTK theme, so run it with GTK_THEME=Oxygen after `make install`. --colors FILE.colors applies a KDE
+colour scheme to this process only (otherwise KDE's exported colours are
+used), and --snapshot FILE.png renders the window and exits.
+"""
+import os
+import sys
+import warnings
+
+import gi
+
+gi.require_version("Gtk", "4.0")
+gi.require_version("Gdk", "4.0")
+gi.require_version("Graphene", "1.0")
+gi.require_version("Adw", "1")
+from gi.repository import Gdk, Gio, GLib, Graphene, Gtk  # noqa: E402
+
+import kdecolors  # noqa: E402
+
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
+BUILD = os.path.join(ROOT, "build", "Oxygen", "gtk-4.0")
+ADW = "--adw" in sys.argv
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+
+def arg(name):
+    return sys.argv[sys.argv.index(name) + 1] if name in sys.argv else None
+
+
+def add_css(path=None, data=None, priority=Gtk.STYLE_PROVIDER_PRIORITY_USER):
+    p = Gtk.CssProvider()
+    if path:
+        p.load_from_file(Gio.File.new_for_path(path))
+    else:
+        p.load_from_string(data)
+    Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), p, priority)
+
+
+def vbox(spacing=6):
+    return Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=spacing)
+
+
+def frame(title, child):
+    f = Gtk.Frame(label=title)
+    for side in ("start", "end", "top", "bottom"):
+        getattr(child, "set_margin_" + side)(6)
+    f.set_child(child)
+    return f
+
+
+def widgets():
+    grid = Gtk.Grid(row_spacing=8, column_spacing=8, column_homogeneous=True)
+    for side in ("start", "end", "top", "bottom"):
+        getattr(grid, "set_margin_" + side)(8)
+
+    b = vbox()
+    b.append(Gtk.Button(label="Normal"))
+    default = Gtk.Button(label="Default")
+    default.add_css_class("suggested-action")
+    b.append(default)
+    b.append(Gtk.ToggleButton(label="Toggled", active=True))
+    b.append(Gtk.Button(label="Disabled", sensitive=False))
+    tools = Gtk.Box(spacing=2)
+    for icon in ("document-open", "document-save", "edit-copy"):
+        t = Gtk.Button(icon_name=icon)
+        t.add_css_class("flat")
+        tools.append(t)
+    b.append(tools)
+    grid.attach(frame("Buttons", b), 0, 0, 1, 1)
+
+    i = vbox()
+    i.append(Gtk.Entry(text="Text entry"))
+    i.append(Gtk.Entry(text="Disabled entry", sensitive=False))
+    i.append(Gtk.DropDown.new_from_strings(["Drop down", "Second"]))
+    combo = Gtk.ComboBoxText.new_with_entry()
+    for t in ("Editable combo", "Second"):
+        combo.append_text(t)
+    combo.set_active(0)
+    i.append(combo)
+    spin = Gtk.SpinButton.new_with_range(0, 99, 1)
+    spin.set_value(42)
+    i.append(spin)
+    grid.attach(frame("Inputs", i), 1, 0, 1, 1)
+
+    c = vbox()
+    c.append(Gtk.CheckButton(label="Unchecked"))
+    c.append(Gtk.CheckButton(label="Checked", active=True))
+    c.append(Gtk.CheckButton(label="Partial", inconsistent=True))
+    r1 = Gtk.CheckButton(label="Radio on", active=True)
+    c.append(r1)
+    c.append(Gtk.CheckButton(label="Radio off", group=r1))
+    c.append(Gtk.CheckButton(label="Disabled", active=True, sensitive=False))
+    grid.attach(frame("Checks", c), 2, 0, 1, 1)
+
+    r = vbox()
+    scale = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 0, 100, 1)
+    scale.set_value(40)
+    r.append(scale)
+    r.append(Gtk.ProgressBar(fraction=0.6, show_text=True))
+    r.append(Gtk.Switch(active=True, halign=Gtk.Align.START))
+    grid.attach(frame("Ranges", r), 0, 1, 1, 1)
+
+    nb = Gtk.Notebook()
+    for name in ("First", "Second", "Third"):
+        nb.append_page(Gtk.Box(), Gtk.Label(label=name))
+    grid.attach(nb, 1, 1, 1, 1)
+
+    model = Gtk.StringList.new(["Item %d" % n for n in range(1, 30)])
+    factory = Gtk.SignalListItemFactory()
+    factory.connect("setup", lambda _f, item: item.set_child(Gtk.Label(xalign=0)))
+    factory.connect("bind", lambda _f, item: item.get_child().set_label(item.get_item().get_string()))
+    selection = Gtk.SingleSelection(model=model)
+    selection.set_selected(2)
+    view = Gtk.ListView(model=selection, factory=factory)
+    scroller = Gtk.ScrolledWindow(has_frame=True, vexpand=True)
+    scroller.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.ALWAYS)
+    scroller.set_child(view)
+    grid.attach(scroller, 2, 1, 1, 1)
+    return grid
+
+
+def adw_page():
+    from gi.repository import Adw
+    page = vbox(12)
+    for side in ("start", "end", "top", "bottom"):
+        getattr(page, "set_margin_" + side)(12)
+
+    group = Adw.PreferencesGroup(title="Preferences group", description="A boxed list of rows")
+    row = Adw.ActionRow(title="Action row", subtitle="With a subtitle", activatable=True)
+    row.add_suffix(Gtk.Image(icon_name="go-next-symbolic"))
+    group.add(row)
+    group.add(Adw.SwitchRow(title="Switch row", active=True))
+    group.add(Adw.EntryRow(title="Entry row"))
+    group.add(Adw.ComboRow(title="Combo row", model=Gtk.StringList.new(["One", "Two"])))
+    group.add(Adw.SpinRow.new_with_range(0, 10, 1))
+    page.append(group)
+
+    buttons = Gtk.Box(spacing=8, halign=Gtk.Align.CENTER)
+    pill = Gtk.Button(label="Pill button")
+    pill.add_css_class("pill")
+    buttons.append(pill)
+    sug = Gtk.Button(label="Suggested")
+    sug.add_css_class("suggested-action")
+    sug.add_css_class("pill")
+    buttons.append(sug)
+    dest = Gtk.Button(label="Destructive")
+    dest.add_css_class("destructive-action")
+    buttons.append(dest)
+    page.append(buttons)
+
+    card = Gtk.Label(label="A card", margin_top=16, margin_bottom=16)
+    card_box = Gtk.Box()
+    card_box.add_css_class("card")
+    card_box.append(card)
+    card.set_hexpand(True)
+    page.append(card_box)
+    return page
+
+
+def build(app):
+    if ADW:
+        from gi.repository import Adw
+        add_css(os.path.join(BUILD, "libadwaita.css"))
+        win = Adw.ApplicationWindow(application=app, title="Oxygen libadwaita")
+        tv = Adw.ToolbarView()
+        hb = Adw.HeaderBar()
+        hb.pack_start(Gtk.Button(icon_name="list-add-symbolic"))
+        hb.pack_end(Gtk.MenuButton(icon_name="open-menu-symbolic"))
+        tv.add_top_bar(hb)
+        tabs = Adw.TabView()
+        bar = Adw.TabBar(view=tabs, autohide=False)
+        tv.add_top_bar(bar)
+        content = Gtk.Box()
+        content.append(adw_page())
+        content.append(Gtk.Separator(orientation=Gtk.Orientation.VERTICAL))
+        content.append(widgets())
+        tabs.append(content).set_title("First tab")
+        tabs.append(Gtk.Box()).set_title("Second tab")
+        tv.set_content(tabs)
+        win.set_content(tv)
+        win.set_default_size(1180, 560)
+    else:
+        win = Gtk.ApplicationWindow(application=app, title="Oxygen GTK 4")
+        hb = Gtk.HeaderBar()
+        hb.pack_start(Gtk.Button(icon_name="document-open"))
+        win.set_titlebar(hb)
+        box = vbox(0)
+        menu = Gio.Menu()
+        for name in ("File", "Edit", "View", "Help"):
+            sub = Gio.Menu()
+            sub.append("Open…", "app.open")
+            menu.append_submenu(name, sub)
+        box.append(Gtk.PopoverMenuBar.new_from_model(menu))
+        box.append(widgets())
+        win.set_child(box)
+        win.set_default_size(720, 480)
+
+    if arg("--colors"):
+        add_css(data=kdecolors.gtk_css(arg("--colors")), priority=Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
+
+    win.present()
+    if arg("--snapshot"):
+        GLib.timeout_add(1500, snapshot, win, arg("--snapshot"), app)
+
+
+def snapshot(win, path, app):
+    w, h = win.get_width(), win.get_height()
+    paintable = Gtk.WidgetPaintable.new(win)
+    snap = Gtk.Snapshot()
+    paintable.snapshot(snap, w, h)
+    node = snap.to_node()
+    texture = win.get_native().get_renderer().render_texture(node, Graphene.Rect().init(0, 0, w, h))
+    texture.save_to_png(path)
+    app.quit()
+    return False
+
+
+def main():
+    if ADW:
+        from gi.repository import Adw
+        app = Adw.Application(application_id="org.oxygen.compare.Adw")
+    else:
+        app = Gtk.Application(application_id="org.oxygen.compare.Gtk4")
+    app.connect("activate", build)
+    app.run([])
+
+
+if __name__ == "__main__":
+    main()

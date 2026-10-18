@@ -1,0 +1,8 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Oxygen for GTK 4 and libadwaita, loaded as user CSS from
+// ~/.config/gtk-4.0/gtk.css. It carries no fallback colours, so the ones KDE
+// exports to colors.css always apply.
+@import 'colors';
+@import 'drawing';
+@import 'widgets';
+@import 'libadwaita';
