@@ -33,6 +33,7 @@ PREFS = {
     "toolkit.legacyUserProfileCustomizations.stylesheets": True,
     # As in firefox/user.js: without it, light GTK themes get libadwaita's colours.
     "widget.gtk.libadwaita-colors.enabled": False,
+    "svg.context-properties.content.enabled": True,
     "marionette.port": PORT,
     # Marionette otherwise applies its own defaults, which blank the new tab page.
     "remote.prefs.recommended": False,

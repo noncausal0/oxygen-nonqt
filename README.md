@@ -33,6 +33,7 @@ This puts the theme in the profile's `chrome/oxygen/`, adds one `@import` line e
 
 - `toolkit.legacyUserProfileCustomizations.stylesheets`: load the stylesheets.
 - `widget.gtk.libadwaita-colors.enabled = false`: otherwise Firefox replaces light GTK themes' colours with libadwaita's.
+- `svg.context-properties.content.enabled`: lets the theme's own SVG glyphs take their colour from the scheme; Firefox otherwise draws them black.
 - `browser.nova.enabled = false` and `browser.uidensity = 1`: the classic design in compact density.
 
 Firefox's own pages, like the new tab page, only get the real accent colour; the other system colours are replaced by fixed stand-ins so web pages cannot read them. So the install writes the current KDE colours for the new tab page; run it again after changing colour schemes.

@@ -86,9 +86,10 @@ firefox-install: firefox-check
 		grep -qF "$$line" "$$f" || { { echo "$$line"; cat "$$f"; } > "$$f.tmp"; mv "$$f.tmp" "$$f"; }; \
 	done
 	@touch "$(PROFILE)/user.js"
-	@grep -qF '$(FF_BEGIN)' "$(PROFILE)/user.js" || { \
+	@sed '\|^$(FF_BEGIN)$$|,\|^$(FF_END)$$|d' "$(PROFILE)/user.js" > "$(PROFILE)/user.js.tmp"; \
+		mv "$(PROFILE)/user.js.tmp" "$(PROFILE)/user.js"; \
 		if [ -n "$$(tail -c1 "$(PROFILE)/user.js")" ]; then echo >> "$(PROFILE)/user.js"; fi; \
-		{ echo '$(FF_BEGIN)'; cat firefox/user.js; echo '$(FF_END)'; } >> "$(PROFILE)/user.js"; }
+		{ echo '$(FF_BEGIN)'; cat firefox/user.js; echo '$(FF_END)'; } >> "$(PROFILE)/user.js"
 	@echo "Installed into $(PROFILE). Restart Firefox."
 
 firefox-uninstall: firefox-check

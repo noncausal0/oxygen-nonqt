@@ -8,6 +8,11 @@ user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
 // instead of the theme's, so the chrome would not follow the KDE scheme.
 user_pref("widget.gtk.libadwaita-colors.enabled", false);
 
+// Let the theme's own SVG glyphs (title buttons, tab close) take their colour
+// from CSS. Firefox only allows that for its built-in icons by default and
+// draws the others black, which is invisible on dark schemes.
+user_pref("svg.context-properties.content.enabled", true);
+
 // The theme is made for Firefox's classic design (Nova off) in compact
 // density, which also matches Oxygen's tighter metrics.
 user_pref("browser.nova.enabled", false);
