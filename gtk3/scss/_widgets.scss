@@ -10,12 +10,9 @@ $radius: 4px;
 
 // --- Windows ----------------------------------------------------------------
 
-// Oxygen lights the top of every window. A client-side titlebar is painted
-// separately, so it takes the brightest part of the gradient and the window
-// body continues from where it ends, the way Oxygen's frame blends in.
 window.background, dialog.background {
-  background-color: $bg;
-  background-image: linear-gradient(to bottom, shade($bg, 1.06), $bg 300px);
+  background-color: $win_bottom;
+  background-image: linear-gradient(to bottom, $win_split, $win_bottom 270px);
   color: $fg;
 }
 
@@ -28,7 +25,7 @@ decoration {
 }
 decoration:backdrop { box-shadow: 0 2px 8px galpha(black, 0.3), 0 0 0 1px galpha(black, 0.2); }
 .maximized decoration, .fullscreen decoration, .tiled decoration { border-radius: 0; }
-.solid-csd decoration { border-radius: 0; margin: 0; box-shadow: inset 0 0 0 1px $frame; }
+.solid-csd decoration { border-radius: 0; margin: 0; box-shadow: inset 0 0 0 1px shade($bg, 0.72); }
 .popup decoration { box-shadow: none; }
 .csd.popup decoration { box-shadow: 0 2px 6px galpha(black, 0.35), 0 0 0 1px galpha(black, 0.2); }
 tooltip.csd decoration, messagedialog.csd decoration { border-radius: $radius; }
@@ -37,6 +34,8 @@ tooltip.csd decoration, messagedialog.csd decoration { border-radius: $radius; }
 
 // Oxygen's window decoration is the window colour, never the accent, and the
 // title area runs straight into the window body without a dividing line.
+// GTK paints the titlebar separately from the window, so it carries the top
+// stretch of the window gradient and the body continues from there.
 headerbar {
   background: none;
   color: $fg;
@@ -53,17 +52,16 @@ headerbar {
 }
 
 headerbar.titlebar, .titlebar:not(headerbar) {
-  background-color: $bg;
-  background-image: linear-gradient(to bottom, shade($bg, 1.09), shade($bg, 1.06));
+  background-color: $win_split;
+  background-image: linear-gradient(to bottom, $win_top, $win_split);
   box-shadow: inset 0 1px shade($bg, 1.15);
-  &:backdrop { background-image: linear-gradient(to bottom, shade($bg, 1.07), shade($bg, 1.06)); }
 }
 
 .maximized headerbar, .tiled headerbar, .fullscreen headerbar { border-radius: 0; }
 
 // A headerbar used as an ordinary toolbar inside a window, not as the titlebar.
-window > box > headerbar, window > grid > headerbar, .titlebar headerbar {
-  border-bottom: 1px solid galpha($frame, 0.5);
+window > box > headerbar, window > grid > headerbar {
+  border-bottom: 1px solid shade($bg, 0.8);
 }
 
 // The KWin decoration buttons are drawn by window-decorations-gtk-module, so
@@ -75,8 +73,7 @@ button.titlebutton {
   padding: 2px;
   min-width: 18px;
   min-height: 18px;
-  &:hover { @include glow($hover); border-radius: 50%; border: 1px solid $hover; }
-  &:active { @include sunken; border-radius: 50%; }
+  &:hover, &:active { background: none; border: none; box-shadow: none; }
 }
 
 // --- Labels and selection ---------------------------------------------------
@@ -105,23 +102,22 @@ button {
   color: $btn_fg;
   border-radius: $radius;
   padding: 3px 9px;
-  min-height: 22px;
+  min-height: 20px;
   min-width: 18px;
   transition: border-color 150ms ease, box-shadow 150ms ease;
 
+  &:focus { @include glow($focus); }
   &:hover { @include glow($hover); }
-  &:focus:not(:hover) { @include glow($focus); }
   &:active, &:checked { @include sunken; }
   &:checked:hover, &:active:hover { border-color: $hover; }
 
+  // Oxygen keeps disabled buttons raised and only fades them.
   &:disabled {
-    background-image: none;
-    background-color: $dis_bg;
-    border-color: shade($dis_bg, 0.85);
-    box-shadow: none;
+    @include raised($bg);
+    box-shadow: inset 0 1px shade($bg, 1.12);
     color: $dis_fg;
   }
-  &:disabled:checked { background-color: shade($dis_bg, 0.92); }
+  &:disabled:checked { @include sunken($bg); color: $dis_fg; }
 
   &.flat {
     background: none;
@@ -129,60 +125,63 @@ button {
     box-shadow: none;
     &:hover { @include raised; @include glow($hover); }
     &:active, &:checked { @include sunken; }
-    &:disabled { background: none; border-color: transparent; }
+    &:disabled { background: none; border-color: transparent; box-shadow: none; }
   }
 
-  &.suggested-action {
-    @include raised($sel_bg);
-    color: $sel_fg;
-    &:hover { @include glow($hover); }
-    &:active, &:checked { @include sunken($sel_bg); color: $sel_fg; }
-  }
-  &.destructive-action {
-    @include raised($error);
-    color: white;
-    &:hover { @include glow($hover); }
-    &:active, &:checked { @include sunken($error); color: white; }
-  }
+  // Qt has no coloured default button, so suggested actions look like any
+  // other button and destructive ones only colour their label.
+  &.destructive-action { color: $error; }
 
   &.image-button { padding: 3px 5px; }
   &.circular { border-radius: 9999px; padding: 3px; }
-  &.link { @extend .flat; padding: 0; color: $link; }
+  &.link { background: none; border-color: transparent; box-shadow: none; padding: 0; color: $link; }
   &.link:hover { background: none; border-color: transparent; box-shadow: none; text-decoration: underline; }
 
-  // The arrows next to combo and menu button labels.
   arrow { min-width: 16px; min-height: 16px; }
 }
 
 // Toolbar and headerbar buttons are flat until hovered, like Oxygen tool buttons.
-toolbar button, headerbar button:not(.titlebutton):not(.suggested-action):not(.destructive-action) {
+toolbar button, headerbar button:not(.titlebutton) {
   background: none;
   border-color: transparent;
   box-shadow: none;
   &:hover { @include raised; @include glow($hover); }
   &:active, &:checked { @include sunken; }
-  &:disabled { background: none; border-color: transparent; }
+  &:disabled { background: none; border-color: transparent; box-shadow: none; }
 }
 
 // Grouped buttons share one frame.
-.linked:not(.vertical) > button, .linked:not(.vertical) > entry, .linked:not(.vertical) > combobox > box > button,
-.linked:not(.vertical) > spinbutton:not(.vertical) { border-radius: 0; }
-.linked:not(.vertical) > :first-child, .linked:not(.vertical) > combobox:first-child > box > button {
-  border-top-left-radius: $radius; border-bottom-left-radius: $radius;
-}
-.linked:not(.vertical) > :last-child, .linked:not(.vertical) > combobox:last-child > box > button {
-  border-top-right-radius: $radius; border-bottom-right-radius: $radius;
-}
+.linked:not(.vertical) > button, .linked:not(.vertical) > entry { border-radius: 0; }
+.linked:not(.vertical) > :first-child { border-top-left-radius: $radius; border-bottom-left-radius: $radius; }
+.linked:not(.vertical) > :last-child { border-top-right-radius: $radius; border-bottom-right-radius: $radius; }
 .linked:not(.vertical) > :not(:first-child) { border-left-width: 0; }
 .linked.vertical > button, .linked.vertical > entry { border-radius: 0; }
 .linked.vertical > :first-child { border-radius: $radius $radius 0 0; }
 .linked.vertical > :last-child { border-radius: 0 0 $radius $radius; }
 .linked.vertical > :not(:first-child) { border-top-width: 0; }
 
-combobox > box > button.combo:not(:only-child) { border-radius: $radius 0 0 $radius; }
-combobox entry + button.combo { border-left-width: 0; border-radius: 0 $radius $radius 0; }
-combobox entry { border-radius: $radius 0 0 $radius; }
-combobox menu menuitem { padding: 3px 6px; }
+// --- Combo boxes ------------------------------------------------------------
+
+combobox {
+  arrow { -gtk-icon-source: -gtk-recolor(url("assets/arrow-down-symbolic.svg")); min-width: 16px; min-height: 16px; }
+  button.combo { padding: 3px 6px 3px 8px; }
+  menu menuitem { padding: 3px 6px; }
+
+  // An editable combo is one text field with the arrow inside, as in Qt.
+  > box.linked {
+    > entry { border-radius: $radius 0 0 $radius; border-right-width: 0; }
+    > entry + button.combo {
+      @include hole;
+      border-left-width: 0;
+      border-radius: 0 $radius $radius 0;
+      color: $text;
+      padding: 0 4px;
+      &:hover { color: $hover; }
+      &:disabled { background-color: $dis_base; color: $dis_fg; }
+    }
+    > entry:focus + button.combo { border-color: $focus; }
+  }
+}
 
 button.color { padding: 4px; colorswatch { border-radius: 2px; } }
 
@@ -193,11 +192,11 @@ entry {
   color: $text;
   border-radius: $radius;
   padding: 3px 6px;
-  min-height: 22px;
+  min-height: 20px;
   caret-color: $text;
 
-  &:focus { @include glow($focus); background-color: $base; }
-  &:disabled { background-image: none; background-color: $dis_base; color: $dis_fg; box-shadow: none; }
+  &:focus { @include glow($focus); }
+  &:disabled { background-color: $dis_base; color: $dis_fg; box-shadow: none; }
   &.error { border-color: $error; color: $error; }
   &.warning { border-color: $warning; }
   &.flat { border-color: transparent; background: none; box-shadow: none; }
@@ -207,25 +206,30 @@ entry {
   selection { background-color: $sel_bg; color: $sel_fg; }
 }
 
+// The step buttons sit inside the field like Qt's spin box arrows.
 spinbutton {
+  button.up { -gtk-icon-source: -gtk-recolor(url("assets/arrow-up-symbolic.svg")); }
+  button.down { -gtk-icon-source: -gtk-recolor(url("assets/arrow-down-symbolic.svg")); }
+
   &:not(.vertical) {
     @include hole;
     border-radius: $radius;
     padding: 0;
+    color: $text;
     entry { background: none; border: none; box-shadow: none; min-width: 32px; }
     &:focus-within { @include glow($focus); }
+    &:disabled { background-color: $dis_base; color: $dis_fg; }
     button {
       background: none;
       border: none;
-      border-left: 1px solid galpha($frame, 0.5);
-      border-radius: 0;
       box-shadow: none;
+      border-radius: 0;
       color: $text;
-      padding: 0 4px;
-      &:hover { background-color: galpha($hover, 0.2); }
-      &:active { background-color: galpha($hover, 0.35); }
-      &:disabled { color: $dis_fg; }
-      &:last-child { border-radius: 0 $radius $radius 0; }
+      padding: 0 3px;
+      min-width: 16px;
+      &:hover { color: $hover; background: none; border: none; box-shadow: none; }
+      &:active { color: $focus; }
+      &:disabled { color: $dis_fg; background: none; border: none; box-shadow: none; }
     }
   }
   &.vertical {
@@ -237,52 +241,53 @@ spinbutton {
 
 // --- Check boxes, radio buttons and switches --------------------------------
 
-// The marks are GTK's builtin ones, which take their colour from `color`.
+// Oxygen draws check boxes and radio buttons as small raised buttons. The
+// marks are recoloured from symbolic assets, so they follow `color`.
 check, radio {
-  @include hole;
-  background-image: linear-gradient(to bottom, shade($base, 0.88), $base 70%);
-  border-color: $frame;
-  color: $text;
-  min-width: 14px;
-  min-height: 14px;
-  margin: 0 4px 0 0;
+  @include raised($btn_bg);
+  color: $btn_fg;
+  min-width: 15px;
+  min-height: 15px;
+  margin: 0 5px 0 0;
+  -gtk-icon-source: none;
 
   &:hover { @include glow($hover); }
-  &:active { background-image: linear-gradient(to bottom, shade($base, 0.8), shade($base, 0.92)); }
-  &:disabled { background-image: none; background-color: $dis_base; color: $dis_fg; border-color: shade($dis_bg, 0.85); box-shadow: none; }
+  &:disabled { @include raised($bg); box-shadow: none; color: $dis_fg; }
 }
 check { border-radius: 3px; }
 radio { border-radius: 9999px; }
+check:checked { -gtk-icon-source: -gtk-recolor(url("assets/check-symbolic.svg")); }
+check:indeterminate { -gtk-icon-source: -gtk-recolor(url("assets/check-mixed-symbolic.svg")); }
+radio:checked, radio:indeterminate { -gtk-icon-source: -gtk-recolor(url("assets/radio-symbolic.svg")); }
 
 checkbutton.text-button, radiobutton.text-button { padding: 2px 0; outline: none; }
 
 // Menu and view marks have no box of their own.
-menu check, menu radio, treeview check, treeview radio {
+menu check, menu radio, treeview check, treeview radio, modelbutton check, modelbutton radio {
   background: none;
-  border: 1px solid shade($text, 1.6);
+  border: none;
   box-shadow: none;
-  &:hover { border-color: $hover; }
+  &:hover { border: none; box-shadow: none; }
 }
-menu menuitem:hover check, menu menuitem:hover radio,
-treeview:selected check, treeview:selected radio { color: $sel_fg; border-color: $sel_fg; }
+menu menuitem:hover check, menu menuitem:hover radio, treeview:selected check, treeview:selected radio { color: $sel_fg; }
 
 switch {
   @include groove;
-  border-radius: 12px;
-  min-width: 46px;
-  min-height: 20px;
+  border-radius: 11px;
+  min-width: 44px;
+  min-height: 18px;
   font-size: 0;
   color: transparent;
 
-  &:checked { @include accent-fill; border-color: shade($sel_bg, 0.7); }
+  &:checked { @include accent-bar; }
   &:disabled { opacity: 0.55; }
   image { color: transparent; -gtk-icon-source: none; }
 
   slider {
     @include raised;
-    border-radius: 11px;
-    min-width: 20px;
-    min-height: 20px;
+    border-radius: 10px;
+    min-width: 18px;
+    min-height: 18px;
     margin: -1px;
   }
   &:hover slider { @include glow($hover); }
@@ -290,30 +295,30 @@ switch {
 
 // --- Scales, progress bars, level bars --------------------------------------
 
+// Oxygen sliders are a thin groove with a round knob and no fill.
 scale {
-  min-height: 16px;
-  min-width: 16px;
+  min-height: 18px;
+  min-width: 18px;
   padding: 6px;
 
   trough {
     @include groove;
     border-radius: 3px;
-    min-height: 5px;
-    min-width: 5px;
+    min-height: 4px;
+    min-width: 4px;
   }
-  highlight { @include accent-fill; border-radius: 3px; margin: -1px; border: 1px solid shade($sel_bg, 0.7); }
-  fill { background-color: galpha($sel_bg, 0.3); border-radius: 3px; }
+  highlight, fill { background: none; border: none; box-shadow: none; }
 
   slider {
     @include raised;
     border-radius: 9999px;
-    min-width: 16px;
-    min-height: 16px;
-    margin: -7px;
+    min-width: 18px;
+    min-height: 18px;
+    margin: -8px;
     &:hover { @include glow($hover); }
-    &:active { @include sunken; }
+    &:active { @include glow($focus); }
+    &:disabled { @include raised($bg); box-shadow: none; }
   }
-  &:disabled { highlight { background-image: none; background-color: $dis_fg; border-color: shade($dis_fg, 0.85); } }
 
   marks, value { color: shade($fg, 1.6); font-size: smaller; }
   marks mark { min-height: 4px; min-width: 4px; }
@@ -326,76 +331,88 @@ progressbar {
   trough {
     @include groove;
     border-radius: 3px;
-    min-height: 7px;
-    min-width: 7px;
+    min-height: 14px;
+    min-width: 14px;
   }
   progress {
-    @include accent-fill;
-    border: 1px solid shade($sel_bg, 0.7);
+    @include accent-bar;
     border-radius: 3px;
     margin: -1px;
-    min-height: 7px;
-    min-width: 7px;
-    box-shadow: inset 0 1px galpha(white, 0.3);
+    min-height: 14px;
+    min-width: 14px;
   }
-  &.osd { trough { border: none; background: none; box-shadow: none; } progress { border: none; border-radius: 0; margin: 0; } }
+  &.osd { trough { border: none; background: none; box-shadow: none; min-height: 3px; } progress { border: none; border-radius: 0; margin: 0; min-height: 3px; } }
 }
 
 levelbar {
   block {
     min-width: 32px;
-    min-height: 5px;
+    min-height: 6px;
     border-radius: 2px;
-    border: 1px solid shade($bg, 0.68);
-    &.empty { background-color: $groove; }
-    &.filled, &.high { @include accent-fill; border-color: shade($sel_bg, 0.7); }
-    &.low { background-color: $warning; background-image: none; border-color: shade($bg, 0.68); }
-    &.full { background-color: $success; background-image: none; }
+    &.empty { @include groove; }
+    &.filled, &.high { @include accent-bar; }
+    &.low { @include accent-bar($warning); }
+    &.full { @include accent-bar($success); }
   }
   &.discrete block { min-width: 24px; margin: 0 1px; }
-  &.vertical block { min-width: 5px; min-height: 32px; }
+  &.vertical block { min-width: 6px; min-height: 32px; }
 }
 
 // --- Scrollbars -------------------------------------------------------------
 
-// Oxygen scrollbars: a sunken groove with a rounded raised handle.
+// Oxygen scrollbars: a sunken groove holding a raised handle that fills it,
+// with arrow steppers at either end.
 scrollbar {
-  background-color: $bg;
-  transition: none;
+  -GtkScrollbar-has-backward-stepper: true;
+  -GtkScrollbar-has-forward-stepper: true;
+  background: none;
+  padding: 1px;
 
-  trough { @include groove; border-radius: 6px; margin: 2px; }
+  trough { @include groove; border-radius: 6px; }
   slider {
     @include raised($bg);
     border-radius: 6px;
-    min-width: 9px;
-    min-height: 9px;
+    min-width: 10px;
+    min-height: 10px;
     margin: -1px;
     &:hover { @include glow($hover); }
     &:active { @include glow($focus); }
   }
   &.vertical slider { min-height: 30px; }
   &.horizontal slider { min-width: 30px; }
-  button { background: none; border: none; box-shadow: none; min-width: 14px; min-height: 14px; padding: 0; color: $fg;
-    &:hover { color: $hover; } &:disabled { color: $dis_fg; } }
+
+  button {
+    background: none;
+    border: none;
+    box-shadow: none;
+    min-width: 12px;
+    min-height: 12px;
+    padding: 0;
+    color: shade($fg, 1.4);
+    &:hover { color: $hover; background: none; border: none; box-shadow: none; }
+    &:active { color: $focus; background: none; border: none; box-shadow: none; }
+    &:disabled { color: galpha($fg, 0.3); background: none; border: none; box-shadow: none; }
+  }
+  &.vertical button.up { -gtk-icon-source: -gtk-recolor(url("assets/arrow-up-symbolic.svg")); }
+  &.vertical button.down { -gtk-icon-source: -gtk-recolor(url("assets/arrow-down-symbolic.svg")); }
+  &.horizontal button.up { -gtk-icon-source: -gtk-recolor(url("assets/arrow-left-symbolic.svg")); }
+  &.horizontal button.down { -gtk-icon-source: -gtk-recolor(url("assets/arrow-right-symbolic.svg")); }
 
   // Overlay scrollbars only show the handle until hovered.
-  &.overlay-indicator {
-    background: none;
-    &:not(.dragging):not(.hovering) {
-      trough { background: none; border-color: transparent; box-shadow: none; }
-      slider { min-width: 4px; min-height: 4px; margin: 1px; border-radius: 3px; background-image: none; background-color: galpha($fg, 0.5); border-color: galpha($bg, 0.6); box-shadow: none; }
-      &.vertical slider { min-height: 30px; }
-      &.horizontal slider { min-width: 30px; }
-      button { min-width: 0; min-height: 0; -gtk-icon-source: none; }
-    }
+  &.overlay-indicator:not(.dragging):not(.hovering) {
+    trough { background: none; border-color: transparent; box-shadow: none; }
+    slider { min-width: 4px; min-height: 4px; margin: 1px; border-radius: 3px; background-image: none; background-color: galpha($fg, 0.45); border-color: transparent; box-shadow: none; }
+    &.vertical slider { min-height: 30px; }
+    &.horizontal slider { min-width: 30px; }
+    button { min-width: 0; min-height: 0; -gtk-icon-source: none; }
   }
 }
 
 scrolledwindow {
-  &.frame, viewport.frame { border: 1px solid $frame; }
-  junction { background-color: $bg; }
-  overshoot { background: none; }
-  undershoot { background: none; }
+  &.frame { @include hole; border-radius: 3px; }
+  viewport.frame { border: none; }
+  junction { background: none; }
+  overshoot, undershoot { background: none; }
 }
 
 // --- Views ------------------------------------------------------------------
@@ -406,13 +423,9 @@ scrolledwindow {
 }
 .view:disabled, treeview.view:disabled { color: $dis_fg; }
 
-// Oxygen paints selections with a gentle accent gradient.
-.view:selected, iconview:selected, treeview.view:selected, row:selected {
-  @include accent-fill;
-}
+.view:selected, iconview:selected, treeview.view:selected, row:selected { @include selection; }
 .view:selected:backdrop, treeview.view:selected:backdrop, row:selected:backdrop {
-  background-image: none;
-  background-color: $backdrop_sel_bg;
+  @include selection($backdrop_sel_bg);
   color: $backdrop_sel_fg;
 }
 
@@ -426,8 +439,15 @@ treeview.view {
   &:hover:not(:selected) { background-color: galpha($hover, 0.18); }
   &.separator { min-height: 2px; color: galpha($text, 0.12); }
   &:drop(active) { border: 1px solid $focus; }
-  &.expander { color: shade($text, 1.4); &:hover { color: $hover; } &:selected { color: $sel_fg; } }
-  &.progressbar { @include accent-fill; border: 1px solid shade($sel_bg, 0.7); border-radius: 3px; }
+  &.expander {
+    -gtk-icon-source: -gtk-recolor(url("assets/arrow-right-symbolic.svg"));
+    &:dir(rtl) { -gtk-icon-source: -gtk-recolor(url("assets/arrow-left-symbolic.svg")); }
+    &:checked { -gtk-icon-source: -gtk-recolor(url("assets/arrow-down-symbolic.svg")); }
+    color: shade($text, 1.4);
+    &:hover { color: $hover; }
+    &:selected { color: $sel_fg; }
+  }
+  &.progressbar { @include accent-bar; border-radius: 3px; }
   &.trough { @include groove; border-radius: 3px; }
   entry { border-radius: 0; }
 
@@ -439,7 +459,7 @@ treeview.view {
     padding: 2px 6px;
     font-weight: normal;
     color: $fg;
-    &:hover { @include raised($bg); border-width: 0 1px 1px 0; color: $hover; box-shadow: none; }
+    &:hover { border-width: 0 1px 1px 0; color: $hover; box-shadow: none; border-color: shade($bg, 0.8); }
     &:active { @include sunken($bg); border-width: 0 1px 1px 0; }
     &:last-child { border-right-width: 0; }
   }
@@ -452,16 +472,29 @@ row {
 }
 list.separators > row:not(:last-child) { border-bottom: 1px solid galpha($text, 0.1); }
 
-iconview { &:selected { border-radius: 3px; } }
+iconview:selected { border-radius: 3px; }
 
 textview { text { selection { background-color: $sel_bg; color: $sel_fg; } } border { background-color: shade($base, 0.96); } }
 
 // --- Frames, separators, panes ----------------------------------------------
 
-frame > border, .frame { border: 1px solid $frame; border-radius: 0; }
+// Oxygen group boxes: a rounded panel slightly lighter than the window, with
+// a light edge rather than a dark outline.
+frame:not(.flat) {
+  background-image: linear-gradient(to bottom, galpha(shade($bg, 1.2), 0.45), galpha(shade($bg, 1.2), 0.08));
+  border-radius: 5px;
+  box-shadow: 0 1px 1px galpha(black, 0.08);
+  > border {
+    border: 1px solid galpha(shade($bg, 1.25), 0.8);
+    border-bottom-color: galpha(shade($bg, 0.8), 0.6);
+    border-radius: 5px;
+  }
+  > label { margin: 0 4px; }
+}
 frame.flat > border, frame > border.flat { border: none; }
+.frame { border: 1px solid shade($bg, 0.8); }
 
-separator { background-color: galpha($frame, 0.6); min-width: 1px; min-height: 1px; }
+separator { background-color: galpha(shade($bg, 0.7), 0.6); min-width: 1px; min-height: 1px; }
 separator.spacer { background: none; }
 
 paned > separator {
@@ -473,56 +506,60 @@ paned > separator {
 
 // --- Notebooks --------------------------------------------------------------
 
-// The active tab is raised and merges into its page; the others sit a little
-// lower and darker, as in Oxygen.
+// The active tab is a lit surface that opens into its page; inactive tabs are
+// a flat, darker strip, as in Oxygen.
 notebook {
   > header {
     background: none;
     padding: 0;
 
     tab {
-      color: shade($fg, 1.5);
-      background-color: shade($bg, 0.94);
-      background-image: linear-gradient(to bottom, shade($bg, 0.98), shade($bg, 0.9));
-      border: 1px solid shade($bg, 0.75);
-      padding: 4px 12px;
+      color: $fg;
+      background-color: shade($bg, 0.88);
+      border: 1px solid shade($bg, 0.8);
+      padding: 4px 14px;
       min-height: 20px;
 
-      &:hover { color: $fg; border-color: $hover; }
+      &:hover:not(:checked) { background-color: shade($bg, 0.93); }
       &:checked {
-        color: $fg;
         background-color: $bg;
-        background-image: linear-gradient(to bottom, shade($bg, 1.08), $bg);
-        border-color: $frame;
+        background-image: linear-gradient(to bottom, shade($bg, 1.08), shade($bg, 0.98));
+        border-color: shade($bg, 0.8);
+        box-shadow: inset 0 1px shade($bg, 1.15);
       }
       &:disabled { color: $dis_fg; }
-      button.flat { padding: 0; min-width: 16px; min-height: 16px; margin: 0 -4px 0 4px; }
+      button.flat { padding: 0; min-width: 16px; min-height: 16px; margin: 0 -6px 0 4px; }
     }
 
     &.top {
-      border-bottom: 1px solid $frame;
-      tab { border-radius: $radius $radius 0 0; border-bottom: none; margin: 4px 0 0 -1px; &:first-child { margin-left: 0; }
-        &:checked { margin-top: 0; padding-bottom: 5px; margin-bottom: -1px; } }
+      border-bottom: 1px solid shade($bg, 0.8);
+      tab { border-radius: $radius $radius 0 0; border-bottom: none; margin-top: 3px;
+        &:not(:first-child) { border-left: none; }
+        &:checked { margin-top: 0; margin-bottom: -1px; border-left: 1px solid shade($bg, 0.8); } }
     }
     &.bottom {
-      border-top: 1px solid $frame;
-      tab { border-radius: 0 0 $radius $radius; border-top: none; margin: 0 0 4px -1px; &:first-child { margin-left: 0; }
-        &:checked { margin-bottom: 0; padding-top: 5px; margin-top: -1px; background-image: linear-gradient(to top, shade($bg, 1.04), $bg); } }
+      border-top: 1px solid shade($bg, 0.8);
+      tab { border-radius: 0 0 $radius $radius; border-top: none; margin-bottom: 3px;
+        &:not(:first-child) { border-left: none; }
+        &:checked { margin-bottom: 0; margin-top: -1px; border-left: 1px solid shade($bg, 0.8);
+          background-image: linear-gradient(to top, shade($bg, 1.04), $bg); } }
     }
     &.left {
-      border-right: 1px solid $frame;
-      tab { border-radius: $radius 0 0 $radius; border-right: none; margin: -1px 0 0 4px; &:first-child { margin-top: 0; }
-        &:checked { margin-left: 0; margin-right: -1px; } }
+      border-right: 1px solid shade($bg, 0.8);
+      tab { border-radius: $radius 0 0 $radius; border-right: none; margin-left: 3px;
+        &:not(:first-child) { border-top: none; }
+        &:checked { margin-left: 0; margin-right: -1px; border-top: 1px solid shade($bg, 0.8); } }
     }
     &.right {
-      border-left: 1px solid $frame;
-      tab { border-radius: 0 $radius $radius 0; border-left: none; margin: -1px 4px 0 0; &:first-child { margin-top: 0; }
-        &:checked { margin-right: 0; margin-left: -1px; } }
+      border-left: 1px solid shade($bg, 0.8);
+      tab { border-radius: 0 $radius $radius 0; border-left: none; margin-right: 3px;
+        &:not(:first-child) { border-top: none; }
+        &:checked { margin-right: 0; margin-left: -1px; border-top: 1px solid shade($bg, 0.8); } }
     }
   }
 
-  &.frame { border: 1px solid $frame; > header { border: none; } }
-  > stack:not(:only-child) { background-color: $bg; }
+  &.frame { border: 1px solid shade($bg, 0.8); border-radius: 0 0 $radius $radius; > header { border: none; } }
+  > stack:not(:only-child) { background: none; }
 }
 
 // --- Menus ------------------------------------------------------------------
@@ -533,14 +570,14 @@ menubar, .menubar {
   > menuitem {
     padding: 4px 8px;
     border-radius: $radius;
-    &:hover { @include accent-fill; }
+    &:hover { @include selection; }
   }
 }
 
 menu, .menu, .context-menu {
-  background-color: shade($bg, 1.04);
-  background-image: linear-gradient(to bottom, shade($bg, 1.08), $bg);
-  border: 1px solid $frame;
+  background-color: $bg;
+  background-image: linear-gradient(to bottom, $win_top, $bg);
+  border: 1px solid shade($bg, 0.72);
   padding: 3px;
   color: $fg;
 
@@ -548,21 +585,21 @@ menu, .menu, .context-menu {
     padding: 4px 8px;
     min-height: 18px;
     border-radius: 3px;
-    &:hover { @include accent-fill; }
+    &:hover { @include selection; }
     &:disabled { color: $dis_fg; }
     accelerator { color: galpha($fg, 0.55); }
     &:hover accelerator { color: galpha($sel_fg, 0.75); }
-    arrow { min-width: 16px; min-height: 16px; -gtk-icon-source: -gtk-icontheme("pan-end-symbolic"); }
-    arrow:dir(rtl) { -gtk-icon-source: -gtk-icontheme("pan-start-symbolic"); }
+    arrow { min-width: 16px; min-height: 16px; -gtk-icon-source: -gtk-recolor(url("assets/arrow-right-symbolic.svg")); }
+    arrow:dir(rtl) { -gtk-icon-source: -gtk-recolor(url("assets/arrow-left-symbolic.svg")); }
   }
   separator { margin: 3px 6px; }
-  > arrow { min-height: 16px; background-color: shade($bg, 1.04); border: none; }
+  > arrow { min-height: 16px; background-color: $bg; border: none; }
 }
 
 popover, popover.background {
-  background-color: shade($bg, 1.04);
-  background-image: linear-gradient(to bottom, shade($bg, 1.08), $bg);
-  border: 1px solid $frame;
+  background-color: $bg;
+  background-image: linear-gradient(to bottom, $win_top, $bg);
+  border: 1px solid shade($bg, 0.72);
   border-radius: $radius;
   box-shadow: 0 2px 6px galpha(black, 0.3);
   padding: 4px;
@@ -581,11 +618,11 @@ modelbutton.flat, .menuitem.button.flat {
   border: none;
   box-shadow: none;
   color: $fg;
-  &:hover { @include accent-fill; }
+  &:hover { @include selection; border: none; box-shadow: none; }
   &:checked { color: $fg; }
   check, radio { &:last-child { margin-left: 6px; } &:first-child { margin-right: 6px; } }
-  arrow.left { -gtk-icon-source: -gtk-icontheme("pan-start-symbolic"); }
-  arrow.right { -gtk-icon-source: -gtk-icontheme("pan-end-symbolic"); }
+  arrow.left { -gtk-icon-source: -gtk-recolor(url("assets/arrow-left-symbolic.svg")); }
+  arrow.right { -gtk-icon-source: -gtk-recolor(url("assets/arrow-right-symbolic.svg")); }
 }
 
 // --- Tooltips ---------------------------------------------------------------
@@ -604,13 +641,13 @@ tooltip, tooltip.background {
 toolbar {
   background: none;
   padding: 3px;
-  &.inline-toolbar { background-color: $bg; border: 1px solid $frame; border-top: none; }
+  &.inline-toolbar { border: 1px solid shade($bg, 0.8); border-top: none; }
   separator { margin: 4px 2px; }
 }
 
-actionbar > revealer > box { border-top: 1px solid galpha($frame, 0.6); padding: 4px; }
+actionbar > revealer > box { border-top: 1px solid shade($bg, 0.8); padding: 4px; }
 statusbar { padding: 2px 6px; }
-searchbar > revealer > box { border-bottom: 1px solid galpha($frame, 0.6); padding: 4px; }
+searchbar > revealer > box { border-bottom: 1px solid shade($bg, 0.8); padding: 4px; }
 
 infobar {
   border: 1px solid shade($bg, 0.75);
@@ -631,9 +668,9 @@ placessidebar, stacksidebar, .sidebar {
 expander arrow {
   min-width: 16px;
   min-height: 16px;
-  -gtk-icon-source: -gtk-icontheme("pan-end-symbolic");
-  &:dir(rtl) { -gtk-icon-source: -gtk-icontheme("pan-start-symbolic"); }
-  &:checked { -gtk-icon-source: -gtk-icontheme("pan-down-symbolic"); }
+  -gtk-icon-source: -gtk-recolor(url("assets/arrow-right-symbolic.svg"));
+  &:dir(rtl) { -gtk-icon-source: -gtk-recolor(url("assets/arrow-left-symbolic.svg")); }
+  &:checked { -gtk-icon-source: -gtk-recolor(url("assets/arrow-down-symbolic.svg")); }
   &:hover { color: $hover; }
 }
 
@@ -641,8 +678,8 @@ calendar {
   @include hole;
   color: $text;
   padding: 2px;
-  &:selected { @include accent-fill; border-radius: 3px; }
-  &.header { color: $fg; border: none; background: none; }
+  &:selected { @include selection; border-radius: 3px; }
+  &.header { color: $fg; border: none; background: none; box-shadow: none; }
   &.button { color: shade($fg, 1.5); &:hover { color: $hover; } }
   &.highlight { color: $sel_bg; font-weight: bold; }
   &:indeterminate { color: $dis_fg; }
@@ -651,7 +688,7 @@ calendar {
 colorswatch {
   border-radius: 3px;
   &.light overlay, &.dark overlay { border: 1px solid galpha(black, 0.25); border-radius: 3px; }
-  &:hover overlay { box-shadow: 0 0 2px 1px galpha($hover, 0.7); }
+  &:hover overlay { box-shadow: 0 0 2px galpha($hover, 0.9); }
 }
 
 .osd, .app-notification {
