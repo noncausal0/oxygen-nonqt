@@ -8,12 +8,14 @@ given, opens a few tabs and saves a screenshot of the whole browser window,
 taken through Marionette so it does not depend on window focus.
 
   firefox_window.py PROFILE_DIR OUT.png [--vertical] [--stock] [--wait]
-                    [--colors FILE.colors] [--height PX]
+                    [--colors FILE.colors] [--height PX] [--newtab] [--hover-tab] [--url URL]
 
 --vertical switches to vertical tabs. --wait leaves the window open for
 interactive testing instead of quitting. --colors runs Firefox with its own
 GTK config holding that KDE colour scheme (Firefox takes its colours from
-GTK); the user's config is not touched.
+GTK); the user's config is not touched. --newtab shows Firefox's new tab page
+in the selected tab, --url loads the given page there instead, and
+--hover-tab holds an inactive tab in its hover state.
 """
 import base64
 import json
@@ -32,17 +34,21 @@ PREFS = {
     # As in firefox/user.js: without it, light GTK themes get libadwaita's colours.
     "widget.gtk.libadwaita-colors.enabled": False,
     "marionette.port": PORT,
+    # Marionette otherwise applies its own defaults, which blank the new tab page.
+    "remote.prefs.recommended": False,
     "browser.shell.checkDefaultBrowser": False,
     "browser.startup.homepage_override.mstone": "ignore",
     "browser.aboutwelcome.enabled": False,
     "browser.startup.page": 0,
     "datareporting.policy.dataSubmissionEnabled": False,
     "toolkit.telemetry.reportingpolicy.firstRun": False,
-    "browser.newtabpage.enabled": False,
     "browser.tabs.firefox-view": False,
     "sidebar.revamp": True,
     "sidebar.verticalTabs": False,
     "browser.toolbars.bookmarks.visibility": "always",
+    # As in firefox/user.js: the classic design in compact density.
+    "browser.nova.enabled": False,
+    "browser.uidensity": 1,
 }
 
 PAGE = "data:text/html,<title>{0}</title><body style='font:20px sans-serif;padding:2em'>{0}"
@@ -84,7 +90,7 @@ class Marionette:
         return self("WebDriver:ExecuteScript", {"script": script, "args": list(args)})["value"]
 
 
-def make_profile(path, stock):
+def make_profile(path, stock, scheme=None):
     if os.path.exists(path):
         shutil.rmtree(path)
     os.makedirs(path)
@@ -94,8 +100,10 @@ def make_profile(path, stock):
     if not stock:
         # The same install the user runs, so the test covers it.
         open(os.path.join(path, "prefs.js"), "a").close()
-        subprocess.run(["make", "-s", "-C", ROOT, "firefox-install", "PROFILE=" + os.path.abspath(path)],
-                       check=True, stdout=subprocess.DEVNULL)
+        cmd = ["make", "-s", "-C", ROOT, "firefox-install", "PROFILE=" + os.path.abspath(path)]
+        if scheme:
+            cmd.append("FF_SCHEME=" + os.path.abspath(scheme))
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
 
 
 def gtk_config(profile, scheme):
@@ -132,7 +140,14 @@ def gtk_config(profile, scheme):
 
 def main():
     profile, out = sys.argv[1], sys.argv[2]
-    make_profile(profile, "--stock" in sys.argv)
+    scheme = sys.argv[sys.argv.index("--colors") + 1] if "--colors" in sys.argv else None
+    make_profile(profile, "--stock" in sys.argv, scheme)
+    # --pref NAME=JSON adds a preference, for experiments.
+    for i, a in enumerate(sys.argv):
+        if a == "--pref":
+            name, value = sys.argv[i + 1].split("=", 1)
+            with open(os.path.join(profile, "user.js"), "a") as f:
+                f.write("user_pref(%s, %s);\n" % (json.dumps(name), value))
     env = dict(os.environ, GTK_THEME="Oxygen")
     if "--colors" in sys.argv:
         env["XDG_CONFIG_HOME"] = gtk_config(profile, sys.argv[sys.argv.index("--colors") + 1])
@@ -154,8 +169,15 @@ def main():
             for (const url of pages.slice(1))
                 gb.addTab(url, {triggeringPrincipal: Services.scriptSecurityManager.getSystemPrincipal()});
             gb.selectedTab = gb.tabs[1];
-        """, [PAGE.format(t) for t in ("Oxygen", "Selected tab", "Another tab", "Fourth tab")])
-        time.sleep(2.5)
+            if (arguments[1]) {
+                gb.loadURI(Services.io.newURI(arguments[1]), {triggeringPrincipal: Services.scriptSecurityManager.getSystemPrincipal()});
+            }
+            if (arguments[2])
+                InspectorUtils.addPseudoClassLock(gb.tabs[2], ":hover");
+        """, [PAGE.format(t) for t in ("Oxygen", "Selected tab", "Another tab", "Fourth tab")],
+            "about:newtab" if "--newtab" in sys.argv else (sys.argv[sys.argv.index("--url") + 1] if "--url" in sys.argv else None),
+            "--hover-tab" in sys.argv)
+        time.sleep(6 if "--newtab" in sys.argv or "--url" in sys.argv else 2.5)
         shot = m("WebDriver:TakeScreenshot", {"full": False})["value"]
         with open(out, "wb") as f:
             f.write(base64.b64decode(shot))

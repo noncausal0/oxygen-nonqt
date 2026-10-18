@@ -1,0 +1,152 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Oxygen for Firefox's new tab and home pages.
+ *
+ * The page sits on the window gradient, the search box is a sunken field,
+ * shortcut tiles are raised buttons and the widget cards are Oxygen group
+ * boxes.
+ *
+ * Firefox gives its own pages fixed stand-ins for the window, text and button
+ * system colours, so those come from content-colors.css, written at install
+ * from the KDE scheme. The accent is real and stays live. The page's own
+ * variables are pointed at the palette, along with Firefox's accent tokens and
+ * corner radii. Everything is inside the @-moz-document block, since this file
+ * applies to every web page. */
+
+@import url("palette.css");
+/* Written at install from the KDE scheme; see tools/firefox_colors.py. */
+@import url("content-colors.css");
+
+@-moz-document url("about:newtab"), url("about:home"), url-prefix("about:newtab#"), url-prefix("about:home#") {
+
+  :root {
+    --ox-bg: var(--ox-c-bg) !important;
+    --ox-top: hsl(from var(--ox-c-bg) h s calc(l * 1.05)) !important;
+    --ox-win: hsl(from var(--ox-c-bg) h s calc(l * 0.92)) !important;
+    --ox-fg: var(--ox-c-fg) !important;
+    --ox-base: var(--ox-c-base) !important;
+    --ox-text: var(--ox-c-text) !important;
+    --ox-btn: hsl(from var(--ox-c-btn) h s calc(l * 1.1)) !important;
+    --ox-btn-fg: var(--ox-c-btn-fg) !important;
+    --ox-frame: hsl(from var(--ox-c-bg) h s calc(l * 0.8)) !important;
+
+    /* Oxygen's corners are 4-5px, not Firefox's 8-24px. */
+    --border-radius-xsmall: 3px !important;
+    --border-radius-small: 4px !important;
+    --border-radius-medium: 5px !important;
+    --border-radius-large: 5px !important;
+    --border-radius-xlarge: 5px !important;
+    --button-border-radius: 4px !important;
+
+    --background-color-canvas: var(--ox-bg) !important;
+    --text-color: var(--ox-fg) !important;
+    --text-color-deemphasized: color-mix(in srgb, var(--ox-fg) 65%, transparent) !important;
+    --content-search-handoff-ui-background-color: var(--ox-base) !important;
+    --content-search-handoff-ui-fakefocus-border-color: var(--ox-focus) !important;
+    --content-search-handoff-ui-unfocused-border-color: var(--ox-frame) !important;
+    --content-search-handoff-ui-border-radius: var(--ox-radius) !important;
+    --card-box-shadow: 0 1px 1px rgb(0 0 0 / 0.08) !important;
+    --card-box-shadow-hover: 0 0 2px var(--ox-hover) !important;
+
+    --color-accent-primary: AccentColor !important;
+    --color-accent-primary-hover: hsl(from AccentColor h s calc(l * 1.1)) !important;
+    --color-accent-primary-active: hsl(from AccentColor h s calc(l * 0.9)) !important;
+    --color-accent-primary-selected: AccentColor !important;
+    --focus-outline-color: AccentColor !important;
+    --newtab-background-color: var(--ox-bg) !important;
+    --newtab-background-color-secondary: var(--ox-base) !important;
+    --newtab-background-card: var(--ox-base) !important;
+    --newtab-text-primary-color: var(--ox-fg) !important;
+    --newtab-text-secondary-color: color-mix(in srgb, var(--ox-fg) 65%, transparent) !important;
+    --newtab-contextual-text-primary-color: var(--ox-text) !important;
+    --newtab-primary-action-background: var(--ox-focus) !important;
+    --newtab-primary-action-background-pocket: var(--ox-focus) !important;
+    --newtab-primary-element-text-color: var(--ox-sel-fg) !important;
+    --newtab-text-topic-label-color: var(--ox-focus) !important;
+    --newtab-weather-background-color: transparent !important;
+    --newtab-element-hover-color: color-mix(in srgb, var(--ox-hover) 18%, transparent) !important;
+    --newtab-element-active-color: color-mix(in srgb, var(--ox-hover) 30%, transparent) !important;
+    --newtab-button-static-background: var(--ox-btn) !important;
+    --newtab-button-static-hover-background: var(--ox-btn) !important;
+    --newtab-button-static-active-background: var(--ox-btn) !important;
+    --newtab-section-card-box-shadow-color: rgb(0 0 0 / 0.12) !important;
+    --newtab-layout-panel-background: var(--ox-bg) !important;
+  }
+
+  /* The window gradient, lit at the top. */
+  body {
+    background: linear-gradient(to bottom, var(--ox-top), var(--ox-win) 300px) fixed !important;
+    color: var(--ox-fg) !important;
+  }
+
+  /* The search box is a sunken field with a focus glow. Its component sets
+   * its own variables on its host element, so they are overridden there. */
+  content-search-handoff-ui {
+    --content-search-handoff-ui-border-radius: var(--ox-radius) !important;
+    --content-search-handoff-ui-background-color: var(--ox-base) !important;
+    --content-search-handoff-ui-unfocused-border-color: var(--ox-frame) !important;
+    --content-search-handoff-ui-fakefocus-border-color: var(--ox-focus) !important;
+    border-radius: var(--ox-radius) !important;
+  }
+  .search-wrapper content-search-handoff-ui::part(button),
+  .search-wrapper .search-handoff-button,
+  .search-wrapper input {
+    background-color: var(--ox-base) !important;
+    color: var(--ox-text) !important;
+    border: 1px solid var(--ox-frame) !important;
+    border-top-color: hsl(from var(--ox-bg) h s calc(l * 0.74)) !important;
+    border-radius: var(--ox-radius) !important;
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.08), 0 1px rgb(255 255 255 / 0.12) !important;
+    transition: border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
+  }
+  .search-wrapper content-search-handoff-ui:focus-within::part(button),
+  .search-wrapper input:focus {
+    border-color: var(--ox-focus) !important;
+    box-shadow: 0 0 2px var(--ox-focus) !important;
+  }
+
+  /* Shortcut tiles are raised buttons that glow on hover. */
+  .top-site-outer .tile {
+    background: linear-gradient(to bottom, color-mix(in srgb, var(--ox-btn), white 8%), var(--ox-btn)) !important;
+    border: 1px solid hsl(from var(--ox-btn) h s calc(l * 0.72)) !important;
+    border-bottom-color: hsl(from var(--ox-btn) h s calc(l * 0.56)) !important;
+    border-radius: var(--ox-radius) !important;
+    box-shadow: inset 0 1px color-mix(in srgb, var(--ox-btn), white 15%), 0 1px 1px rgb(0 0 0 / 0.12) !important;
+    transition: border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
+  }
+  .top-site-outer:is(:hover, :focus-within) .tile {
+    border-color: var(--ox-hover) !important;
+    box-shadow: inset 0 1px rgb(255 255 255 / 0.15), 0 0 2px var(--ox-hover) !important;
+  }
+  .top-site-outer:is(:hover, :focus-within) { background: none !important; }
+  .top-site-outer .title { color: var(--ox-fg) !important; }
+
+  /* Widget and story cards are Oxygen group boxes: a rounded panel slightly
+   * lighter than the window, with a light edge instead of a dark outline. */
+  .card-outer, .weather, .medium-widget, .large-widget, .widgets-section-container > *,
+  [class*="widget"][class*="-container"] > article, .ds-card {
+    background: linear-gradient(to bottom, hsl(from var(--ox-bg) h s calc(l * 1.2) / 0.45),
+                                           hsl(from var(--ox-bg) h s calc(l * 1.2) / 0.08)) !important;
+    border: 1px solid hsl(from var(--ox-bg) h s calc(l * 1.25) / 0.8) !important;
+    border-bottom-color: hsl(from var(--ox-bg) h s calc(l * 0.8) / 0.6) !important;
+    border-radius: 5px !important;
+    box-shadow: 0 1px 1px rgb(0 0 0 / 0.08) !important;
+    color: var(--ox-fg) !important;
+  }
+
+  /* Buttons on the page are Oxygen push buttons, not coloured pills. */
+  button.primary, .button.primary, moz-button[type="primary"]::part(button),
+  .personalize-button, .show-more-widgets-button, button[class*="widget"] {
+    background: linear-gradient(to bottom, color-mix(in srgb, var(--ox-btn), white 8%), var(--ox-btn)) !important;
+    color: var(--ox-btn-fg) !important;
+    border: 1px solid hsl(from var(--ox-btn) h s calc(l * 0.72)) !important;
+    border-bottom-color: hsl(from var(--ox-btn) h s calc(l * 0.56)) !important;
+    border-radius: var(--ox-radius) !important;
+    box-shadow: inset 0 1px color-mix(in srgb, var(--ox-btn), white 15%), 0 1px 1px rgb(0 0 0 / 0.12) !important;
+    transition: border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
+  }
+  :is(button.primary, .button.primary, .personalize-button, .show-more-widgets-button, button[class*="widget"]):hover,
+  moz-button[type="primary"]:hover::part(button) {
+    border-color: var(--ox-hover) !important;
+    box-shadow: inset 0 1px rgb(255 255 255 / 0.15), 0 0 2px var(--ox-hover) !important;
+  }
+}

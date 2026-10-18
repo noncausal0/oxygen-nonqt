@@ -10,34 +10,18 @@
  * userChrome.css is a user stylesheet, which loses to Firefox's own author
  * styles unless declarations are !important; hence all the !important. */
 
-/* --- Palette ---------------------------------------------------------------
- *
- * Firefox reports the GTK window colour as -moz-Dialog, about 2.5% darker
- * than the window colour itself (measured: 209,205,203 for Oxygen's
- * 214,210,208). The window colour and Oxygen's lit top and darker bottom are
- * scaled from it; hsl() lightness scaling stands in for GTK's shade(). */
+@import url("palette.css");
 
+/* Firefox's own theme variables, pointed at the palette. */
 :root {
-  --ox-bg: hsl(from -moz-Dialog h s calc(l * 1.025));
-  --ox-top: hsl(from -moz-Dialog h s calc(l * 1.077));
-  --ox-win: hsl(from -moz-Dialog h s calc(l * 0.944));
-  --ox-fg: -moz-DialogText;
-  --ox-base: Field;
-  --ox-text: FieldText;
-  --ox-sel: SelectedItem;
-  --ox-sel-fg: SelectedItemText;
-  --ox-focus: AccentColor;
-  --ox-hover: hsl(from AccentColor h s calc(min(l * 1.4, 72)));
-  --ox-btn: ButtonFace;
-  --ox-btn-fg: ButtonText;
-  --ox-frame: hsl(from var(--ox-bg) h s calc(l * 0.8));
-  --ox-frame-dark: hsl(from var(--ox-bg) h s calc(l * 0.62));
-  --ox-groove: hsl(from var(--ox-bg) h s calc(l * 0.84));
-  --ox-tab: hsl(from var(--ox-bg) h s calc(l * 0.9));
-  --ox-radius: 4px;
-  --ox-fade: 150ms ease-out;
+  /* Firefox's design tokens: its accent follows the KDE one instead of
+     Firefox's blue and purple. */
+  --color-accent-primary: AccentColor !important;
+  --color-accent-primary-hover: hsl(from AccentColor h s calc(l * 1.1)) !important;
+  --color-accent-primary-active: hsl(from AccentColor h s calc(l * 0.9)) !important;
+  --color-accent-primary-selected: AccentColor !important;
+  --focus-outline-color: AccentColor !important;
 
-  /* Firefox's own theme variables, pointed at the palette. */
   --toolbar-bgcolor: transparent !important;
   --toolbar-color: var(--ox-fg) !important;
   --toolbox-bgcolor: var(--ox-top) !important;
@@ -59,7 +43,6 @@
   --sidebar-background-color: transparent !important;
   --sidebar-text-color: var(--ox-fg) !important;
   --tabpanel-background-color: var(--ox-base) !important;
-  --focus-outline-color: var(--ox-focus) !important;
 }
 
 /* --- Window -----------------------------------------------------------------
@@ -138,13 +121,12 @@
 #unified-extensions-button { list-style-image: url("moz-icon://stock/preferences-plugin?size=16") !important; }
 #fxa-toolbar-menu-button { list-style-image: url("moz-icon://stock/user-identity?size=16") !important; }
 #library-button, #bookmarks-menu-button { list-style-image: url("moz-icon://stock/bookmarks?size=16") !important; }
-#new-tab-button, #tabs-newtab-button, #vertical-tabs-newtab-button { list-style-image: url("moz-icon://stock/tab-new?size=16") !important; }
+#new-tab-button, #tabs-newtab-button, #vertical-tabs-newtab-button { list-style-image: url("moz-icon://stock/list-add?size=16") !important; }
 #alltabs-button { list-style-image: url("moz-icon://stock/arrow-down-double?size=16") !important; }
 #nav-bar-overflow-button { list-style-image: url("moz-icon://stock/arrow-right-double?size=16") !important; }
 #star-button { list-style-image: url("moz-icon://stock/bookmark-new?size=16") !important; }
 #star-button[starred] { list-style-image: url("moz-icon://stock/bookmarks?size=16") !important; }
 .bookmark-item[container] { list-style-image: url("moz-icon://stock/folder-bookmark?size=16") !important; }
-.tab-close-button { list-style-image: url("moz-icon://stock/tab-close?size=16") !important; }
 /* Pages without a favicon get Oxygen's web page icon instead of Firefox's
  * globe. Firefox sets the globe as the tab icon's source, which only
  * `content` can replace. */
@@ -184,6 +166,58 @@
   outline: none !important;
 }
 #urlbar-input, #searchbar .searchbar-textbox { color: var(--ox-text) !important; }
+
+/* The security indicator uses Oxygen's shields, as Konqueror did: green when
+ * verified, yellow for mixed content, red when not secure. */
+#identity-box.verifiedDomain #identity-icon,
+#identity-box.chromeUI #identity-icon,
+#identity-box.localResource #identity-icon {
+  list-style-image: url("moz-icon://stock/security-high?size=16") !important;
+}
+#identity-box:is(.mixedDisplayContent, .mixedDisplayContentLoadedActiveBlocked, .weakCipher, .certUserOverridden, .certErrorPage) #identity-icon {
+  list-style-image: url("moz-icon://stock/security-medium?size=16") !important;
+}
+#identity-box:is(.notSecure, .mixedActiveContent, .httpsOnlyErrorPage) #identity-icon {
+  list-style-image: url("moz-icon://stock/security-low?size=16") !important;
+}
+#identity-box #identity-icon { -moz-context-properties: none !important; }
+
+/* Tracking protection is Konqueror's ad blocker icon; dimmed when turned off
+ * for the site. */
+#tracking-protection-icon {
+  list-style-image: url("moz-icon://stock/preferences-web-browser-adblock?size=16") !important;
+  -moz-context-properties: none !important;
+}
+#tracking-protection-icon-container[hasException] #tracking-protection-icon { opacity: 0.45 !important; }
+#identity-box.notSecureText > #identity-icon-box,
+#identity-box.notSecureText #identity-icon-label {
+  background: none !important;
+  color: var(--ox-text) !important;
+}
+#identity-icon-box, #tracking-protection-icon-container, #permissions-granted-icon, .urlbar-page-action {
+  transition: box-shadow var(--ox-fade) !important;
+}
+:is(#identity-icon-box, #tracking-protection-icon-container, .urlbar-page-action):hover {
+  background: none !important;
+  box-shadow: inset 0 0 0 1px var(--ox-hover), 0 0 2px var(--ox-hover) !important;
+}
+
+/* The results list hangs from the field like a combo box popup, and the
+ * selected result gets Oxygen's selection gradient. */
+#urlbar[open] > .urlbarView {
+  border-top: 1px solid var(--ox-frame) !important;
+}
+.urlbarView-row[selected] > .urlbarView-row-inner,
+.urlbarView-row:not([selected]):hover > .urlbarView-row-inner {
+  border-radius: 3px !important;
+}
+.urlbarView-row[selected] > .urlbarView-row-inner {
+  background: linear-gradient(to bottom, hsl(from var(--ox-sel) h s calc(min(l * 1.22, 92))), var(--ox-sel)) !important;
+  color: var(--ox-sel-fg) !important;
+}
+.urlbarView-row:not([selected]):hover > .urlbarView-row-inner {
+  background: color-mix(in srgb, var(--ox-hover) 18%, transparent) !important;
+}
 #urlbar .urlbar-page-action, #identity-box > box, #tracking-protection-icon-container {
   border-radius: 3px !important;
 }
@@ -219,8 +253,15 @@
   outline: none !important;
 }
 
+/* Hovering an inactive tab lifts it towards the selected tab's light and
+ * outlines it in the hover glow, fading in like Oxygen's. */
+#tabbrowser-tabs:not([orient="vertical"]) .tab-background {
+  transition: background-color var(--ox-fade), border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
+}
 #tabbrowser-tabs:not([orient="vertical"]) .tabbrowser-tab:hover:not([selected]) > .tab-stack > .tab-background {
-  background: hsl(from var(--ox-bg) h s calc(l * 0.95)) !important;
+  background: color-mix(in srgb, var(--ox-tab), var(--ox-top) 70%) !important;
+  border-color: var(--ox-hover) !important;
+  box-shadow: inset 0 0 3px color-mix(in srgb, var(--ox-hover) 60%, transparent) !important;
 }
 
 #tabbrowser-tabs:not([orient="vertical"]) .tabbrowser-tab[selected] > .tab-stack > .tab-background {
@@ -235,14 +276,25 @@
 .tab-label { font-weight: normal !important; }
 .tab-context-line, .tab-loading-burst { display: none !important; }
 
+/* Tab close buttons are an X in the text colour, as Oxygen's tab widgets draw
+ * it, turning red with a glow when hovered. */
 .tab-close-button {
+  list-style-image: url("icons/close.svg") !important;
+  -moz-context-properties: fill !important;
+  fill: var(--ox-fg) !important;
+  fill-opacity: 0.7 !important;
+  width: 18px !important;
+  height: 18px !important;
+  padding: 4px !important;
   border-radius: 50% !important;
-  padding: 3px !important;
-  transition: box-shadow var(--ox-fade) !important;
+  background: none !important;
+  transition: fill var(--ox-fade), fill-opacity var(--ox-fade), box-shadow var(--ox-fade) !important;
 }
 .tab-close-button:hover {
+  fill: rgb(191 3 3) !important;
+  fill-opacity: 1 !important;
   background: none !important;
-  box-shadow: 0 0 0 1px var(--ox-hover), 0 0 3px var(--ox-hover) !important;
+  box-shadow: inset 0 0 0 1px rgb(191 3 3 / 0.7), inset 0 0 3px rgb(191 3 3 / 0.4) !important;
 }
 
 /* --- Vertical tabs ---------------------------------------------------------------
@@ -337,3 +389,49 @@ sidebar-main, #sidebar-main, #sidebar-box {
 }
 :root:not([sizemode="maximized"]) .titlebar-restore,
 :root[sizemode="maximized"] .titlebar-max { display: none !important; }
+
+/* --- Menus and panels ---------------------------------------------------------------
+ *
+ * Firefox draws its own menus. They get the window colour, a frame, and
+ * Oxygen's selection gradient on the highlighted item. */
+
+menupopup, panel {
+  --panel-background: var(--ox-bg) !important;
+  --panel-color: var(--ox-fg) !important;
+  --panel-border-color: hsl(from var(--ox-bg) h s calc(l * 0.72)) !important;
+  --panel-border-radius: var(--ox-radius) !important;
+  --menu-background-color: var(--ox-bg) !important;
+  --menu-color: var(--ox-fg) !important;
+  --menu-border-color: hsl(from var(--ox-bg) h s calc(l * 0.72)) !important;
+  --menuitem-hover-background-color: transparent !important;
+  --menuitem-border-radius: 3px !important;
+  --arrowpanel-background: var(--ox-bg) !important;
+  --arrowpanel-color: var(--ox-fg) !important;
+  --arrowpanel-border-color: hsl(from var(--ox-bg) h s calc(l * 0.72)) !important;
+  --arrowpanel-border-radius: var(--ox-radius) !important;
+}
+
+menupopup > :is(menuitem, menu):not([disabled])[_moz-menuactive] {
+  background: linear-gradient(to bottom, hsl(from var(--ox-sel) h s calc(min(l * 1.22, 92))), var(--ox-sel)) !important;
+  color: var(--ox-sel-fg) !important;
+}
+
+/* The navigation row at the top of the page context menu uses Oxygen's icons. */
+#context-back { list-style-image: url("moz-icon://stock/go-previous?size=16") !important; }
+#context-forward { list-style-image: url("moz-icon://stock/go-next?size=16") !important; }
+#context-reload { list-style-image: url("moz-icon://stock/view-refresh?size=16") !important; }
+#context-stop { list-style-image: url("moz-icon://stock/process-stop?size=16") !important; }
+#context-bookmarkpage { list-style-image: url("moz-icon://stock/bookmark-new?size=16") !important; }
+#context-bookmarkpage[starred] { list-style-image: url("moz-icon://stock/bookmarks?size=16") !important; }
+#context-navigation > menuitem > .menu-icon { -moz-context-properties: none !important; }
+#context-navigation > menuitem[disabled] > .menu-icon { opacity: 0.4 !important; }
+#context-navigation > menuitem {
+  border: 1px solid transparent !important;
+  border-radius: var(--ox-radius) !important;
+  transition: border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
+}
+#context-navigation > menuitem:not([disabled])[_moz-menuactive] {
+  background: none !important;
+  border-color: var(--ox-hover) !important;
+  box-shadow: 0 0 2px var(--ox-hover) !important;
+}

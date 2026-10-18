@@ -60,10 +60,14 @@ clean:
 	rm -rf build
 
 # Firefox, per profile: make firefox-install PROFILE=<dir from about:profiles>.
-# The theme goes into chrome/oxygen/ and is pulled in by one @import line, so
-# an existing userChrome.css keeps working; the prefs it needs go into user.js
+# The theme goes into chrome/oxygen/ and is pulled in by one @import line in
+# each of userChrome.css and userContent.css, so existing ones keep working;
+# the new tab page's colours are written from the current KDE scheme; the prefs it needs go into user.js
 # between markers. firefox-uninstall removes exactly those again.
-FF_IMPORT := @import url("oxygen/userChrome.css");
+FF_SHEETS := userChrome userContent
+# The new tab page cannot read the KDE colours live; install writes them from
+# this scheme (rerun after changing schemes).
+FF_SCHEME ?= $(firstword $(wildcard $(HOME)/.config/kdeglobals) /usr/share/color-schemes/Oxygen.colors)
 FF_BEGIN  := // oxygen-nonqt begin
 FF_END    := // oxygen-nonqt end
 
@@ -75,10 +79,12 @@ firefox-install: firefox-check
 	rm -rf "$(PROFILE)/chrome/oxygen"
 	mkdir -p "$(PROFILE)/chrome"
 	cp -r firefox/chrome "$(PROFILE)/chrome/oxygen"
-	@touch "$(PROFILE)/chrome/userChrome.css"
-	@grep -qF '$(FF_IMPORT)' "$(PROFILE)/chrome/userChrome.css" || { \
-		{ echo '$(FF_IMPORT)'; cat "$(PROFILE)/chrome/userChrome.css"; } > "$(PROFILE)/chrome/userChrome.css.tmp"; \
-		mv "$(PROFILE)/chrome/userChrome.css.tmp" "$(PROFILE)/chrome/userChrome.css"; }
+	python3 -I tools/firefox_colors.py "$(FF_SCHEME)" "$(PROFILE)/chrome/oxygen/content-colors.css"
+	@for sheet in $(FF_SHEETS); do \
+		f="$(PROFILE)/chrome/$$sheet.css"; line="@import url(\"oxygen/$$sheet.css\");"; \
+		touch "$$f"; \
+		grep -qF "$$line" "$$f" || { { echo "$$line"; cat "$$f"; } > "$$f.tmp"; mv "$$f.tmp" "$$f"; }; \
+	done
 	@touch "$(PROFILE)/user.js"
 	@grep -qF '$(FF_BEGIN)' "$(PROFILE)/user.js" || { \
 		if [ -n "$$(tail -c1 "$(PROFILE)/user.js")" ]; then echo >> "$(PROFILE)/user.js"; fi; \
@@ -87,9 +93,10 @@ firefox-install: firefox-check
 
 firefox-uninstall: firefox-check
 	rm -rf "$(PROFILE)/chrome/oxygen"
-	@if [ -f "$(PROFILE)/chrome/userChrome.css" ]; then \
-		grep -vF '$(FF_IMPORT)' "$(PROFILE)/chrome/userChrome.css" > "$(PROFILE)/chrome/userChrome.css.tmp"; \
-		mv "$(PROFILE)/chrome/userChrome.css.tmp" "$(PROFILE)/chrome/userChrome.css"; fi
+	@for sheet in $(FF_SHEETS); do \
+		f="$(PROFILE)/chrome/$$sheet.css"; line="@import url(\"oxygen/$$sheet.css\");"; \
+		if [ -f "$$f" ]; then grep -vF "$$line" "$$f" > "$$f.tmp"; mv "$$f.tmp" "$$f"; fi; \
+	done
 	@if [ -f "$(PROFILE)/user.js" ]; then \
 		sed '\|^$(FF_BEGIN)$$|,\|^$(FF_END)$$|d' "$(PROFILE)/user.js" > "$(PROFILE)/user.js.tmp"; \
 		mv "$(PROFILE)/user.js.tmp" "$(PROFILE)/user.js"; fi

@@ -1,0 +1,32 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* The Oxygen palette, shared by userChrome.css and userContent.css. Since
+ * userContent.css applies to every web page, this only defines --ox-*
+ * variables, which pages will not be using themselves. */
+
+/* Firefox reports the GTK window colour as Canvas, about 2.5% darker than the
+ * window colour itself (measured: 209,205,203 for Oxygen's 214,210,208). The
+ * window colour and Oxygen's lit top and darker bottom are scaled from it;
+ * hsl() lightness scaling stands in for GTK's shade(). Only standard system
+ * colours are used, since Firefox's own pages (userContent.css) may not get
+ * the -moz- ones. */
+
+:root {
+  --ox-bg: hsl(from Canvas h s calc(l * 1.025));
+  --ox-top: hsl(from Canvas h s calc(l * 1.077));
+  --ox-win: hsl(from Canvas h s calc(l * 0.944));
+  --ox-fg: CanvasText;
+  --ox-base: Field;
+  --ox-text: FieldText;
+  --ox-sel: Highlight;
+  --ox-sel-fg: HighlightText;
+  --ox-focus: AccentColor;
+  --ox-hover: hsl(from AccentColor h s calc(min(l * 1.4, 72)));
+  --ox-btn: ButtonFace;
+  --ox-btn-fg: ButtonText;
+  --ox-frame: hsl(from var(--ox-bg) h s calc(l * 0.8));
+  --ox-frame-dark: hsl(from var(--ox-bg) h s calc(l * 0.62));
+  --ox-groove: hsl(from var(--ox-bg) h s calc(l * 0.84));
+  --ox-tab: hsl(from var(--ox-bg) h s calc(l * 0.9));
+  --ox-radius: 4px;
+  --ox-fade: 150ms ease-out;
+}
