@@ -1,0 +1,48 @@
+// Oxygen surface recipes. Every colour is a GTK expression on the KDE
+// palette, so they follow the active scheme instead of being baked in.
+
+// Raised control: a soft vertical gradient, a bright top edge and a faint
+// drop shadow under a frame that is a shade of the control colour.
+@mixin raised($c: $btn_bg) {
+  background-color: $c;
+  background-image: linear-gradient(to bottom, shade($c, 1.08), shade($c, 0.95));
+  border: 1px solid shade($c, 0.72);
+  box-shadow: inset 0 1px shade($c, 1.15), 0 1px 1px $shadow;
+}
+
+// Pressed or checked control: the gradient flips and the shadow moves inside.
+@mixin sunken($c: $btn_bg) {
+  background-color: shade($c, 0.92);
+  background-image: linear-gradient(to bottom, shade($c, 0.85), shade($c, 0.97));
+  border: 1px solid shade($c, 0.65);
+  box-shadow: inset 0 1px 2px $shadow;
+}
+
+// Text fields and other content holes.
+@mixin hole($c: $base) {
+  background-color: $c;
+  background-image: linear-gradient(to bottom, shade($c, 0.94), $c 5px);
+  border: 1px solid $frame;
+  box-shadow: 0 1px shade($bg, 1.1);
+}
+
+// Oxygen marks hover and focus with a coloured glow around the frame.
+@mixin glow($c) {
+  border-color: $c;
+  box-shadow: inset 0 1px galpha(white, 0.15), 0 0 2px 1px galpha($c, 0.6);
+}
+
+// A groove that progress bars, sliders and switches run in.
+@mixin groove {
+  background-color: $groove;
+  background-image: linear-gradient(to bottom, shade($bg, 0.78), shade($bg, 0.92));
+  border: 1px solid shade($bg, 0.68);
+  box-shadow: inset 0 1px 1px $shadow, 0 1px shade($bg, 1.1);
+}
+
+// The accent fill used for selections and progress.
+@mixin accent-fill($c: $sel_bg) {
+  background-color: $c;
+  background-image: linear-gradient(to bottom, shade($c, 1.1), shade($c, 0.92));
+  color: $sel_fg;
+}

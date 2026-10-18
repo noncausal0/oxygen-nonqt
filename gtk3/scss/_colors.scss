@@ -1,0 +1,98 @@
+// Colours.
+//
+// KDE's GTK integration (kde-gtk-config) writes the active colour scheme and
+// accent to ~/.config/gtk-3.0/colors.css as `*_breeze` named colours. User CSS
+// has higher priority than the theme, so those definitions override the
+// fallbacks below, and the colorreload module reapplies them on change.
+// The fallbacks are the stock Oxygen scheme, for sessions without KDE.
+
+@define-color theme_bg_color_breeze #d6d2d0;
+@define-color theme_fg_color_breeze #221f1e;
+@define-color theme_base_color_breeze #ffffff;
+@define-color theme_text_color_breeze #1f1c1b;
+@define-color theme_selected_bg_color_breeze #43ace8;
+@define-color theme_selected_fg_color_breeze #ffffff;
+@define-color theme_button_background_normal_breeze #dfdcd9;
+@define-color theme_button_foreground_normal_breeze #221f1e;
+@define-color theme_button_decoration_focus_breeze #3aa7dd;
+@define-color theme_button_decoration_hover_breeze #6ed6ff;
+@define-color theme_unfocused_fg_color_breeze #2f2d2b;
+@define-color theme_unfocused_selected_bg_color_breeze #95c8fe;
+@define-color theme_unfocused_selected_fg_color_breeze #242c36;
+@define-color borders_breeze #b2aeac;
+@define-color insensitive_fg_color_breeze #908c8b;
+@define-color insensitive_bg_color_breeze #cdc8c5;
+@define-color insensitive_base_color_breeze #f3f3f3;
+@define-color insensitive_base_fg_color_breeze #a9a7a7;
+@define-color tooltip_background_breeze #181513;
+@define-color tooltip_text_breeze #e7fdff;
+@define-color tooltip_border_breeze #414342;
+@define-color link_color_breeze #0057ae;
+@define-color link_visited_color_breeze #644a9b;
+@define-color error_color_breeze #bf0303;
+@define-color warning_color_breeze #b08000;
+@define-color success_color_breeze #006e28;
+
+// Standard GTK names, for applications that use them in their own CSS.
+@define-color theme_bg_color @theme_bg_color_breeze;
+@define-color theme_fg_color @theme_fg_color_breeze;
+@define-color theme_base_color @theme_base_color_breeze;
+@define-color theme_text_color @theme_text_color_breeze;
+@define-color theme_selected_bg_color @theme_selected_bg_color_breeze;
+@define-color theme_selected_fg_color @theme_selected_fg_color_breeze;
+@define-color theme_unfocused_bg_color @theme_bg_color_breeze;
+@define-color theme_unfocused_fg_color @theme_unfocused_fg_color_breeze;
+@define-color theme_unfocused_base_color @theme_base_color_breeze;
+@define-color theme_unfocused_text_color @theme_text_color_breeze;
+@define-color theme_unfocused_selected_bg_color @theme_unfocused_selected_bg_color_breeze;
+@define-color theme_unfocused_selected_fg_color @theme_unfocused_selected_fg_color_breeze;
+@define-color insensitive_bg_color @insensitive_bg_color_breeze;
+@define-color insensitive_fg_color @insensitive_fg_color_breeze;
+@define-color insensitive_base_color @insensitive_base_color_breeze;
+@define-color borders @borders_breeze;
+@define-color unfocused_borders @borders_breeze;
+@define-color link_color @link_color_breeze;
+@define-color visited_link_color @link_visited_color_breeze;
+@define-color error_color @error_color_breeze;
+@define-color warning_color @warning_color_breeze;
+@define-color success_color @success_color_breeze;
+@define-color tooltip_bg_color @tooltip_background_breeze;
+@define-color tooltip_fg_color @tooltip_text_breeze;
+
+// GTK colour expressions. Sass would evaluate mix() and alpha() itself, so
+// these build the GTK call as a string instead.
+@function shade($c, $f) { @return unquote("shade(#{$c}, #{$f})"); }
+@function gmix($a, $b, $f) { @return unquote("mix(#{$a}, #{$b}, #{$f})"); }
+@function galpha($c, $a) { @return unquote("alpha(#{$c}, #{$a})"); }
+
+$bg:       unquote("@theme_bg_color_breeze");
+$fg:       unquote("@theme_fg_color_breeze");
+$base:     unquote("@theme_base_color_breeze");
+$text:     unquote("@theme_text_color_breeze");
+$sel_bg:   unquote("@theme_selected_bg_color_breeze");
+$sel_fg:   unquote("@theme_selected_fg_color_breeze");
+$btn_bg:   unquote("@theme_button_background_normal_breeze");
+$btn_fg:   unquote("@theme_button_foreground_normal_breeze");
+$focus:    unquote("@theme_button_decoration_focus_breeze");
+$hover:    unquote("@theme_button_decoration_hover_breeze");
+$backdrop_fg: unquote("@theme_unfocused_fg_color_breeze");
+$backdrop_sel_bg: unquote("@theme_unfocused_selected_bg_color_breeze");
+$backdrop_sel_fg: unquote("@theme_unfocused_selected_fg_color_breeze");
+$borders:  unquote("@borders_breeze");
+$dis_fg:   unquote("@insensitive_fg_color_breeze");
+$dis_bg:   unquote("@insensitive_bg_color_breeze");
+$dis_base: unquote("@insensitive_base_color_breeze");
+$tip_bg:   unquote("@tooltip_background_breeze");
+$tip_fg:   unquote("@tooltip_text_breeze");
+$tip_border: unquote("@tooltip_border_breeze");
+$link:     unquote("@link_color_breeze");
+$visited:  unquote("@link_visited_color_breeze");
+$error:    unquote("@error_color_breeze");
+$warning:  unquote("@warning_color_breeze");
+$success:  unquote("@success_color_breeze");
+
+// Oxygen draws frames as a shade of the surface they sit on, so these work
+// for light and dark schemes alike.
+$frame:    shade($bg, 0.72);
+$groove:   shade($bg, 0.86);
+$shadow:   galpha(black, 0.22);

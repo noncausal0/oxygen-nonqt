@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=Oxygen
+Comment=The KDE Oxygen look for GTK, following the KDE colour scheme
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=Oxygen
+IconTheme=oxygen
+CursorTheme=Oxygen_White
