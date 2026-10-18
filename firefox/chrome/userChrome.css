@@ -180,6 +180,36 @@
 }
 #identity-box #identity-icon { -moz-context-properties: none !important; }
 
+/* Newer Firefox shows a trust indicator instead of the identity icon. */
+#trust-icon-container:is(.secure, .scanning, .has-blocked-trackers, .breached) {
+  list-style-image: url("moz-icon://stock/security-high?size=16") !important;
+}
+#trust-icon-container.warning {
+  list-style-image: url("moz-icon://stock/security-medium?size=16") !important;
+}
+#trust-icon-container.insecure {
+  list-style-image: url("moz-icon://stock/security-low?size=16") !important;
+}
+/* Protections turned off for the site: the same shield, dimmed. */
+#trust-icon-container.inactive:not(.insecure) {
+  list-style-image: url("moz-icon://stock/security-high?size=16") !important;
+}
+#trust-icon-container.inactive:not(.insecure) > #trust-icon { opacity: 0.5 !important; }
+#trust-icon-container > #trust-icon { animation: none !important; }
+/* "Not Secure" is plain text beside the red shield, not a coloured chip. */
+#trust-icon-container.insecure {
+  background: none !important;
+  color: var(--ox-text) !important;
+}
+#trust-icon-container {
+  border-radius: 3px !important;
+  transition: box-shadow var(--ox-fade) !important;
+}
+#trust-icon-container:hover {
+  background: none !important;
+  box-shadow: inset 0 0 0 1px var(--ox-hover), 0 0 2px var(--ox-hover) !important;
+}
+
 /* Tracking protection is Konqueror's ad blocker icon; dimmed when turned off
  * for the site. */
 #tracking-protection-icon {
@@ -435,15 +465,47 @@ menupopup > :is(menuitem, menu):not([disabled])[_moz-menuactive] {
   color: var(--ox-sel-fg) !important;
 }
 
-/* The navigation row at the top of the page context menu uses Oxygen's icons. */
-#context-back { list-style-image: url("moz-icon://stock/go-previous?size=16") !important; }
-#context-forward { list-style-image: url("moz-icon://stock/go-next?size=16") !important; }
-#context-reload { list-style-image: url("moz-icon://stock/view-refresh?size=16") !important; }
-#context-stop { list-style-image: url("moz-icon://stock/process-stop?size=16") !important; }
-#context-bookmarkpage { list-style-image: url("moz-icon://stock/bookmark-new?size=16") !important; }
-#context-bookmarkpage[starred] { list-style-image: url("moz-icon://stock/bookmarks?size=16") !important; }
-#context-navigation > menuitem > .menu-icon { -moz-context-properties: none !important; }
-#context-navigation > menuitem[disabled] > .menu-icon { opacity: 0.4 !important; }
+/* Context menu items carry Oxygen's icons, as KDE menus do. Firefox draws a
+ * menu item's icon from --menuitem-icon. */
+#context-back { --menuitem-icon: url("moz-icon://stock/go-previous?size=16") !important; }
+#context-forward { --menuitem-icon: url("moz-icon://stock/go-next?size=16") !important; }
+#context-reload { --menuitem-icon: url("moz-icon://stock/view-refresh?size=16") !important; }
+#context-stop { --menuitem-icon: url("moz-icon://stock/process-stop?size=16") !important; }
+#context-bookmarkpage { --menuitem-icon: url("moz-icon://stock/bookmark-new?size=16") !important; }
+#context-savepage { --menuitem-icon: url("moz-icon://stock/document-save-as?size=16") !important; }
+#context-selectall { --menuitem-icon: url("moz-icon://stock/edit-select-all?size=16") !important; }
+#context-take-screenshot { --menuitem-icon: url("moz-icon://stock/ksnapshot?size=16") !important; }
+#context-viewsource { --menuitem-icon: url("moz-icon://stock/code-context?size=16") !important; }
+#context-inspect { --menuitem-icon: url("moz-icon://stock/applications-development?size=16") !important; }
+#context-inspect-a11y { --menuitem-icon: url("moz-icon://stock/applications-development?size=16") !important; }
+#context-undo { --menuitem-icon: url("moz-icon://stock/edit-undo?size=16") !important; }
+#context-redo { --menuitem-icon: url("moz-icon://stock/edit-redo?size=16") !important; }
+#context-cut { --menuitem-icon: url("moz-icon://stock/edit-cut?size=16") !important; }
+#context-copy { --menuitem-icon: url("moz-icon://stock/edit-copy?size=16") !important; }
+#context-paste { --menuitem-icon: url("moz-icon://stock/edit-paste?size=16") !important; }
+#context-delete { --menuitem-icon: url("moz-icon://stock/edit-delete?size=16") !important; }
+#context-openlinkintab { --menuitem-icon: url("moz-icon://stock/tab-new?size=16") !important; }
+#context-openlink { --menuitem-icon: url("moz-icon://stock/window-new?size=16") !important; }
+#context-bookmarklink { --menuitem-icon: url("moz-icon://stock/bookmark-new?size=16") !important; }
+#context-savelink { --menuitem-icon: url("moz-icon://stock/document-save-as?size=16") !important; }
+#context-copylink { --menuitem-icon: url("moz-icon://stock/insert-link?size=16") !important; }
+#context-viewimage { --menuitem-icon: url("moz-icon://stock/image-x-generic?size=16") !important; }
+#context-copyimage-contents { --menuitem-icon: url("moz-icon://stock/edit-copy?size=16") !important; }
+#context-copyimage { --menuitem-icon: url("moz-icon://stock/insert-link?size=16") !important; }
+#context-saveimage { --menuitem-icon: url("moz-icon://stock/document-save-as?size=16") !important; }
+#context-searchselect { --menuitem-icon: url("moz-icon://stock/edit-find?size=16") !important; }
+#context-print-selection { --menuitem-icon: url("moz-icon://stock/document-print?size=16") !important; }
+#context-sendpagetodevice { --menuitem-icon: url("moz-icon://stock/mail-send?size=16") !important; }
+#context-sendlinktodevice { --menuitem-icon: url("moz-icon://stock/mail-send?size=16") !important; }
+#context-bookmarkpage[starred] { --menuitem-icon: url("moz-icon://stock/bookmarks?size=16") !important; }
+/* Firefox only draws icons for items marked iconic; the others keep an empty
+ * slot of the same size, so showing the icon there does not shift anything. */
+#contentAreaContextMenu :is(menuitem, menu) > .menu-icon {
+  content: var(--menuitem-icon) !important;
+  display: revert !important;
+  visibility: inherit !important;
+}
+#contentAreaContextMenu menuitem[disabled] > .menu-icon { opacity: 0.4 !important; }
 #context-navigation > menuitem {
   border: 1px solid transparent !important;
   border-radius: var(--ox-radius) !important;
@@ -453,4 +515,70 @@ menupopup > :is(menuitem, menu):not([disabled])[_moz-menuactive] {
   background: none !important;
   border-color: var(--ox-hover) !important;
   box-shadow: 0 0 2px var(--ox-hover) !important;
+}
+
+/* Panels (the main menu, downloads and the like) are framed popups in the
+ * window colour. Their items are flat until highlighted, which gives them
+ * Oxygen's selection gradient; their footer buttons are push buttons. */
+
+panel {
+  --panel-shadow-margin: 4px !important;
+  --panel-shadow: 0 2px 6px rgb(0 0 0 / 0.3) !important;
+}
+
+.subviewbutton, .panel-subview-footer-button, #downloadsListBox > richlistitem {
+  border-radius: 3px !important;
+}
+.subviewbutton:not([disabled]):is(:hover, [open], :focus-visible),
+#downloadsListBox > richlistitem:is(:hover, [selected]) {
+  background: linear-gradient(to bottom, hsl(from var(--ox-sel) h s calc(min(l * 1.22, 92))), var(--ox-sel)) !important;
+  color: var(--ox-sel-fg) !important;
+}
+.subviewbutton:not([disabled]):hover:active {
+  background: var(--ox-sel) !important;
+}
+
+.panel-footer button, .panel-footer .footer-button, #downloadsPanel .footer-button {
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--ox-btn), white 8%), var(--ox-btn)) !important;
+  color: var(--ox-btn-fg) !important;
+  border: 1px solid hsl(from var(--ox-btn) h s calc(l * 0.72)) !important;
+  border-bottom-color: hsl(from var(--ox-btn) h s calc(l * 0.56)) !important;
+  border-radius: var(--ox-radius) !important;
+  box-shadow: inset 0 1px color-mix(in srgb, var(--ox-btn), white 15%), 0 1px 1px rgb(0 0 0 / 0.12) !important;
+  transition: border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
+}
+:is(.panel-footer button, .panel-footer .footer-button, #downloadsPanel .footer-button):not([disabled]):hover {
+  border-color: var(--ox-hover) !important;
+  box-shadow: inset 0 1px rgb(255 255 255 / 0.15), 0 0 2px var(--ox-hover) !important;
+}
+
+toolbarseparator, menuseparator {
+  border-color: hsl(from var(--ox-bg) h s calc(l * 0.78)) !important;
+}
+
+/* The main menu's items get Oxygen's icons. */
+#appMenu-new-tab-button2 { list-style-image: url("moz-icon://stock/tab-new?size=16") !important; }
+#appMenu-new-window-button2 { list-style-image: url("moz-icon://stock/window-new?size=16") !important; }
+#appMenu-new-private-window-button2 { list-style-image: url("moz-icon://stock/user-identity?size=16") !important; }
+#appMenu-history-button { list-style-image: url("moz-icon://stock/view-history?size=16") !important; }
+#appMenu-bookmarks-button { list-style-image: url("moz-icon://stock/bookmarks?size=16") !important; }
+#appMenu-downloads-button { list-style-image: url("moz-icon://stock/download?size=16") !important; }
+#appMenu-passwords-button { list-style-image: url("moz-icon://stock/dialog-password?size=16") !important; }
+#appMenu-extensions-themes-button { list-style-image: url("moz-icon://stock/preferences-plugin?size=16") !important; }
+#appMenu-print-button2 { list-style-image: url("moz-icon://stock/document-print?size=16") !important; }
+#appMenu-save-file-button2 { list-style-image: url("moz-icon://stock/document-save-as?size=16") !important; }
+#appMenu-translate-button { list-style-image: url("moz-icon://stock/preferences-desktop-locale?size=16") !important; }
+#appMenu-find-button2 { list-style-image: url("moz-icon://stock/edit-find?size=16") !important; }
+#appMenu-zoomReduce-button2 { list-style-image: url("moz-icon://stock/zoom-out?size=16") !important; }
+#appMenu-zoomEnlarge-button2 { list-style-image: url("moz-icon://stock/zoom-in?size=16") !important; }
+#appMenu-fullscreen-button2 { list-style-image: url("moz-icon://stock/view-fullscreen?size=16") !important; }
+#appMenu-settings-button { list-style-image: url("moz-icon://stock/configure?size=16") !important; }
+#appMenu-more-button2 { list-style-image: url("moz-icon://stock/preferences-other?size=16") !important; }
+#appMenu-help-button2 { list-style-image: url("moz-icon://stock/help-contents?size=16") !important; }
+#appMenu-quit-button2 { list-style-image: url("moz-icon://stock/application-exit?size=16") !important; }
+#appMenu-protonMainView .subviewbutton > .toolbarbutton-icon {
+  -moz-context-properties: none !important;
+  width: 16px !important;
+  height: 16px !important;
+  margin-inline-end: 8px !important;
 }
