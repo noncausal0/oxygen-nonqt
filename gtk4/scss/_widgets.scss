@@ -203,6 +203,8 @@ entry, spinbutton:not(.vertical) {
   min-height: 26px;
   caret-color: $text;
 
+  transition: border-color $fade, box-shadow $fade;
+
   &:focus-within { @include glow($focus); }
   &:disabled { background-color: $dis_base; color: $dis_fg; box-shadow: none; }
   &.error { border-color: $error; color: $error; }
@@ -218,21 +220,22 @@ entry, spinbutton:not(.vertical) {
 
 // The step buttons sit inside the field like Qt's spin box arrows.
 spinbutton {
+
   &:not(.vertical) {
     padding: 0;
     > text { padding: 0 6px; min-width: 32px; }
     > button {
-      background: none;
+      background-color: transparent;
       border: none;
       box-shadow: none;
       border-radius: 0;
-      color: $text;
       padding: 0 3px;
       min-width: 16px;
       min-height: 16px;
-      &:hover { color: $hover; background: none; border: none; box-shadow: none; }
-      &:active { color: $focus; background: none; border: none; box-shadow: none; }
-      &:disabled { color: $dis_fg; background: none; border: none; box-shadow: none; }
+      color: $text;
+      &:hover { color: $hover; background-color: transparent; border: none; box-shadow: none; }
+      &:active { color: $focus; background-color: transparent; border: none; box-shadow: none; }
+      &:disabled { color: $dis_fg; background-color: transparent; border: none; box-shadow: none; }
     }
   }
   &.vertical {
@@ -288,6 +291,7 @@ switch {
   > slider {
     @include raised;
     border-radius: 10px;
+    transition: border-color $fade, box-shadow $fade;
     min-width: 18px;
     min-height: 18px;
     margin: -1px;
@@ -313,6 +317,7 @@ scale {
       @include raised;
       border-radius: 9999px;
       min-width: 18px;
+      transition: border-color $fade, box-shadow $fade;
       min-height: 18px;
       margin: -8px;
       &:hover { @include glow($hover); }
@@ -374,6 +379,7 @@ scrollbar {
     @include raised($bg);
     border-radius: 6px;
     min-width: 10px;
+    transition: border-color $fade, box-shadow $fade;
     min-height: 10px;
     margin: -1px;
     &:hover { @include glow($hover); }
@@ -489,6 +495,7 @@ notebook {
       background-color: shade($bg, 0.88);
       border: 1px solid shade($bg, 0.8);
       padding: 4px 14px;
+      transition: background-color $fade, border-color $fade;
       min-height: 20px;
 
       &:hover:not(:checked) { background-color: shade($bg, 0.93); }
