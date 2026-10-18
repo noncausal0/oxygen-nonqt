@@ -257,7 +257,7 @@ banner > revealer > widget {
 
 dialog.floating > sheet, window.dialog.message, dialog.alert > sheet, floating-sheet > sheet {
   border-radius: $radius;
-  box-shadow: 0 3px 12px 1px galpha(black, 0.45), 0 0 0 1px galpha(black, 0.25);
+  box-shadow: $window-shadow;
   background-color: $win_bottom;
   background-image: linear-gradient(to bottom, $win_top, $win_bottom 300px);
 }

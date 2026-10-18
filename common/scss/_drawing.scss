@@ -95,3 +95,10 @@ $win_bottom: shade($bg, 0.92);
 
 // Oxygen fades hover and focus glows and toggled marks over the same time.
 $fade: 150ms ease-out;
+
+// Shadows of client-side decorated windows. GTK sizes the window's surface to
+// fit this shadow, so its geometry must be the same in every state: a focus
+// change that altered the offset or blur would resize the window and make it
+// flicker. Only the opacity changes.
+$window-shadow: 0 3px 12px 1px galpha(black, 0.45), 0 0 0 1px galpha(black, 0.25);
+$window-shadow-backdrop: 0 3px 12px 1px galpha(black, 0.25), 0 0 0 1px galpha(black, 0.18);
