@@ -1,4 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-  <rect x="7" y="2.2" width="2.1" height="11.6" rx="1" class="error" fill="#bebebe" transform="rotate(45 8 8)"/>
-  <rect x="7" y="2.2" width="2.1" height="11.6" rx="1" class="error" fill="#bebebe" transform="rotate(-45 8 8)"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+  <circle class="warning" cx="10" cy="10" r="9"/>
+  <circle class="success" cx="10" cy="10" r="8"/>
+  <ellipse cx="10" cy="7.6" rx="6.6" ry="5" fill="#fff" fill-opacity="0.1"/>
+  <ellipse cx="10" cy="6.4" rx="5" ry="3.4" fill="#fff" fill-opacity="0.12"/>
+  <rect class="error" x="9.1" y="4.9" width="1.8" height="10.2" rx="0.9" transform="rotate(45 10 10)"/><rect class="error" x="9.1" y="4.9" width="1.8" height="10.2" rx="0.9" transform="rotate(-45 10 10)"/>
 </svg>

@@ -50,26 +50,8 @@ headerbar {
   .subtitle { font-size: smaller; opacity: 0.75; }
 }
 
-// Oxygen's title buttons: small round raised buttons with the glyph inside.
-// Plain GTK 4 stretches them to the headerbar's height, so the margin keeps
-// the 18px buttons round in a 32px titlebar.
-windowcontrols {
-  border-spacing: 4px;
-  margin: 7px 0;
-  > button.image-button {
-    @include raised($bg);
-    border-radius: 9999px;
-    min-width: 18px;
-    min-height: 18px;
-    padding: 1px;
-    margin: 0;
-    color: $fg;
-    &:hover { @include glow($hover); }
-    &:active { @include sunken($bg); }
-    image { -gtk-icon-size: 12px; }
-  }
-  &:backdrop button { color: $backdrop_fg; }
-}
+// Title buttons are drawn in _decorations.scss, included from _libadwaita.scss.
+windowcontrols { border-spacing: 4px; }
 
 // --- Labels and selection ---------------------------------------------------
 

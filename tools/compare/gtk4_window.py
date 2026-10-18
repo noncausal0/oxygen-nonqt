@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """GTK 4 counterpart of qt_window.py, plus a libadwaita page.
 
---adw loads the built libadwaita.css from build/Oxygen as user CSS on top of
+--files shows a mock of Nautilus's window (same widget types and style
+classes) instead of the widget gallery. --adw loads the built libadwaita.css from build/Oxygen as user CSS on top of
 libadwaita, so nothing has to be installed. Without it the window uses the
 GTK theme, so run it with GTK_THEME=Oxygen after `make install`. --colors FILE.colors applies a KDE
 colour scheme to this process only (otherwise KDE's exported colours are
@@ -24,7 +25,8 @@ import kdecolors  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 BUILD = os.path.join(ROOT, "build", "Oxygen", "gtk-4.0")
-ADW = "--adw" in sys.argv
+FILES = "--files" in sys.argv
+ADW = "--adw" in sys.argv or FILES
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
@@ -162,8 +164,81 @@ def adw_page():
     return page
 
 
+def files_window(app):
+    """Nautilus's layout: a view-coloured window, a sidebar with places and a
+    toolbar with a path bar over a grid of files."""
+    from gi.repository import Adw
+    win = Adw.ApplicationWindow(application=app, title="Home")
+    win.add_css_class("view")
+    split = Adw.OverlaySplitView(max_sidebar_width=240, sidebar_width_fraction=0.2)
+
+    side = Adw.ToolbarView()
+    shb = Adw.HeaderBar(title_widget=Adw.WindowTitle(title="Files"), show_end_title_buttons=False)
+    shb.pack_start(Gtk.ToggleButton(icon_name="edit-find-symbolic"))
+    shb.pack_end(Gtk.MenuButton(icon_name="open-menu-symbolic"))
+    side.add_top_bar(shb)
+    places = Gtk.ListBox()
+    places.add_css_class("navigation-sidebar")
+    for icon, name in (("user-home", "Home"), ("document-open-recent", "Recent"), ("starred", "Starred"),
+                       ("network-workgroup", "Network"), ("user-trash", "Trash")):
+        row = Gtk.Box(spacing=8)
+        row.append(Gtk.Image(icon_name=icon))
+        row.append(Gtk.Label(label=name, xalign=0))
+        places.append(row)
+    places.select_row(places.get_row_at_index(0))
+    side.set_content(Gtk.ScrolledWindow(child=places, vexpand=True))
+    split.set_sidebar(side)
+
+    content = Adw.ToolbarView()
+    hb = Adw.HeaderBar(show_start_title_buttons=False)
+    for icon in ("go-previous-symbolic", "go-next-symbolic"):
+        hb.pack_start(Gtk.Button(icon_name=icon))
+    path = Gtk.Box(hexpand=True)
+    path.add_css_class("nautilus-pathbar")
+    for name, current in (("/", False), ("home", False), ("Home", True)):
+        b = Gtk.Button(label=name)
+        b.add_css_class("flat")
+        b.add_css_class("nautilus-path-button")
+        if current:
+            b.add_css_class("current-dir")
+        path.append(b)
+    hb.set_title_widget(path)
+    hb.pack_end(Gtk.MenuButton(icon_name="view-more-symbolic"))
+    content.add_top_bar(hb)
+    model = Gtk.StringList.new(["Applications", "Documents", "Downloads", "Music", "Pictures",
+                                "Public", "Templates", "Videos", "cat.jpg", "notes.txt"])
+    factory = Gtk.SignalListItemFactory()
+    def setup(_f, item):
+        cell = vbox(4)
+        cell.append(Gtk.Image(pixel_size=64))
+        cell.append(Gtk.Label())
+        item.set_child(cell)
+    def bind(_f, item):
+        name = item.get_item().get_string()
+        cell = item.get_child()
+        cell.get_first_child().set_from_icon_name("folder" if "." not in name else "image-x-generic")
+        cell.get_last_child().set_label(name)
+    factory.connect("setup", setup)
+    factory.connect("bind", bind)
+    selection = Gtk.SingleSelection(model=model)
+    selection.set_selected(1)
+    grid = Gtk.GridView(model=selection, factory=factory, max_columns=6)
+    view = Gtk.Box()
+    view.add_css_class("nautilus-grid-view")
+    view.append(Gtk.ScrolledWindow(child=grid, hexpand=True, vexpand=True))
+    content.set_content(view)
+    split.set_content(content)
+
+    win.set_content(split)
+    win.set_default_size(1000, 640)
+    return win
+
+
 def build(app):
-    if ADW:
+    if FILES:
+        add_css(os.path.join(BUILD, "libadwaita.css"))
+        win = files_window(app)
+    elif ADW:
         from gi.repository import Adw
         add_css(os.path.join(BUILD, "libadwaita.css"))
         win = Adw.ApplicationWindow(application=app, title="Oxygen libadwaita")

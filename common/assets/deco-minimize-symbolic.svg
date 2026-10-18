@@ -1,3 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-  <path d="M2.9 6.2 4.4 4.7 8 8.3 11.6 4.7 13.1 6.2 8 11.3Z" class="error" fill="#bebebe"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+  <circle class="warning" cx="10" cy="10" r="9"/>
+  <circle class="success" cx="10" cy="10" r="8"/>
+  <ellipse cx="10" cy="7.6" rx="6.6" ry="5" fill="#fff" fill-opacity="0.1"/>
+  <ellipse cx="10" cy="6.4" rx="5" ry="3.4" fill="#fff" fill-opacity="0.12"/>
+  <path class="error" d="M5.6 8.3 6.8 7.1 10 10.3 13.2 7.1 14.4 8.3 10 12.7Z"/>
 </svg>

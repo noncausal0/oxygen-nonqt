@@ -23,9 +23,9 @@
   --headerbar-shade-color: transparent;
   --headerbar-darker-shade-color: transparent;
 
-  --sidebar-bg-color: #{$base};
-  --sidebar-fg-color: #{$text};
-  --sidebar-backdrop-color: #{$base};
+  --sidebar-bg-color: #{$bg};
+  --sidebar-fg-color: #{$fg};
+  --sidebar-backdrop-color: #{$bg};
   --sidebar-border-color: #{shade($bg, 0.8)};
   --sidebar-shade-color: transparent;
   --secondary-sidebar-bg-color: #{$base};
@@ -140,17 +140,78 @@ row label.subtitle { opacity: 0.6; }
 preferencesgroup > box > box.header > box.labels > label.heading,
 preferencesgroup > box > box.header label.title { font-weight: bold; }
 
-// --- Navigation and sidebars ------------------------------------------------
+// --- Windows and panes ------------------------------------------------------
 
-.navigation-sidebar > row {
-  border-radius: 3px;
-  margin: 1px 4px;
-  &:selected { @include selection; }
+// libadwaita lets a window use the content colour throughout (the `view`
+// style class, which Nautilus uses). Oxygen windows always use the window
+// colour, with content views set into them as framed panels, so such windows
+// get the normal window background and their views are framed below.
+window.background.view {
+  background-color: $win_bottom;
+  background-image: linear-gradient(to bottom, $win_top, $win_bottom 300px);
+  color: $fg;
 }
+
+// Sidebars are part of the window, like Dolphin's panels: they repeat the
+// window gradient (they start at the top of the window too) instead of a
+// separate colour and divider.
 navigation-view, navigation-split-view > widget, overlay-split-view > widget { background: none; }
 navigation-split-view > widget.sidebar-pane, overlay-split-view > widget.sidebar-pane {
-  background-color: $base;
-  border-right: 1px solid shade($bg, 0.8);
+  background-color: $win_bottom;
+  background-image: linear-gradient(to bottom, $win_top, $win_bottom 300px);
+  border: none;
+  box-shadow: none;
+  color: $fg;
+}
+
+// The places list is a framed view inside the sidebar, like Dolphin's Places
+// panel. The viewport stretches the list to the sidebar's height, so the frame
+// runs to the bottom.
+.navigation-sidebar {
+  @include hole;
+  border-radius: $radius;
+  margin: 0 0 6px 6px;
+  padding: 3px;
+  color: $text;
+  > row {
+    border-radius: 3px;
+    margin: 1px 0;
+    &:selected { @include selection; }
+  }
+}
+overlay-split-view.collapsed .navigation-sidebar, navigation-split-view.collapsed .navigation-sidebar { margin-right: 6px; }
+
+// --- Nautilus ---------------------------------------------------------------
+
+// The file views are set into the window as framed panels with a margin, the
+// way Dolphin's view sits in its window. Their own backgrounds give way to the
+// frame's, so its rounded corners show.
+.nautilus-grid-view, .nautilus-list-view, .nautilus-network-view {
+  @include hole;
+  border-radius: $radius;
+  margin: 0 6px 6px 6px;
+  .view, gridview, columnview, columnview > listview, listview, scrolledwindow, viewport { background-color: transparent; }
+}
+
+// The path bar is a sunken field holding flat crumb buttons.
+.nautilus-pathbar {
+  @include hole;
+  border-radius: $radius;
+  padding: 0 2px;
+  min-height: 26px;
+  color: $text;
+  .nautilus-path-button {
+    background: none;
+    border-color: transparent;
+    box-shadow: none;
+    color: $text;
+    min-height: 20px;
+    padding: 1px 6px;
+    margin: 2px 0;
+    &:hover { @include raised; @include glow($hover); }
+    &.current-dir { font-weight: bold; }
+  }
+  > menubutton > button { background: none; border-color: transparent; box-shadow: none; color: $text; }
 }
 
 // --- Tab bars ---------------------------------------------------------------
