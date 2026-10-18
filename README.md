@@ -15,6 +15,12 @@ make install    # copies to ~/.local/share/themes/Oxygen
 
 Then pick "Oxygen" under System Settings → Colors & Themes → Application Style → Configure GNOME/GTK Application Style.
 
+Oxygen has no overlay scrollbars. GTK decides that outside the theme, so turn them off to get the classic always-visible scrollbars:
+
+```
+gsettings set org.gnome.desktop.interface overlay-scrolling false
+```
+
 ## License
 
 GPL-3.0-or-later. See [LICENSE](LICENSE).
