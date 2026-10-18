@@ -8,14 +8,15 @@ given, opens a few tabs and saves a screenshot of the whole browser window,
 taken through Marionette so it does not depend on window focus.
 
   firefox_window.py PROFILE_DIR OUT.png [--vertical] [--stock] [--wait]
-                    [--colors FILE.colors] [--height PX] [--newtab] [--hover-tab] [--url URL]
+                    [--colors FILE.colors] [--height PX] [--newtab] [--hover-tab] [--hover ID] [--url URL]
 
 --vertical switches to vertical tabs. --wait leaves the window open for
 interactive testing instead of quitting. --colors runs Firefox with its own
 GTK config holding that KDE colour scheme (Firefox takes its colours from
 GTK); the user's config is not touched. --newtab shows Firefox's new tab page
 in the selected tab, --url loads the given page there instead, and
---hover-tab holds an inactive tab in its hover state.
+--hover-tab holds an inactive tab in its hover state, and --hover ID holds
+the element with that id in its hover state.
 """
 import base64
 import json
@@ -46,6 +47,7 @@ PREFS = {
     "browser.tabs.firefox-view": False,
     "sidebar.revamp": True,
     "sidebar.verticalTabs": False,
+    "sidebar.verticalTabs.dragToPinPromo.dismissed": True,
     "browser.toolbars.bookmarks.visibility": "always",
     # As in firefox/user.js: the classic design in compact density.
     "browser.nova.enabled": False,
@@ -175,9 +177,12 @@ def main():
             }
             if (arguments[2])
                 InspectorUtils.addPseudoClassLock(gb.tabs[2], ":hover");
+            if (arguments[3])
+                InspectorUtils.addPseudoClassLock(win.document.getElementById(arguments[3]), ":hover");
         """, [PAGE.format(t) for t in ("Oxygen", "Selected tab", "Another tab", "Fourth tab")],
             "about:newtab" if "--newtab" in sys.argv else (sys.argv[sys.argv.index("--url") + 1] if "--url" in sys.argv else None),
-            "--hover-tab" in sys.argv)
+            "--hover-tab" in sys.argv,
+            sys.argv[sys.argv.index("--hover") + 1] if "--hover" in sys.argv else None)
         time.sleep(6 if "--newtab" in sys.argv or "--url" in sys.argv else 2.5)
         shot = m("WebDriver:TakeScreenshot", {"full": False})["value"]
         with open(out, "wb") as f:
