@@ -3,8 +3,11 @@ PREFIX  ?= $(HOME)/.local/share/themes
 GTK4CFG ?= $(HOME)/.config/gtk-4.0
 SASS    ?= sassc
 BUILD   := build/Oxygen
+# Where KDE renders the KWin decoration's buttons for GTK.
+DECO    ?= $(HOME)/.config/gtk-3.0/assets
+SASSFLAGS := -t expanded -I common/scss -I build/scss
 
-COMMON := $(wildcard common/scss/*.scss)
+COMMON := $(wildcard common/scss/*.scss) build/scss/_config.scss
 ASSETS := $(notdir $(wildcard common/assets/*.svg))
 
 # libadwaita only reads user CSS, so install hooks the theme's libadwaita
@@ -18,15 +21,23 @@ gtk4: $(BUILD)/gtk-4.0/gtk.css $(BUILD)/gtk-4.0/libadwaita.css $(addprefix $(BUI
 
 $(BUILD)/gtk-3.0/gtk.css: gtk3/scss/gtk.scss $(wildcard gtk3/scss/*.scss) $(COMMON)
 	@mkdir -p $(@D)
-	$(SASS) -t expanded -I common/scss $< $@
+	$(SASS) $(SASSFLAGS) $< $@
 
 $(BUILD)/gtk-4.0/gtk.css: gtk4/scss/gtk.scss $(wildcard gtk4/scss/*.scss) $(COMMON)
 	@mkdir -p $(@D)
-	$(SASS) -t expanded -I common/scss $< $@
+	$(SASS) $(SASSFLAGS) $< $@
 
 $(BUILD)/gtk-4.0/libadwaita.css: gtk4/scss/libadwaita-user.scss $(wildcard gtk4/scss/*.scss) $(COMMON)
 	@mkdir -p $(@D)
-	$(SASS) -t expanded -I common/scss $< $@
+	$(SASS) $(SASSFLAGS) $< $@
+
+# Build settings for the stylesheets. Rewritten only when they change, so
+# that make does not rebuild every time.
+build/scss/_config.scss: FORCE
+	@mkdir -p $(@D)
+	@if [ -f "$(DECO)/close-normal.svg" ]; then d='$(DECO)'; else d=''; fi; \
+	printf '$$deco_assets: "%s";\n' "$$d" > $@.tmp; \
+	cmp -s $@.tmp $@ && rm $@.tmp || mv $@.tmp $@
 
 $(BUILD)/gtk-3.0/assets/%.svg: common/assets/%.svg
 	@mkdir -p $(@D)
@@ -58,4 +69,5 @@ uninstall:
 clean:
 	rm -rf build
 
-.PHONY: all gtk3 gtk4 install uninstall clean
+.PHONY: all gtk3 gtk4 install uninstall clean FORCE
+FORCE:
