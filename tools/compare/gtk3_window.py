@@ -45,7 +45,10 @@ def main():
     if csd and not snapshot:
         hb = Gtk.HeaderBar(title="Oxygen GTK 3", show_close_button=True)
         hb.pack_start(Gtk.Button.new_from_icon_name("document-open", Gtk.IconSize.BUTTON))
-        hb.pack_end(Gtk.MenuButton())
+        menu = Gtk.Menu()
+        menu.append(Gtk.MenuItem(label="Preferences"))
+        menu.show_all()
+        hb.pack_end(Gtk.MenuButton(popup=menu, image=Gtk.Image.new_from_icon_name("open-menu", Gtk.IconSize.BUTTON)))
         win.set_titlebar(hb)
     else:
         bar = Gtk.MenuBar()

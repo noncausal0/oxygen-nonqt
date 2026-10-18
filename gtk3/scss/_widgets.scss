@@ -711,5 +711,5 @@ rubberband, .rubberband {
 
 assistant .sidebar label { padding: 4px 8px; &.highlight { font-weight: bold; } }
 
-// Title buttons drawn from the KWin decoration (see common/_decorations.scss).
+// Title buttons drawn like Oxygen's window decoration (see common/_decorations.scss).
 @include decoration-buttons(("headerbar button.titlebutton", ".titlebar button.titlebutton"), ".maximized", "image");

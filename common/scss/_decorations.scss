@@ -1,58 +1,72 @@
-// Title buttons from the real window decoration.
+// Title buttons in the style of Oxygen's window decoration.
 //
-// KDE renders the active KWin decoration's buttons, every state of each, to
-// ~/.config/gtk-3.0/assets and refreshes them when the decoration changes.
-// Painting title buttons with those images makes client-side titlebars use
-// Oxygen's actual buttons. The build sets $deco_assets
-// to that folder, or to "" when KDE has not generated it, in which case the
-// widget styles' own round buttons stay.
-//
-// KDE captures Oxygen's buttons before their hover animation has started, so
-// its hover images look the same as the normal ones. Hover therefore keeps
-// the normal image and adds Oxygen's glow ring itself: the hover colour, and
-// red for close.
+// KDE renders the KWin decoration's buttons to ~/.config/gtk-3.0/assets, but
+// only while Breeze is the GTK theme, so with this theme those images go stale
+// as soon as the colour scheme changes. The buttons are drawn here instead,
+// from the window colours, so they follow any scheme: a lit circle with a soft
+// rim and the glyph in the window text colour. Hovering turns the glyph and a
+// ring around it the hover colour, or red for close.
 
-@function deco-url($file) {
-  @return url("file://#{$deco_assets}/#{$file}.svg");
+@function deco-glyph($name) {
+  @return -gtk-recolor(url("assets/deco-#{$name}-symbolic.svg"));
+}
+
+// Shading multiplies lightness, which barely lifts dark colours and saturates
+// light ones, so the circle also mixes towards white to get a similar lift on
+// both.
+@function deco-face($pressed: false) {
+  $lit: gmix(shade($bg, 1.6), white, 0.12);
+  $base: gmix($bg, shade($bg, 1.6), 0.4);
+  @return if($pressed, linear-gradient(to bottom, $base, $lit), linear-gradient(to bottom, $lit, $base));
+}
+
+// The glyph is a recoloured image layered over the face, so it follows `color`.
+@mixin deco-layers($glyph) {
+  background-image: deco-glyph($glyph), deco-face();
+  &:active { background-image: deco-glyph($glyph), deco-face(true); }
+}
+
+@mixin deco-button($name, $glow) {
+  @include deco-layers($name);
+  background-color: $bg;
+  background-size: 14px 14px, auto;
+  background-repeat: no-repeat;
+  background-position: center;
+  border: 1px solid galpha(black, 0.25);
+  border-radius: 50%;
+  box-shadow: inset 0 1px galpha(white, 0.15), 0 1px 1px galpha(black, 0.2);
+  color: $fg;
+  min-width: 16px;
+  min-height: 16px;
+  padding: 0;
+
+  &:hover {
+    color: $glow;
+    border-color: galpha($glow, 0.7);
+    box-shadow: inset 0 0 2px 1px galpha($glow, 0.45), 0 1px 1px galpha(black, 0.2);
+  }
+  &:active {
+    color: $glow;
+    border-color: galpha($glow, 0.7);
+    box-shadow: inset 0 1px 2px galpha(black, 0.3);
+  }
+  &:backdrop { color: $backdrop_fg; }
+  &:backdrop:hover { color: $glow; }
 }
 
 // $headers: selectors for a title button, before its name class.
 // $maximized: prefix that matches a maximized window.
-// $image: selector for the button's own icon, which the image replaces.
+// $image: selector for the button's own icon, which the glyph replaces.
 @mixin decoration-buttons($headers, $maximized, $image) {
-  @if $deco_assets != "" {
-    @each $name in (close, maximize, minimize) {
-      @each $header in $headers {
-        #{$header}.#{$name} {
-          background-color: transparent;
-          // The button circle fills 72% of each image; scale it to fill the box
-          // so the glow ring hugs the circle.
-          background-size: 139% 139%;
-          background-repeat: no-repeat;
-          background-position: center;
-          border: none;
-          border-radius: 50%;
-          box-shadow: none;
-          min-width: 18px;
-          min-height: 18px;
-          padding: 0;
-          @include deco-states($name, if($name == close, $error, $hover));
-          #{$image} { opacity: 0; }
-        }
-        @if $name == maximize {
-          #{$maximized} #{$header}.maximize { @include deco-states(maximized, $hover); }
-        }
+  @each $name in (close, maximize, minimize) {
+    @each $header in $headers {
+      #{$header}.#{$name} {
+        @include deco-button($name, if($name == close, $error, $hover));
+        #{$image} { opacity: 0; }
+      }
+      @if $name == maximize {
+        #{$maximized} #{$header}.maximize { @include deco-layers(restore); }
       }
     }
   }
-}
-
-@mixin deco-states($name, $glow) {
-  background-image: deco-url("#{$name}-normal");
-  // Drawn inside the edge, since title buttons sit too close to the window
-  // edge for an outer glow to have room.
-  &:hover { border: none; box-shadow: inset 0 0 0 1px galpha($glow, 0.9), inset 0 0 3px 1px galpha($glow, 0.5); }
-  &:active { background-image: deco-url("#{$name}-active"); border: none; box-shadow: none; }
-  &:backdrop { background-image: deco-url("#{$name}-backdrop-normal"); }
-  &:backdrop:active { background-image: deco-url("#{$name}-backdrop-active"); }
 }

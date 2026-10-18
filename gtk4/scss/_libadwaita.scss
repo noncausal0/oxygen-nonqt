@@ -210,6 +210,6 @@ statuspage > scrolledwindow > viewport > box > clamp > box > .title { font-weigh
 .title-1, .title-2, .title-3, .title-4 { font-weight: bold; }
 .caption, .caption-heading { font-size: smaller; }
 
-// Title buttons drawn from the KWin decoration (see common/_decorations.scss).
+// Title buttons drawn like Oxygen's window decoration (see common/_decorations.scss).
 // They come last so they also beat libadwaita's own round title buttons.
 @include decoration-buttons(("windowcontrols > button.image-button",), "window.maximized", "> image");

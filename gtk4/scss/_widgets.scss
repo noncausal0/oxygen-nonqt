@@ -52,10 +52,10 @@ headerbar {
 
 // Oxygen's title buttons: small round raised buttons with the glyph inside.
 // Plain GTK 4 stretches them to the headerbar's height, so the margin keeps
-// them round in a 32px titlebar.
+// the 18px buttons round in a 32px titlebar.
 windowcontrols {
   border-spacing: 4px;
-  margin: 5px 0;
+  margin: 7px 0;
   > button.image-button {
     @include raised($bg);
     border-radius: 9999px;
