@@ -278,7 +278,7 @@
  * it, turning red with a glow when hovered. */
 .tab-close-button {
   list-style-image: url("icons/close.svg") !important;
-  -moz-context-properties: fill !important;
+  -moz-context-properties: fill, fill-opacity !important;
   fill: var(--ox-fg) !important;
   fill-opacity: 0.7 !important;
   width: 18px !important;
@@ -369,11 +369,13 @@ sidebar-main, #sidebar-main, #sidebar-box {
   appearance: none !important;
   background: none !important;
   padding: 0 3px !important;
-  -moz-context-properties: fill !important;
 }
 
 .titlebar-button > .toolbarbutton-icon {
   appearance: none !important;
+  /* Firefox sets this on the icon itself (to stroke), so it has to be set
+   * here for the glyph to get its colour. */
+  -moz-context-properties: fill !important;
   width: 20px !important;
   height: 20px !important;
   padding: 3px !important;
