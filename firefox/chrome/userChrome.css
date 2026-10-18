@@ -1,0 +1,339 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Oxygen for Firefox's toolbars and tabs.
+ *
+ * Colours come from Firefox's system colours, which Firefox reads from the
+ * GTK theme, which in turn follows the KDE colour scheme; so this follows the
+ * scheme and accent like the GTK theme does. Icons come from the system icon
+ * theme through moz-icon://stock/, so with KDE's Oxygen icons set they are
+ * Oxygen's.
+ *
+ * userChrome.css is a user stylesheet, which loses to Firefox's own author
+ * styles unless declarations are !important; hence all the !important. */
+
+/* --- Palette ---------------------------------------------------------------
+ *
+ * Firefox reports the GTK window colour as -moz-Dialog, about 2.5% darker
+ * than the window colour itself (measured: 209,205,203 for Oxygen's
+ * 214,210,208). The window colour and Oxygen's lit top and darker bottom are
+ * scaled from it; hsl() lightness scaling stands in for GTK's shade(). */
+
+:root {
+  --ox-bg: hsl(from -moz-Dialog h s calc(l * 1.025));
+  --ox-top: hsl(from -moz-Dialog h s calc(l * 1.077));
+  --ox-win: hsl(from -moz-Dialog h s calc(l * 0.944));
+  --ox-fg: -moz-DialogText;
+  --ox-base: Field;
+  --ox-text: FieldText;
+  --ox-sel: SelectedItem;
+  --ox-sel-fg: SelectedItemText;
+  --ox-focus: AccentColor;
+  --ox-hover: hsl(from AccentColor h s calc(min(l * 1.4, 72)));
+  --ox-btn: ButtonFace;
+  --ox-btn-fg: ButtonText;
+  --ox-frame: hsl(from var(--ox-bg) h s calc(l * 0.8));
+  --ox-frame-dark: hsl(from var(--ox-bg) h s calc(l * 0.62));
+  --ox-groove: hsl(from var(--ox-bg) h s calc(l * 0.84));
+  --ox-tab: hsl(from var(--ox-bg) h s calc(l * 0.9));
+  --ox-radius: 4px;
+  --ox-fade: 150ms ease-out;
+
+  /* Firefox's own theme variables, pointed at the palette. */
+  --toolbar-bgcolor: transparent !important;
+  --toolbar-color: var(--ox-fg) !important;
+  --toolbox-bgcolor: var(--ox-top) !important;
+  --toolbox-bgcolor-inactive: var(--ox-top) !important;
+  --toolbox-textcolor: var(--ox-fg) !important;
+  --toolbox-textcolor-inactive: var(--ox-fg) !important;
+  --tab-selected-bgcolor: var(--ox-bg) !important;
+  --tab-selected-textcolor: var(--ox-fg) !important;
+  --toolbarbutton-hover-background: transparent !important;
+  --toolbarbutton-active-background: transparent !important;
+  --toolbarbutton-border-radius: var(--ox-radius) !important;
+  --toolbar-field-background-color: var(--ox-base) !important;
+  --toolbar-field-focus-background-color: var(--ox-base) !important;
+  --toolbar-field-color: var(--ox-text) !important;
+  --toolbar-field-focus-color: var(--ox-text) !important;
+  --toolbar-field-border-color: var(--ox-frame) !important;
+  --toolbar-field-focus-border-color: var(--ox-focus) !important;
+  --chrome-content-separator-color: var(--ox-frame) !important;
+  --sidebar-background-color: transparent !important;
+  --sidebar-text-color: var(--ox-fg) !important;
+  --tabpanel-background-color: var(--ox-base) !important;
+  --focus-outline-color: var(--ox-focus) !important;
+}
+
+/* --- Window -----------------------------------------------------------------
+ *
+ * Oxygen lights the top of the window and darkens towards the bottom; the
+ * toolbars are part of the window, without separating lines. */
+
+#navigator-toolbox {
+  background: linear-gradient(to bottom, var(--ox-top), var(--ox-win) 300px) !important;
+  border-bottom: 1px solid var(--ox-frame) !important;
+  color: var(--ox-fg) !important;
+}
+
+#TabsToolbar, #nav-bar, #PersonalToolbar, #titlebar, #toolbar-menubar {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* --- Raised and sunken surfaces (the GTK theme's recipes) ------------------- */
+
+.toolbarbutton-1:not([disabled]):hover > :is(.toolbarbutton-icon, .toolbarbutton-badge-stack, .toolbarbutton-text),
+.bookmark-item:not([disabled]):hover,
+#tabs-newtab-button:hover > .toolbarbutton-icon,
+#vertical-tabs-newtab-button:hover {
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--ox-btn), white 8%), var(--ox-btn)) !important;
+  border-color: hsl(from var(--ox-btn) h s calc(l * 0.72)) !important;
+  border-bottom-color: hsl(from var(--ox-btn) h s calc(l * 0.56)) !important;
+  box-shadow: inset 0 1px color-mix(in srgb, var(--ox-btn), white 15%), 0 1px 1px rgb(0 0 0 / 0.12) !important;
+}
+
+/* Oxygen marks hover with a glow in the hover colour. */
+.toolbarbutton-1:not([disabled]):hover > :is(.toolbarbutton-icon, .toolbarbutton-badge-stack, .toolbarbutton-text),
+.bookmark-item:not([disabled]):hover,
+#tabs-newtab-button:hover > .toolbarbutton-icon,
+#vertical-tabs-newtab-button:hover {
+  border-color: var(--ox-hover) !important;
+  box-shadow: inset 0 1px rgb(255 255 255 / 0.15), 0 0 2px var(--ox-hover) !important;
+}
+
+/* Pressed, open or checked: nearly flat, shadowed from the top. */
+.toolbarbutton-1:not([disabled]):is([open], [checked], :hover:active) > :is(.toolbarbutton-icon, .toolbarbutton-badge-stack, .toolbarbutton-text),
+.bookmark-item:not([disabled]):is([open], :hover:active) {
+  background: linear-gradient(to bottom, hsl(from var(--ox-btn) h s calc(l * 0.94)), var(--ox-btn)) !important;
+  border-color: hsl(from var(--ox-btn) h s calc(l * 0.72)) !important;
+  border-top-color: hsl(from var(--ox-btn) h s calc(l * 0.6)) !important;
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.2) !important;
+}
+
+/* --- Toolbar buttons ---------------------------------------------------------
+ *
+ * Flat until hovered, like Oxygen tool buttons, with the glow fading in. */
+
+.toolbarbutton-1 > :is(.toolbarbutton-icon, .toolbarbutton-badge-stack, .toolbarbutton-text),
+.bookmark-item {
+  border: 1px solid transparent !important;
+  border-radius: var(--ox-radius) !important;
+  transition: border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
+}
+
+.bookmark-item { padding: 2px 6px !important; margin-inline: 1px !important; }
+.bookmark-item > .toolbarbutton-text { border: none !important; box-shadow: none !important; background: none !important; }
+
+/* --- Oxygen icons ------------------------------------------------------------
+ *
+ * Loaded from the system icon theme by name. */
+
+#back-button { list-style-image: url("moz-icon://stock/go-previous?size=16") !important; }
+#forward-button { list-style-image: url("moz-icon://stock/go-next?size=16") !important; }
+#reload-button { list-style-image: url("moz-icon://stock/view-refresh?size=16") !important; }
+#stop-button { list-style-image: url("moz-icon://stock/process-stop?size=16") !important; }
+#home-button { list-style-image: url("moz-icon://stock/go-home?size=16") !important; }
+#downloads-button { list-style-image: url("moz-icon://stock/download?size=16") !important; }
+#PanelUI-menu-button { list-style-image: url("moz-icon://stock/application-menu?size=16") !important; }
+#sidebar-button { list-style-image: url("moz-icon://stock/view-split-left-right?size=16") !important; }
+#unified-extensions-button { list-style-image: url("moz-icon://stock/preferences-plugin?size=16") !important; }
+#fxa-toolbar-menu-button { list-style-image: url("moz-icon://stock/user-identity?size=16") !important; }
+#library-button, #bookmarks-menu-button { list-style-image: url("moz-icon://stock/bookmarks?size=16") !important; }
+#new-tab-button, #tabs-newtab-button, #vertical-tabs-newtab-button { list-style-image: url("moz-icon://stock/tab-new?size=16") !important; }
+#alltabs-button { list-style-image: url("moz-icon://stock/arrow-down-double?size=16") !important; }
+#nav-bar-overflow-button { list-style-image: url("moz-icon://stock/arrow-right-double?size=16") !important; }
+#star-button { list-style-image: url("moz-icon://stock/bookmark-new?size=16") !important; }
+#star-button[starred] { list-style-image: url("moz-icon://stock/bookmarks?size=16") !important; }
+.bookmark-item[container] { list-style-image: url("moz-icon://stock/folder-bookmark?size=16") !important; }
+.tab-close-button { list-style-image: url("moz-icon://stock/tab-close?size=16") !important; }
+/* Pages without a favicon get Oxygen's web page icon instead of Firefox's
+ * globe. Firefox sets the globe as the tab icon's source, which only
+ * `content` can replace. */
+.tabbrowser-tab:is(:not([image]), [image^="chrome://global/skin/icons/defaultFavicon"]) .tab-icon-image {
+  content: url("moz-icon://stock/text-html?size=16") !important;
+  -moz-context-properties: none !important;
+}
+
+/* Firefox colours its own symbolic icons; the Oxygen ones keep their colours. */
+:is(#back-button, #forward-button, #reload-button, #stop-button, #home-button, #downloads-button,
+    #PanelUI-menu-button, #sidebar-button, #unified-extensions-button, #fxa-toolbar-menu-button,
+    #library-button, #bookmarks-menu-button, #new-tab-button, #tabs-newtab-button,
+    #vertical-tabs-newtab-button, #alltabs-button, #nav-bar-overflow-button) :is(.toolbarbutton-icon, .toolbarbutton-badge-stack > image) {
+  -moz-context-properties: none !important;
+}
+.toolbarbutton-1[disabled] > .toolbarbutton-icon { opacity: 0.4 !important; }
+
+/* --- URL and search bars -----------------------------------------------------
+ *
+ * Sunken fields with a focus glow. */
+
+:is(#urlbar, #searchbar) {
+  --urlbar-container-height: 32px !important;
+}
+#urlbar-background, #searchbar {
+  background-color: var(--ox-base) !important;
+  border: 1px solid var(--ox-frame) !important;
+  border-top-color: hsl(from var(--ox-bg) h s calc(l * 0.74)) !important;
+  border-radius: var(--ox-radius) !important;
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.08), 0 1px rgb(255 255 255 / 0.12) !important;
+  outline: none !important;
+  transition: border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
+}
+#urlbar:is([focused], [open]) > #urlbar-background, #searchbar:focus-within {
+  border-color: var(--ox-focus) !important;
+  box-shadow: 0 0 2px var(--ox-focus) !important;
+  outline: none !important;
+}
+#urlbar-input, #searchbar .searchbar-textbox { color: var(--ox-text) !important; }
+#urlbar .urlbar-page-action, #identity-box > box, #tracking-protection-icon-container {
+  border-radius: 3px !important;
+}
+
+/* --- Horizontal tabs -----------------------------------------------------------
+ *
+ * The active tab is a lit, raised surface that opens into the toolbar below;
+ * the others sit a little lower in a flat, darker strip, as in Oxygen's tab
+ * widgets. A line along the bottom of the strip closes off the inactive tabs. */
+
+#tabbrowser-tabs:not([orient="vertical"]) {
+  --tab-min-height: 28px !important;
+  --tab-border-radius: var(--ox-radius) !important;
+  --tab-block-margin: 0 !important;
+  border-inline-start: none !important;
+}
+
+#TabsToolbar:not([orient="vertical"]) {
+  box-shadow: inset 0 -1px var(--ox-frame) !important;
+}
+
+#tabbrowser-tabs:not([orient="vertical"]) .tabbrowser-tab {
+  padding-inline: 0 !important;
+  margin-inline-end: -1px !important;
+}
+
+#tabbrowser-tabs:not([orient="vertical"]) .tab-background {
+  margin-block: 4px 0 !important;
+  border: 1px solid var(--ox-frame) !important;
+  border-radius: var(--ox-radius) var(--ox-radius) 0 0 !important;
+  background: var(--ox-tab) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+#tabbrowser-tabs:not([orient="vertical"]) .tabbrowser-tab:hover:not([selected]) > .tab-stack > .tab-background {
+  background: hsl(from var(--ox-bg) h s calc(l * 0.95)) !important;
+}
+
+#tabbrowser-tabs:not([orient="vertical"]) .tabbrowser-tab[selected] > .tab-stack > .tab-background {
+  margin-top: 0 !important;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--ox-top), white 10%), var(--ox-top)) !important;
+  border-color: var(--ox-frame) !important;
+  border-bottom-color: transparent !important;
+  box-shadow: inset 0 1px rgb(255 255 255 / 0.15) !important;
+}
+
+.tabbrowser-tab { color: var(--ox-fg) !important; }
+.tab-label { font-weight: normal !important; }
+.tab-context-line, .tab-loading-burst { display: none !important; }
+
+.tab-close-button {
+  border-radius: 50% !important;
+  padding: 3px !important;
+  transition: box-shadow var(--ox-fade) !important;
+}
+.tab-close-button:hover {
+  background: none !important;
+  box-shadow: 0 0 0 1px var(--ox-hover), 0 0 3px var(--ox-hover) !important;
+}
+
+/* --- Vertical tabs ---------------------------------------------------------------
+ *
+ * The sidebar is part of the window, like Dolphin's panels. Tabs are rows that
+ * glow on hover; the active tab is raised like a pressed-out Oxygen button. */
+
+sidebar-main, #sidebar-main, #sidebar-box {
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--ox-top) 70%, var(--ox-win)), var(--ox-win) 200px) !important;
+  color: var(--ox-fg) !important;
+}
+
+#tabbrowser-tabs[orient="vertical"] .tab-background {
+  border: 1px solid transparent !important;
+  border-radius: var(--ox-radius) !important;
+  background: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
+}
+
+#tabbrowser-tabs[orient="vertical"] .tabbrowser-tab[selected] > .tab-stack > .tab-background {
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--ox-btn), white 8%), var(--ox-btn)) !important;
+  border-color: hsl(from var(--ox-btn) h s calc(l * 0.72)) !important;
+  border-bottom-color: hsl(from var(--ox-btn) h s calc(l * 0.56)) !important;
+  box-shadow: inset 0 1px color-mix(in srgb, var(--ox-btn), white 15%), 0 1px 1px rgb(0 0 0 / 0.12) !important;
+}
+
+#tabbrowser-tabs[orient="vertical"] .tabbrowser-tab:hover:not([selected]) > .tab-stack > .tab-background {
+  border-color: var(--ox-hover) !important;
+  box-shadow: 0 0 2px var(--ox-hover) !important;
+}
+
+#vertical-tabs-newtab-button {
+  border: 1px solid transparent !important;
+  border-radius: var(--ox-radius) !important;
+  transition: border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
+}
+
+/* With vertical tabs the page sits in a framed panel, like Dolphin's view. */
+:root:has(#tabbrowser-tabs[orient="vertical"]) #tabbrowser-tabbox {
+  border: 1px solid var(--ox-frame) !important;
+  border-radius: var(--ox-radius) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* --- Title buttons ------------------------------------------------------------------
+ *
+ * Oxygen's window decoration buttons: lit circles with the glyph in the text
+ * colour; hovering fades the glyph and a ring around it to the hover colour,
+ * or red for close. */
+
+.titlebar-button {
+  appearance: none !important;
+  background: none !important;
+  padding: 0 3px !important;
+  -moz-context-properties: fill !important;
+}
+
+.titlebar-button > .toolbarbutton-icon {
+  appearance: none !important;
+  width: 20px !important;
+  height: 20px !important;
+  padding: 3px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(to bottom, color-mix(in srgb, hsl(from var(--ox-bg) h s calc(l * 1.6)), white 12%),
+                                         color-mix(in srgb, var(--ox-bg) 60%, hsl(from var(--ox-bg) h s calc(l * 1.6)))) !important;
+  border: 1px solid color-mix(in srgb, var(--ox-bg), black 35%) !important;
+  box-shadow: inset 0 1px rgb(255 255 255 / 0.15) !important;
+  fill: var(--ox-fg) !important;
+  transition: fill var(--ox-fade), border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
+}
+
+.titlebar-min { list-style-image: url("icons/minimize.svg") !important; }
+.titlebar-max { list-style-image: url("icons/maximize.svg") !important; }
+.titlebar-restore { list-style-image: url("icons/restore.svg") !important; }
+.titlebar-close { list-style-image: url("icons/close.svg") !important; }
+
+.titlebar-button:hover > .toolbarbutton-icon {
+  fill: var(--ox-hover) !important;
+  border-color: var(--ox-hover) !important;
+  box-shadow: inset 0 0 2px 1px color-mix(in srgb, var(--ox-hover) 45%, transparent) !important;
+}
+.titlebar-close:hover > .toolbarbutton-icon {
+  fill: rgb(191 3 3) !important;
+  border-color: rgb(191 3 3) !important;
+  box-shadow: inset 0 0 2px 1px rgb(191 3 3 / 0.45) !important;
+}
+.titlebar-button:hover:active > .toolbarbutton-icon {
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.3) !important;
+}
+:root:not([sizemode="maximized"]) .titlebar-restore,
+:root[sizemode="maximized"] .titlebar-max { display: none !important; }

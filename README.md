@@ -11,6 +11,7 @@ Early stage. There are no colour variants: the theme follows the KDE colour sche
 - **GTK 3** (`gtk3/`): a regular GTK theme.
 - **GTK 4** (`gtk4/`): a regular GTK theme for plain GTK 4 apps.
 - **libadwaita** (`gtk4/scss/_libadwaita.scss`): libadwaita apps ignore GTK themes, so `make install` adds one `@import` line to `~/.config/gtk-4.0/gtk.css` that loads Oxygen on top of libadwaita. `make uninstall` removes it again. This layer relies on the colours KDE exports and has no fallbacks of its own.
+- **Firefox** (`firefox/`): a `userChrome.css` for the toolbars and tabs, horizontal or vertical, with Oxygen icons from the system icon theme. Firefox takes its colours from the GTK theme, so it follows the KDE scheme too.
 
 Shared colour handling and drawing recipes live in `common/`.
 
@@ -20,6 +21,15 @@ make install    # copies to ~/.local/share/themes/Oxygen and hooks up libadwaita
 ```
 
 Then pick "Oxygen" under System Settings → Colors & Themes → Application Style → Configure GNOME/GTK Application Style.
+
+For Firefox, install into a profile (the directory shown in `about:profiles`) and restart Firefox:
+
+```
+make firefox-install PROFILE=~/.mozilla/firefox/xxxxxxxx.default-release
+make firefox-uninstall PROFILE=...    # removes it again
+```
+
+This puts the theme in the profile's `chrome/oxygen/`, adds one `@import` line to `chrome/userChrome.css` (an existing one keeps its rules) and two preferences to `user.js`: one to load `userChrome.css`, and one that stops Firefox from replacing light GTK themes' colours with libadwaita's.
 
 Oxygen has no overlay scrollbars. GTK decides that outside the theme, so turn them off to get the classic always-visible scrollbars:
 
@@ -40,8 +50,10 @@ The comparison windows from `tools/compare/`, in KDE's stock Oxygen and Oxygen D
 | **GTK 4** | <a href="docs/screenshots/gtk4-light.png"><img src="docs/screenshots/gtk4-light.png" width="380"></a> | <a href="docs/screenshots/gtk4-dark.png"><img src="docs/screenshots/gtk4-dark.png" width="380"></a> |
 | **libadwaita** | <a href="docs/screenshots/libadwaita-light.png"><img src="docs/screenshots/libadwaita-light.png" width="380"></a> | <a href="docs/screenshots/libadwaita-dark.png"><img src="docs/screenshots/libadwaita-dark.png" width="380"></a> |
 | **Files (Nautilus layout)** | <a href="docs/screenshots/files-light.png"><img src="docs/screenshots/files-light.png" width="380"></a> | <a href="docs/screenshots/files-dark.png"><img src="docs/screenshots/files-dark.png" width="380"></a> |
+| **Firefox** | <a href="docs/screenshots/firefox-light.png"><img src="docs/screenshots/firefox-light.png" width="380"></a> | <a href="docs/screenshots/firefox-dark.png"><img src="docs/screenshots/firefox-dark.png" width="380"></a> |
+| **Firefox, vertical tabs** | <a href="docs/screenshots/firefox-vertical-light.png"><img src="docs/screenshots/firefox-vertical-light.png" width="380"></a> | <a href="docs/screenshots/firefox-vertical-dark.png"><img src="docs/screenshots/firefox-vertical-dark.png" width="380"></a> |
 
-The Qt and GTK 3 windows are shown without a titlebar, since KWin draws theirs. The libadwaita and Files windows are test mocks built from libadwaita widgets, not the real apps.
+The Qt and GTK 3 windows are shown without a titlebar, since KWin draws theirs. The libadwaita and Files windows are test mocks built from libadwaita widgets, not the real apps. The striped address bar in the Firefox shots is Firefox marking the window as remote-controlled by the screenshot script.
 
 ## License
 
