@@ -7,3 +7,7 @@ Ports of the KDE Oxygen theme to non-Qt toolkits (GTK and others), so the whole 
 ## Status
 
 Early stage. Nothing usable yet.
+
+## License
+
+GPL-3.0-or-later. See [LICENSE](LICENSE).
