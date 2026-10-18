@@ -29,6 +29,20 @@ gsettings set org.gnome.desktop.interface overlay-scrolling false
 
 `tools/compare/` renders the same widgets in Qt Oxygen, GTK 3, GTK 4 and libadwaita, with any KDE `.colors` scheme, for side-by-side checks.
 
+## Screenshots
+
+The comparison windows from `tools/compare/`, in KDE's stock Oxygen and Oxygen Dark schemes. Click for full size. Regenerate them with `tools/screenshots.sh` after `make install`.
+
+| | Oxygen | Oxygen Dark |
+|---|---|---|
+| **Qt (reference)** | <a href="docs/screenshots/qt-light.png"><img src="docs/screenshots/qt-light.png" width="380"></a> | <a href="docs/screenshots/qt-dark.png"><img src="docs/screenshots/qt-dark.png" width="380"></a> |
+| **GTK 3** | <a href="docs/screenshots/gtk3-light.png"><img src="docs/screenshots/gtk3-light.png" width="380"></a> | <a href="docs/screenshots/gtk3-dark.png"><img src="docs/screenshots/gtk3-dark.png" width="380"></a> |
+| **GTK 4** | <a href="docs/screenshots/gtk4-light.png"><img src="docs/screenshots/gtk4-light.png" width="380"></a> | <a href="docs/screenshots/gtk4-dark.png"><img src="docs/screenshots/gtk4-dark.png" width="380"></a> |
+| **libadwaita** | <a href="docs/screenshots/libadwaita-light.png"><img src="docs/screenshots/libadwaita-light.png" width="380"></a> | <a href="docs/screenshots/libadwaita-dark.png"><img src="docs/screenshots/libadwaita-dark.png" width="380"></a> |
+| **Files (Nautilus layout)** | <a href="docs/screenshots/files-light.png"><img src="docs/screenshots/files-light.png" width="380"></a> | <a href="docs/screenshots/files-dark.png"><img src="docs/screenshots/files-dark.png" width="380"></a> |
+
+The Qt and GTK 3 windows are shown without a titlebar, since KWin draws theirs. The libadwaita and Files windows are test mocks built from libadwaita widgets, not the real apps.
+
 ## License
 
 GPL-3.0-or-later. See [LICENSE](LICENSE).
