@@ -4,11 +4,15 @@
 // only while Breeze is the GTK theme, so with this theme those images go stale
 // as soon as the colour scheme changes. The buttons are drawn here instead,
 // from the window colours, so they follow any scheme: a lit circle with a soft
-// rim and the glyph in the window text colour. Hovering turns the glyph and a
-// ring around it the hover colour, or red for close.
+// rim and the glyph in the window text colour. Hovering fades the glyph and a
+// ring around it to the hover colour, or red for close.
 
-@function deco-glyph($name) {
-  @return -gtk-recolor(url("assets/deco-#{$name}-symbolic.svg"));
+// The glyph's shapes carry the symbolic "error" class, so its colour comes
+// from the recolour palette rather than from `color`. That makes each glyph
+// colour a separate image, which GTK can cross-fade when the state changes;
+// a transition on `color` alone would switch the glyph instantly.
+@function deco-glyph($name, $color) {
+  @return -gtk-recolor(url("assets/deco-#{$name}-symbolic.svg"), error #{$color});
 }
 
 // Shading multiplies lightness, which barely lifts dark colours and saturates
@@ -20,14 +24,17 @@
   @return if($pressed, linear-gradient(to bottom, $base, $lit), linear-gradient(to bottom, $lit, $base));
 }
 
-// The glyph is a recoloured image layered over the face, so it follows `color`.
-@mixin deco-layers($glyph) {
-  background-image: deco-glyph($glyph), deco-face();
-  &:active { background-image: deco-glyph($glyph), deco-face(true); }
+// The glyph is a recoloured image layered over the face.
+@mixin deco-layers($glyph, $glow) {
+  background-image: deco-glyph($glyph, $fg), deco-face();
+  &:hover { background-image: deco-glyph($glyph, $glow), deco-face(); }
+  &:active { background-image: deco-glyph($glyph, $glow), deco-face(true); }
+  &:backdrop { background-image: deco-glyph($glyph, $backdrop_fg), deco-face(); }
+  &:backdrop:hover { background-image: deco-glyph($glyph, $glow), deco-face(); }
 }
 
 @mixin deco-button($name, $glow) {
-  @include deco-layers($name);
+  @include deco-layers($name, $glow);
   background-color: $bg;
   background-size: 14px 14px, auto;
   background-repeat: no-repeat;
@@ -35,23 +42,20 @@
   border: 1px solid galpha(black, 0.25);
   border-radius: 50%;
   box-shadow: inset 0 1px galpha(white, 0.15), 0 1px 1px galpha(black, 0.2);
-  color: $fg;
   min-width: 16px;
   min-height: 16px;
   padding: 0;
+  // Oxygen fades the hover glow in and out.
+  transition: background-image 150ms ease-out, border-color 150ms ease-out, box-shadow 150ms ease-out;
 
   &:hover {
-    color: $glow;
     border-color: galpha($glow, 0.7);
     box-shadow: inset 0 0 2px 1px galpha($glow, 0.45), 0 1px 1px galpha(black, 0.2);
   }
   &:active {
-    color: $glow;
     border-color: galpha($glow, 0.7);
     box-shadow: inset 0 1px 2px galpha(black, 0.3);
   }
-  &:backdrop { color: $backdrop_fg; }
-  &:backdrop:hover { color: $glow; }
 }
 
 // $headers: selectors for a title button, before its name class.
@@ -65,7 +69,7 @@
         #{$image} { opacity: 0; }
       }
       @if $name == maximize {
-        #{$maximized} #{$header}.maximize { @include deco-layers(restore); }
+        #{$maximized} #{$header}.maximize { @include deco-layers(restore, $hover); }
       }
     }
   }
