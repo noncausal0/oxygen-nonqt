@@ -337,14 +337,14 @@ progressbar {
   > trough {
     @include groove;
     border-radius: 3px;
-    min-height: 14px;
-    min-width: 14px;
+    min-height: 18px;
+    min-width: 18px;
     > progress {
       @include accent-bar;
       border-radius: 3px;
       margin: -1px;
-      min-height: 14px;
-      min-width: 14px;
+      min-height: 18px;
+      min-width: 18px;
     }
   }
   &.osd > trough { border: none; background: none; box-shadow: none; min-height: 3px;
@@ -461,7 +461,7 @@ textview { > text > selection { background-color: $sel_bg; color: $sel_fg; } > b
 // a light edge rather than a dark outline. GTK 4 draws the frame on the node
 // itself; there is no separate border node.
 frame {
-  background-image: linear-gradient(to bottom, galpha(shade($bg, 1.2), 0.45), galpha(shade($bg, 1.2), 0.08));
+  background-image: linear-gradient(to bottom, galpha(shade($bg, 1.8), 0.4), galpha(shade($bg, 1.8), 0.15));
   border: 1px solid galpha(shade($bg, 1.25), 0.8);
   border-bottom-color: galpha(shade($bg, 0.8), 0.6);
   border-radius: 5px;
@@ -501,7 +501,7 @@ notebook {
       &:hover:not(:checked) { background-color: shade($bg, 0.93); }
       &:checked {
         background-color: $bg;
-        background-image: linear-gradient(to bottom, shade($bg, 1.08), shade($bg, 0.98));
+        background-image: linear-gradient(to bottom, gmix(shade($bg, 1.12), white, 0.1), shade($bg, 1.0));
         box-shadow: inset 0 1px shade($bg, 1.15);
       }
       &:disabled { color: $dis_fg; }
