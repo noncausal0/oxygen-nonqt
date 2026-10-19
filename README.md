@@ -62,7 +62,7 @@ flatpak override --user \
   --filesystem=xdg-data/themes:ro
 ```
 
-Then restart the apps. A few need more, such as GIMP; see [Flatpak details](#flatpak-details).
+Then restart the apps. A few apps have their own theme setting that needs switching to the system theme, such as GIMP and Inkscape; see [Flatpak details](#flatpak-details).
 
 ### Uninstalling
 
