@@ -1,0 +1,45 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Per-user setup for the Oxygen GTK theme's libadwaita part.
+#
+# libadwaita apps ignore GTK themes and only read the user's gtk.css, so
+# `enable` adds one @import line to ~/.config/gtk-4.0/gtk.css that loads
+# Oxygen's libadwaita stylesheet from wherever the theme is installed, and
+# `disable` removes it again. Run it as each user; distro packages cannot do
+# this system-wide.
+#
+#   oxygen-gtk-setup enable | disable
+set -e
+
+here=$(cd "$(dirname "$0")" && pwd)
+if [ -d "$here/Oxygen" ]; then theme_dir="$here/Oxygen"; else theme_dir="$here/../share/themes/Oxygen"; fi
+theme=$(cd "$theme_dir" 2>/dev/null && pwd) || { echo "Oxygen theme not found at $theme_dir" >&2; exit 1; }
+cfg="${XDG_CONFIG_HOME:-$HOME/.config}/gtk-4.0"
+css="$cfg/gtk.css"
+
+# Drop any earlier import of Oxygen, wherever it pointed.
+drop() {
+    [ -f "$css" ] || return 0
+    grep -v 'Oxygen/gtk-4.0/libadwaita.css' "$css" > "$css.tmp" || true
+    mv "$css.tmp" "$css"
+}
+
+case "$1" in
+enable)
+    mkdir -p "$cfg"
+    touch "$css"
+    drop
+    # KDE writes gtk.css without a final newline; keep its line intact.
+    if [ -s "$css" ] && [ -n "$(tail -c1 "$css")" ]; then echo >> "$css"; fi
+    echo "@import url(\"file://$theme/gtk-4.0/libadwaita.css\");" >> "$css"
+    echo "libadwaita apps will use Oxygen (restart them)."
+    ;;
+disable)
+    drop
+    echo "Removed Oxygen from $css."
+    ;;
+*)
+    echo "Usage: $0 enable|disable" >&2
+    exit 1
+    ;;
+esac

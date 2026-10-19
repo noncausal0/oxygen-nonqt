@@ -13,7 +13,8 @@ kdeglobals or a .colors file, as --ox-c-* variables.
 import os
 import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "compare"))
+here = os.path.dirname(os.path.abspath(__file__))
+sys.path[:0] = [here, os.path.join(here, "compare")]  # beside it in a package, in compare/ in the repo
 import kdecolors  # noqa: E402
 
 COLORS = {

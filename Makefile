@@ -1,16 +1,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-PREFIX  ?= $(HOME)/.local/share/themes
-GTK4CFG ?= $(HOME)/.config/gtk-4.0
+# PREFIX and DESTDIR follow the usual conventions: `make install` puts the
+# theme in $(PREFIX)/share/themes/Oxygen.
+PREFIX  ?= $(HOME)/.local
+VERSION := $(shell cat VERSION)
 SASS    ?= sassc
 BUILD   := build/Oxygen
 SASSFLAGS := -t expanded -I common/scss
 
 COMMON := $(wildcard common/scss/*.scss)
 ASSETS := $(notdir $(wildcard common/assets/*.svg))
-
-# libadwaita only reads user CSS, so install hooks the theme's libadwaita
-# stylesheet into the user's gtk.css with this line.
-IMPORT := @import url("file://$(PREFIX)/Oxygen/gtk-4.0/libadwaita.css");
 
 all: gtk3 gtk4 $(BUILD)/index.theme
 
@@ -41,85 +39,76 @@ $(BUILD)/index.theme: gtk3/index.theme
 	@mkdir -p $(@D)
 	cp $< $@
 
-install: all
-	rm -rf $(PREFIX)/Oxygen
-	mkdir -p $(PREFIX)
-	cp -r $(BUILD) $(PREFIX)/Oxygen
-	@mkdir -p $(GTK4CFG)
-	@touch $(GTK4CFG)/gtk.css
-	@grep -qF '$(IMPORT)' $(GTK4CFG)/gtk.css || { \
-		if [ -n "$$(tail -c1 $(GTK4CFG)/gtk.css)" ]; then echo >> $(GTK4CFG)/gtk.css; fi; \
-		echo '$(IMPORT)' >> $(GTK4CFG)/gtk.css; \
-		echo "Added libadwaita import to $(GTK4CFG)/gtk.css"; }
+# --- Packages -----------------------------------------------------------------
+#
+# The GTK theme and the Firefox theme are two separate packages, each a tarball
+# holding the finished files and small install scripts (no sassc or make
+# needed to install them). `make dist` builds both into dist/.
 
-uninstall:
-	rm -rf $(PREFIX)/Oxygen
-	@if [ -f $(GTK4CFG)/gtk.css ]; then grep -vF '$(IMPORT)' $(GTK4CFG)/gtk.css > $(GTK4CFG)/gtk.css.tmp; mv $(GTK4CFG)/gtk.css.tmp $(GTK4CFG)/gtk.css; fi
+PKG      := build/pkg
+GTK_PKG  := $(PKG)/oxygen-gtk-$(VERSION)
+FF_PKG   := $(PKG)/oxygen-firefox-$(VERSION)
+# Fixed timestamps and ordering keep the tarballs reproducible.
+EPOCH    := $(or $(SOURCE_DATE_EPOCH),$(shell git log -1 --format=%ct 2>/dev/null || echo 0))
+TAR      := tar --sort=name --owner=0 --group=0 --numeric-owner --mtime=@$(EPOCH)
+
+stage-gtk: all
+	rm -rf $(GTK_PKG)
+	mkdir -p $(GTK_PKG)
+	cp -r $(BUILD) $(GTK_PKG)/Oxygen
+	cp packaging/gtk/install.sh packaging/gtk/uninstall.sh packaging/gtk/oxygen-gtk-setup $(GTK_PKG)/
+	cp packaging/gtk/README.md LICENSE $(GTK_PKG)/
+	echo $(VERSION) > $(GTK_PKG)/VERSION
+
+stage-firefox:
+	rm -rf $(FF_PKG)
+	mkdir -p $(FF_PKG)/data/tools
+	cp -r firefox/chrome firefox/user.js $(FF_PKG)/data/
+	cp -r packaging/firefox/systemd packaging/firefox/refresh-colors.sh $(FF_PKG)/data/
+	cp tools/firefox_colors.py tools/compare/kdecolors.py $(FF_PKG)/data/tools/
+	cp packaging/firefox/install.sh packaging/firefox/uninstall.sh packaging/firefox/oxygen-firefox-setup $(FF_PKG)/
+	cp packaging/firefox/README.md LICENSE $(FF_PKG)/
+	echo $(VERSION) > $(FF_PKG)/VERSION
+
+dist: stage-gtk stage-firefox
+	mkdir -p dist
+	cd $(PKG) && $(TAR) -czf ../../dist/oxygen-gtk-$(VERSION).tar.gz oxygen-gtk-$(VERSION)
+	cd $(PKG) && $(TAR) -czf ../../dist/oxygen-firefox-$(VERSION).tar.gz oxygen-firefox-$(VERSION)
+	cd dist && sha256sum oxygen-*-$(VERSION).tar.gz > SHA256SUMS
+	@cat dist/SHA256SUMS
+
+# --- Installing from the source tree --------------------------------------------
+#
+# These run the packages' own scripts from the staged trees, so what is tested
+# here is what users get.
+
+install: stage-gtk
+	PREFIX="$(PREFIX)" DESTDIR="$(DESTDIR)" $(GTK_PKG)/install.sh
+
+uninstall: stage-gtk
+	PREFIX="$(PREFIX)" DESTDIR="$(DESTDIR)" $(GTK_PKG)/uninstall.sh
+
+# Firefox, per profile: make firefox-install PROFILE=<dir from about:profiles>
+# (FF_SCHEME=<file>.colors picks a colour scheme other than the current one).
+firefox-install: stage-firefox
+	@test -n "$(PROFILE)" || { echo "Usage: make firefox-install PROFILE=<profile directory, see about:profiles>"; exit 1; }
+	$(FF_PKG)/oxygen-firefox-setup install "$(PROFILE)" $(FF_SCHEME)
+
+firefox-uninstall: stage-firefox
+	@test -n "$(PROFILE)" || { echo "Usage: make firefox-uninstall PROFILE=<profile directory>"; exit 1; }
+	$(FF_PKG)/oxygen-firefox-setup uninstall "$(PROFILE)"
+
+# Refresh the new tab colours automatically when the KDE scheme changes. The
+# unit needs the files installed, so this installs them into $(PREFIX) first.
+firefox-watch-install: stage-firefox
+	PREFIX="$(PREFIX)" $(FF_PKG)/install.sh
+	"$(PREFIX)/bin/oxygen-firefox-setup" watch-enable
+
+firefox-watch-uninstall: stage-firefox
+	$(FF_PKG)/oxygen-firefox-setup watch-disable
 
 clean:
-	rm -rf build
+	rm -rf build dist
 
-# Firefox, per profile: make firefox-install PROFILE=<dir from about:profiles>.
-# The theme goes into chrome/oxygen/ and is pulled in by one @import line in
-# each of userChrome.css and userContent.css, so existing ones keep working;
-# the new tab page's colours are written from the current KDE scheme; the prefs it needs go into user.js
-# between markers. firefox-uninstall removes exactly those again.
-FF_SHEETS := userChrome userContent
-# The new tab page cannot read the KDE colours live; install writes them from
-# this scheme (rerun after changing schemes).
-FF_SCHEME ?= $(firstword $(wildcard $(HOME)/.config/kdeglobals) /usr/share/color-schemes/Oxygen.colors)
-FF_BEGIN  := // oxygen-nonqt begin
-FF_END    := // oxygen-nonqt end
-
-FF_STATE := $(or $(XDG_DATA_HOME),$(HOME)/.local/share)/oxygen-nonqt
-UNITS    := $(or $(XDG_CONFIG_HOME),$(HOME)/.config)/systemd/user
-
-# Optional: refresh the new tab colours automatically when the KDE scheme
-# changes, with a systemd user path unit watching kdeglobals.
-firefox-watch-install:
-	mkdir -p "$(UNITS)"
-	cp firefox/systemd/oxygen-firefox-colors.path "$(UNITS)/"
-	sed 's|@REPO@|$(CURDIR)|' firefox/systemd/oxygen-firefox-colors.service.in > "$(UNITS)/oxygen-firefox-colors.service"
-	systemctl --user daemon-reload
-	systemctl --user enable --now oxygen-firefox-colors.path
-
-firefox-watch-uninstall:
-	-systemctl --user disable --now oxygen-firefox-colors.path
-	rm -f "$(UNITS)/oxygen-firefox-colors.path" "$(UNITS)/oxygen-firefox-colors.service"
-	-systemctl --user daemon-reload
-
-firefox-check:
-	@test -n "$(PROFILE)" || { echo "Usage: make $(MAKECMDGOALS) PROFILE=<profile directory, see about:profiles>"; exit 1; }
-	@test -f "$(PROFILE)/prefs.js" || { echo "$(PROFILE) does not look like a Firefox profile (no prefs.js)"; exit 1; }
-
-firefox-install: firefox-check
-	rm -rf "$(PROFILE)/chrome/oxygen"
-	mkdir -p "$(PROFILE)/chrome"
-	cp -r firefox/chrome "$(PROFILE)/chrome/oxygen"
-	python3 -I tools/firefox_colors.py "$(FF_SCHEME)" "$(PROFILE)/chrome/oxygen/content-colors.css"
-	@for sheet in $(FF_SHEETS); do \
-		f="$(PROFILE)/chrome/$$sheet.css"; line="@import url(\"oxygen/$$sheet.css\");"; \
-		touch "$$f"; \
-		grep -qF "$$line" "$$f" || { { echo "$$line"; cat "$$f"; } > "$$f.tmp"; mv "$$f.tmp" "$$f"; }; \
-	done
-	@touch "$(PROFILE)/user.js"
-	@sed '\|^$(FF_BEGIN)$$|,\|^$(FF_END)$$|d' "$(PROFILE)/user.js" > "$(PROFILE)/user.js.tmp"; \
-		mv "$(PROFILE)/user.js.tmp" "$(PROFILE)/user.js"; \
-		if [ -n "$$(tail -c1 "$(PROFILE)/user.js")" ]; then echo >> "$(PROFILE)/user.js"; fi; \
-		{ echo '$(FF_BEGIN)'; cat firefox/user.js; echo '$(FF_END)'; } >> "$(PROFILE)/user.js"
-	@mkdir -p "$(FF_STATE)"
-	@grep -qxF "$(abspath $(PROFILE))" "$(FF_STATE)/firefox-profiles" 2>/dev/null || echo "$(abspath $(PROFILE))" >> "$(FF_STATE)/firefox-profiles"
-	@echo "Installed into $(PROFILE). Restart Firefox."
-
-firefox-uninstall: firefox-check
-	rm -rf "$(PROFILE)/chrome/oxygen"
-	@for sheet in $(FF_SHEETS); do \
-		f="$(PROFILE)/chrome/$$sheet.css"; line="@import url(\"oxygen/$$sheet.css\");"; \
-		if [ -f "$$f" ]; then grep -vF "$$line" "$$f" > "$$f.tmp"; mv "$$f.tmp" "$$f"; fi; \
-	done
-	@if [ -f "$(PROFILE)/user.js" ]; then \
-		sed '\|^$(FF_BEGIN)$$|,\|^$(FF_END)$$|d' "$(PROFILE)/user.js" > "$(PROFILE)/user.js.tmp"; \
-		mv "$(PROFILE)/user.js.tmp" "$(PROFILE)/user.js"; fi
-	@echo "Removed from $(PROFILE). Prefs already applied stay set in prefs.js until changed in about:config."
-
-.PHONY: all gtk3 gtk4 install uninstall clean firefox-check firefox-install firefox-uninstall firefox-watch-install firefox-watch-uninstall
+.PHONY: all gtk3 gtk4 stage-gtk stage-firefox dist install uninstall clean \
+	firefox-install firefox-uninstall firefox-watch-install firefox-watch-uninstall

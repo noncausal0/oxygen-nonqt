@@ -3,4 +3,4 @@ Description=Refresh Oxygen's Firefox new tab colours from the KDE scheme
 
 [Service]
 Type=oneshot
-ExecStart=@REPO@/tools/firefox-refresh-colors.sh
+ExecStart=@DATA@/refresh-colors.sh

@@ -1,0 +1,99 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Install the Oxygen theme into a Firefox profile.
+#
+#   oxygen-firefox-setup install PROFILE [SCHEME]   add it to a profile
+#   oxygen-firefox-setup uninstall PROFILE          remove it again
+#   oxygen-firefox-setup refresh                    rewrite the new tab colours
+#   oxygen-firefox-setup watch-enable               refresh them automatically
+#   oxygen-firefox-setup watch-disable
+#
+# PROFILE is the profile folder shown as "Root Directory" in about:profiles.
+# SCHEME is a KDE colour scheme file (default: the current ~/.config/kdeglobals).
+set -e
+
+here=$(cd "$(dirname "$0")" && pwd)
+if [ -d "$here/data" ]; then data="$here/data"; else data="$here/../share/oxygen-firefox"; fi
+data=$(cd "$data" 2>/dev/null && pwd) || { echo "Oxygen Firefox files not found at $data" >&2; exit 1; }
+
+STATE="${XDG_DATA_HOME:-$HOME/.local/share}/oxygen-nonqt"
+LIST="$STATE/firefox-profiles"
+UNITS="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
+BEGIN='// oxygen-nonqt begin'
+END='// oxygen-nonqt end'
+SHEETS="userChrome userContent"
+
+scheme_default() {
+    if [ -f "$HOME/.config/kdeglobals" ]; then echo "$HOME/.config/kdeglobals"
+    else echo /usr/share/color-schemes/Oxygen.colors; fi
+}
+
+profile_check() {
+    [ -n "$1" ] || { echo "Usage: $0 $cmd PROFILE" >&2; exit 1; }
+    [ -f "$1/prefs.js" ] || { echo "$1 does not look like a Firefox profile (no prefs.js)" >&2; exit 1; }
+}
+
+# Delete the marked block from user.js.
+strip_prefs() {
+    [ -f "$1/user.js" ] || return 0
+    sed "\\|^$BEGIN\$|,\\|^$END\$|d" "$1/user.js" > "$1/user.js.tmp"
+    mv "$1/user.js.tmp" "$1/user.js"
+}
+
+cmd="$1"
+case "$cmd" in
+install)
+    profile=$(cd "$2" 2>/dev/null && pwd) || profile="$2"
+    profile_check "$profile"
+    scheme="${3:-$(scheme_default)}"
+    rm -rf "$profile/chrome/oxygen"
+    mkdir -p "$profile/chrome"
+    cp -r "$data/chrome" "$profile/chrome/oxygen"
+    python3 -I "$data/tools/firefox_colors.py" "$scheme" "$profile/chrome/oxygen/content-colors.css"
+    for sheet in $SHEETS; do
+        f="$profile/chrome/$sheet.css"
+        line="@import url(\"oxygen/$sheet.css\");"
+        touch "$f"
+        grep -qF "$line" "$f" || { { echo "$line"; cat "$f"; } > "$f.tmp"; mv "$f.tmp" "$f"; }
+    done
+    touch "$profile/user.js"
+    strip_prefs "$profile"
+    if [ -s "$profile/user.js" ] && [ -n "$(tail -c1 "$profile/user.js")" ]; then echo >> "$profile/user.js"; fi
+    { echo "$BEGIN"; cat "$data/user.js"; echo "$END"; } >> "$profile/user.js"
+    mkdir -p "$STATE"
+    grep -qxF "$profile" "$LIST" 2>/dev/null || echo "$profile" >> "$LIST"
+    echo "Installed into $profile. Restart Firefox."
+    ;;
+uninstall)
+    profile=$(cd "$2" 2>/dev/null && pwd) || profile="$2"
+    profile_check "$profile"
+    rm -rf "$profile/chrome/oxygen"
+    for sheet in $SHEETS; do
+        f="$profile/chrome/$sheet.css"
+        line="@import url(\"oxygen/$sheet.css\");"
+        if [ -f "$f" ]; then grep -vF "$line" "$f" > "$f.tmp" || true; mv "$f.tmp" "$f"; fi
+    done
+    strip_prefs "$profile"
+    if [ -f "$LIST" ]; then grep -vxF "$profile" "$LIST" > "$LIST.tmp" || true; mv "$LIST.tmp" "$LIST"; fi
+    echo "Removed from $profile. Preferences Firefox already applied stay set in prefs.js until changed in about:config."
+    ;;
+refresh)
+    "$data/refresh-colors.sh"
+    ;;
+watch-enable)
+    mkdir -p "$UNITS"
+    cp "$data/systemd/oxygen-firefox-colors.path" "$UNITS/"
+    sed "s|@DATA@|$data|" "$data/systemd/oxygen-firefox-colors.service.in" > "$UNITS/oxygen-firefox-colors.service"
+    systemctl --user daemon-reload
+    systemctl --user enable --now oxygen-firefox-colors.path
+    ;;
+watch-disable)
+    systemctl --user disable --now oxygen-firefox-colors.path 2>/dev/null || true
+    rm -f "$UNITS/oxygen-firefox-colors.path" "$UNITS/oxygen-firefox-colors.service"
+    systemctl --user daemon-reload 2>/dev/null || true
+    ;;
+*)
+    sed -n '3,12p' "$0" | sed 's/^# \{0,1\}//' >&2
+    exit 1
+    ;;
+esac
