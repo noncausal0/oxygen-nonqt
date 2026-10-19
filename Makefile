@@ -71,6 +71,23 @@ FF_SCHEME ?= $(firstword $(wildcard $(HOME)/.config/kdeglobals) /usr/share/color
 FF_BEGIN  := // oxygen-nonqt begin
 FF_END    := // oxygen-nonqt end
 
+FF_STATE := $(or $(XDG_DATA_HOME),$(HOME)/.local/share)/oxygen-nonqt
+UNITS    := $(or $(XDG_CONFIG_HOME),$(HOME)/.config)/systemd/user
+
+# Optional: refresh the new tab colours automatically when the KDE scheme
+# changes, with a systemd user path unit watching kdeglobals.
+firefox-watch-install:
+	mkdir -p "$(UNITS)"
+	cp firefox/systemd/oxygen-firefox-colors.path "$(UNITS)/"
+	sed 's|@REPO@|$(CURDIR)|' firefox/systemd/oxygen-firefox-colors.service.in > "$(UNITS)/oxygen-firefox-colors.service"
+	systemctl --user daemon-reload
+	systemctl --user enable --now oxygen-firefox-colors.path
+
+firefox-watch-uninstall:
+	-systemctl --user disable --now oxygen-firefox-colors.path
+	rm -f "$(UNITS)/oxygen-firefox-colors.path" "$(UNITS)/oxygen-firefox-colors.service"
+	-systemctl --user daemon-reload
+
 firefox-check:
 	@test -n "$(PROFILE)" || { echo "Usage: make $(MAKECMDGOALS) PROFILE=<profile directory, see about:profiles>"; exit 1; }
 	@test -f "$(PROFILE)/prefs.js" || { echo "$(PROFILE) does not look like a Firefox profile (no prefs.js)"; exit 1; }
@@ -90,6 +107,8 @@ firefox-install: firefox-check
 		mv "$(PROFILE)/user.js.tmp" "$(PROFILE)/user.js"; \
 		if [ -n "$$(tail -c1 "$(PROFILE)/user.js")" ]; then echo >> "$(PROFILE)/user.js"; fi; \
 		{ echo '$(FF_BEGIN)'; cat firefox/user.js; echo '$(FF_END)'; } >> "$(PROFILE)/user.js"
+	@mkdir -p "$(FF_STATE)"
+	@grep -qxF "$(abspath $(PROFILE))" "$(FF_STATE)/firefox-profiles" 2>/dev/null || echo "$(abspath $(PROFILE))" >> "$(FF_STATE)/firefox-profiles"
 	@echo "Installed into $(PROFILE). Restart Firefox."
 
 firefox-uninstall: firefox-check
@@ -103,4 +122,4 @@ firefox-uninstall: firefox-check
 		mv "$(PROFILE)/user.js.tmp" "$(PROFILE)/user.js"; fi
 	@echo "Removed from $(PROFILE). Prefs already applied stay set in prefs.js until changed in about:config."
 
-.PHONY: all gtk3 gtk4 install uninstall clean firefox-check firefox-install firefox-uninstall
+.PHONY: all gtk3 gtk4 install uninstall clean firefox-check firefox-install firefox-uninstall firefox-watch-install firefox-watch-uninstall

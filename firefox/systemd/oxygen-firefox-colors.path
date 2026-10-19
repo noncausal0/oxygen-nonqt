@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch the KDE colour scheme for Oxygen's Firefox new tab colours
+
+[Path]
+PathChanged=%h/.config/kdeglobals
+Unit=oxygen-firefox-colors.service
+
+[Install]
+WantedBy=default.target
