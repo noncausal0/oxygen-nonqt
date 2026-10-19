@@ -123,8 +123,6 @@ make firefox-watch-uninstall
 Flatpak apps only see their own private config folder, so they use plain Adwaita until you let them read the theme. The command in the installation section applies to all Flatpak apps. To do it for one app only, add its ID to the end of the command (for example `org.gnome.Boxes`). Flatseal shows and undoes these permissions under "Filesystem"; without it, remove the three `xdg-config/…` and `xdg-data/themes` entries from `~/.local/share/flatpak/overrides/global` (or from the app's file in that folder).
 
 Some apps need a bit more:
-
-- Apps that pin their own theme in their Flatpak metadata, like GIMP (`GTK_THEME=Metal-Light`), also need `flatpak override --user --env=GTK_THEME=Oxygen org.gimp.GIMP`. `flatpak info --show-permissions <app-id>` shows an app's environment.
 - Apps with their own theme preference, like GIMP and Inkscape, must be set to use the system theme in their preferences.
 - GTK 4 and libadwaita apps pick up your KDE colours and the Oxygen styling this way, but only after `make install` has run, since the libadwaita part loads from your `gtk.css`.
 - Qt Flatpaks (Kdenlive, Krita, qBittorrent and the like) use a separate Qt runtime and are not covered.
