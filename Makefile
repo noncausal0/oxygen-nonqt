@@ -88,13 +88,6 @@ firefox-watch-uninstall:
 	rm -f "$(UNITS)/oxygen-firefox-colors.path" "$(UNITS)/oxygen-firefox-colors.service"
 	-systemctl --user daemon-reload
 
-# Flatpak apps cannot see the theme or the GTK config unless allowed to.
-flatpak-install:
-	tools/flatpak-access.sh install
-
-flatpak-uninstall:
-	tools/flatpak-access.sh uninstall
-
 firefox-check:
 	@test -n "$(PROFILE)" || { echo "Usage: make $(MAKECMDGOALS) PROFILE=<profile directory, see about:profiles>"; exit 1; }
 	@test -f "$(PROFILE)/prefs.js" || { echo "$(PROFILE) does not look like a Firefox profile (no prefs.js)"; exit 1; }
@@ -129,4 +122,4 @@ firefox-uninstall: firefox-check
 		mv "$(PROFILE)/user.js.tmp" "$(PROFILE)/user.js"; fi
 	@echo "Removed from $(PROFILE). Prefs already applied stay set in prefs.js until changed in about:config."
 
-.PHONY: all gtk3 gtk4 install uninstall clean firefox-check firefox-install firefox-uninstall firefox-watch-install firefox-watch-uninstall flatpak-install flatpak-uninstall
+.PHONY: all gtk3 gtk4 install uninstall clean firefox-check firefox-install firefox-uninstall firefox-watch-install firefox-watch-uninstall

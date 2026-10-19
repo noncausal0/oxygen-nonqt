@@ -43,14 +43,25 @@ make firefox-watch-install
 make firefox-watch-uninstall
 ```
 
-For Flatpak apps, give them read-only access to the theme and the GTK config (they only see their own private config otherwise), then restart them:
+### Flatpak apps
+
+Flatpak apps only see their own private config folder, so they use plain Adwaita until you let them read the theme. This is not part of the install, since it changes your Flatpak permissions. To apply the theme to all Flatpak apps, give them read-only access to the GTK config and the themes folder, then restart the apps:
 
 ```
-make flatpak-install
-make flatpak-uninstall   # removes exactly those permissions again
+flatpak override --user \
+  --filesystem=xdg-config/gtk-3.0:ro \
+  --filesystem=xdg-config/gtk-4.0:ro \
+  --filesystem=xdg-data/themes:ro
 ```
 
-This adds a user-wide Flatpak override for `xdg-config/gtk-3.0`, `xdg-config/gtk-4.0` and `xdg-data/themes`, all read-only. GTK 3 and GTK 4 apps, libadwaita ones included, then pick up the theme and your KDE colours. Qt Flatpaks are a separate matter and are not covered.
+To do it for one app only, add its ID to the end (for example `org.gnome.Boxes`). [Flatseal](https://flathub.org/apps/com.github.tchx84.Flatseal) can show and undo these permissions under "Filesystem". Without it, remove the three `xdg-config/…` and `xdg-data/themes` entries from `~/.local/share/flatpak/overrides/global` (or from the app's file in that folder).
+
+Some apps need a bit more:
+
+- Apps that pin their own theme in their Flatpak metadata, like GIMP (`GTK_THEME=Metal-Light`), also need `flatpak override --user --env=GTK_THEME=Oxygen org.gimp.GIMP`. `flatpak info --show-permissions <app-id>` shows an app's environment.
+- Apps with their own theme preference, like GIMP and Inkscape, must be set to use the system theme in their preferences.
+- GTK 4 and libadwaita apps pick up your KDE colours and the Oxygen styling this way, but only after `make install` has run, since the libadwaita part loads from your `gtk.css`.
+- Qt Flatpaks (Kdenlive, Krita, qBittorrent and the like) use a separate Qt runtime and are not covered.
 
 Oxygen has no overlay scrollbars. GTK decides that outside the theme, so turn them off to get the classic always-visible scrollbars:
 
