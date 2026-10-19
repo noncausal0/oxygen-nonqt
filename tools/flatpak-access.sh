@@ -5,8 +5,22 @@
 # import live) and to ~/.local/share/themes (where the theme is installed).
 # Flatpak apps otherwise only see their own private config directory.
 #
+# Some apps (GIMP) also pin their own GTK theme through an environment
+# variable in their metadata, which wins over the user's choice; those get a
+# per-app override setting it to Oxygen.
+#
 #   flatpak-access.sh install | uninstall | status
 set -e
+
+APPS_DIR="${FLATPAK_USER_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/flatpak}/overrides"
+
+# Installed apps whose metadata sets GTK_THEME.
+pinned_apps() {
+    for app in $(flatpak list --app --columns=application); do
+        flatpak info --show-permissions "$app" 2>/dev/null |
+            sed -n '/^\[Environment\]/,/^$/p' | grep -q '^GTK_THEME=' && echo "$app"
+    done
+}
 
 PERMS="xdg-config/gtk-3.0:ro xdg-config/gtk-4.0:ro xdg-data/themes:ro"
 OVERRIDES="${FLATPAK_USER_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/flatpak}/overrides/global"
@@ -14,9 +28,19 @@ OVERRIDES="${FLATPAK_USER_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/flatpak}/ove
 case "$1" in
 install)
     for p in $PERMS; do flatpak override --user --filesystem="$p"; done
+    for app in $(pinned_apps); do
+        flatpak override --user --env=GTK_THEME=Oxygen "$app"
+        echo "$app pins its own GTK theme; set to Oxygen."
+    done
     echo "Flatpak apps can now read the GTK config and themes (restart them)."
     ;;
 uninstall)
+    for f in "$APPS_DIR"/*; do
+        [ -f "$f" ] && [ "$f" != "$OVERRIDES" ] && grep -qx 'GTK_THEME=Oxygen' "$f" || continue
+        sed -i '/^GTK_THEME=Oxygen$/d' "$f"
+        # Nothing left but empty section headers: remove the file.
+        grep -qvE '^(\[.*\])?$' "$f" || rm "$f"
+    done
     [ -f "$OVERRIDES" ] || exit 0
     # `flatpak override --nofilesystem` adds a deny entry instead of removing
     # the grant, so the entries are removed from the file directly.
