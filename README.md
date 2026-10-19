@@ -43,6 +43,15 @@ make firefox-watch-install
 make firefox-watch-uninstall
 ```
 
+For Flatpak apps, give them read-only access to the theme and the GTK config (they only see their own private config otherwise), then restart them:
+
+```
+make flatpak-install
+make flatpak-uninstall   # removes exactly those permissions again
+```
+
+This adds a user-wide Flatpak override for `xdg-config/gtk-3.0`, `xdg-config/gtk-4.0` and `xdg-data/themes`, all read-only. GTK 3 and GTK 4 apps, libadwaita ones included, then pick up the theme and your KDE colours. Qt Flatpaks are a separate matter and are not covered.
+
 Oxygen has no overlay scrollbars. GTK decides that outside the theme, so turn them off to get the classic always-visible scrollbars:
 
 ```
