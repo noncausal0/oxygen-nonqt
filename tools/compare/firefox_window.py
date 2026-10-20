@@ -49,6 +49,24 @@ PREFS = {
     "sidebar.verticalTabs": False,
     "sidebar.verticalTabs.dragToPinPromo.dismissed": True,
     "browser.toolbars.bookmarks.visibility": "always",
+    # Keep the new tab page static, so its screenshots look the same on every
+    # machine: no weather, clocks, stories or sponsored content.
+    "browser.newtabpage.activity-stream.showWeather": False,
+    "browser.newtabpage.activity-stream.widgets.enabled": False,
+    "browser.newtabpage.activity-stream.widgets.system.enabled": False,
+    "browser.newtabpage.activity-stream.widgets.system.clocks.enabled": False,
+    "browser.newtabpage.activity-stream.widgets.clocks.enabled": False,
+    "browser.newtabpage.activity-stream.widgets.lists.enabled": False,
+    "browser.newtabpage.activity-stream.widgets.crossword.enabled": False,
+    "browser.newtabpage.activity-stream.widgets.sportsWidget.enabled": False,
+    "browser.newtabpage.activity-stream.widgets.stocks.enabled": False,
+    "browser.newtabpage.activity-stream.widgets.pictureOfTheDay.enabled": False,
+    "browser.newtabpage.activity-stream.feeds.system.topstories": False,
+    "browser.newtabpage.activity-stream.feeds.section.topstories": False,
+    "browser.newtabpage.activity-stream.feeds.section.highlights": False,
+    "browser.newtabpage.activity-stream.showSponsored": False,
+    "browser.newtabpage.activity-stream.showSponsoredTopSites": False,
+    "browser.newtabpage.activity-stream.showSponsoredStories": False,
     # As in firefox/user.js: the classic design in compact density.
     "browser.nova.enabled": False,
     "browser.uidensity": 1,
@@ -151,7 +169,7 @@ def main():
             name, value = sys.argv[i + 1].split("=", 1)
             with open(os.path.join(profile, "user.js"), "a") as f:
                 f.write("user_pref(%s, %s);\n" % (json.dumps(name), value))
-    env = dict(os.environ, GTK_THEME="Oxygen")
+    env = dict(os.environ, GTK_THEME="Oxygen", TZ="UTC")  # the same time zone everywhere
     if "--colors" in sys.argv:
         env["XDG_CONFIG_HOME"] = gtk_config(profile, sys.argv[sys.argv.index("--colors") + 1])
     ff = subprocess.Popen(

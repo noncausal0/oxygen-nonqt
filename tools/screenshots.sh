@@ -18,6 +18,6 @@ for scheme in Oxygen OxygenDark; do
     # Firefox runs in a throwaway profile under build/.
     python3 tools/compare/firefox_window.py build/firefox-profile "$OUT/firefox-$tag.png" --colors "$colors" --height 360 --hover-tab
     python3 tools/compare/firefox_window.py build/firefox-profile "$OUT/firefox-vertical-$tag.png" --vertical --colors "$colors" --height 360
-    python3 tools/compare/firefox_window.py build/firefox-profile "$OUT/firefox-newtab-$tag.png" --newtab --colors "$colors" --height 640
+    python3 tools/compare/firefox_window.py build/firefox-profile "$OUT/firefox-newtab-$tag.png" --newtab --colors "$colors" --height 680
 done
 rm -rf build/firefox-profile
