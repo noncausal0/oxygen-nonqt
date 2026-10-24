@@ -9,7 +9,7 @@ taken through Marionette so it does not depend on window focus.
 
   firefox_window.py PROFILE_DIR OUT.png [--vertical] [--stock] [--wait]
                     [--colors FILE.colors] [--height PX] [--newtab] [--hover-tab] [--hover ID] [--url URL]
-                    [--click SELECTOR]... [--theme NAME]
+                    [--click SELECTOR]... [--theme NAME] [--pip] [--pip-panels]
 
 --vertical switches to vertical tabs. --wait leaves the window open for
 interactive testing instead of quitting. --colors runs Firefox with its own
@@ -19,7 +19,10 @@ in the selected tab, --url loads the given page there instead, and
 --hover-tab holds an inactive tab in its hover state, and --hover ID holds
 the element with that id in its hover state. --click clicks the element the
 CSS selector matches in the page (repeatable, in order; for opening the reader
-view's menus) and --theme NAME picks the reader view's colour theme.
+view's menus) and --theme NAME picks the reader view's colour theme. --pip
+opens the page's video in a picture-in-picture window and saves a picture of
+that window instead, with its controls shown; --pip-panels also opens its
+subtitle and playback speed panels.
 """
 import base64
 import json
@@ -162,6 +165,37 @@ def gtk_config(profile, scheme):
     return config
 
 
+def pip_shot(m, panels):
+    """Open picture-in-picture for the selected tab's video; return a PNG (base64) of its window."""
+    m.js("""
+        const win = Services.wm.getMostRecentWindow('navigator:browser');
+        win.gBrowser.selectedBrowser.browsingContext.currentWindowGlobal
+            .getActor('PictureInPictureLauncher').sendAsyncMessage('PictureInPicture:KeyToggle');
+    """)
+    for _ in range(40):
+        time.sleep(0.5)
+        if m.js("return !!Services.wm.getMostRecentWindow('Toolkit:PictureInPicture');"):
+            break
+    else:
+        raise SystemExit("no picture-in-picture window")
+    time.sleep(2)
+    return m.js("""
+        const w = Services.wm.getMostRecentWindow('Toolkit:PictureInPicture');
+        const d = w.document;
+        InspectorUtils.addPseudoClassLock(d.getElementById('controls'), ':hover');
+        d.getElementById('controls').setAttribute('showing', 'true');
+        for (const el of d.querySelectorAll('[hidden]')) el.hidden = false;
+        if (arguments[0])
+            for (const el of d.querySelectorAll('.panel')) el.classList.remove('hide');
+        return new Promise(resolve => w.setTimeout(() => {
+            const c = d.createElementNS('http://www.w3.org/1999/xhtml', 'canvas');
+            c.width = w.innerWidth; c.height = w.innerHeight;
+            c.getContext('2d').drawWindow(w, 0, 0, c.width, c.height, 'rgb(0,0,0)');
+            resolve(c.toDataURL().split(',')[1]);
+        }, 800));
+    """, panels)
+
+
 def main():
     profile, out = sys.argv[1], sys.argv[2]
     scheme = sys.argv[sys.argv.index("--colors") + 1] if "--colors" in sys.argv else None
@@ -223,7 +257,10 @@ def main():
                 time.sleep(0.6)
             m("Marionette:SetContext", {"value": "chrome"})
             time.sleep(0.5)
-        shot = m("WebDriver:TakeScreenshot", {"full": False})["value"]
+        if "--pip" in sys.argv:
+            shot = pip_shot(m, "--pip-panels" in sys.argv)
+        else:
+            shot = m("WebDriver:TakeScreenshot", {"full": False})["value"]
         with open(out, "wb") as f:
             f.write(base64.b64decode(shot))
         if "--wait" in sys.argv:

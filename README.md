@@ -11,7 +11,7 @@ The KDE Oxygen theme for non-Qt toolkits, so GTK apps and Firefox look consisten
 | GTK 3 apps | yes |
 | GTK 4 apps | yes |
 | libadwaita apps (Nautilus, Flatseal, …) | yes, with some per-app polish still to come |
-| Firefox toolbars, tabs, menus, new tab page and reader view | yes |
+| Firefox toolbars, tabs, menus, new tab page, reader view and picture-in-picture | yes |
 | Flatpak apps | yes, with one extra step |
 | Qt apps | already Oxygen, nothing to do |
 
@@ -138,6 +138,8 @@ The Firefox install puts the theme in the profile's `chrome/oxygen/`, adds one `
 - `widget.gtk.libadwaita-colors.enabled = false`: otherwise Firefox replaces light GTK themes' colours with libadwaita's.
 - `svg.context-properties.content.enabled`: lets the theme's own SVG glyphs take their colour from the scheme; Firefox otherwise draws them black.
 - `browser.nova.enabled = false` and `browser.uidensity = 1`: the classic design in compact density.
+
+The picture-in-picture window only lets its own icons load, so its buttons, sliders and panels are Oxygen but its icons stay Firefox's.
 
 Prefs Firefox has already applied stay set in `prefs.js` after uninstalling; change them in `about:config` if you want them back.
 

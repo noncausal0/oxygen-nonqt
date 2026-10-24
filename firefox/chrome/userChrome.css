@@ -1044,3 +1044,107 @@ search-textbox .textbox-search-icon, .textbox-search-icon {
   list-style-image: url("moz-icon://stock/edit-find?size=16") !important;
   -moz-context-properties: none !important;
 }
+
+/* The picture-in-picture window. The controls float over the video, so they
+ * stay translucent and light on dark; the buttons are Oxygen tool buttons with
+ * Oxygen icons, the panels are Oxygen window-coloured, and the sliders have
+ * Oxygen grooves and handles. */
+@-moz-document url("chrome://global/content/pictureinpicture/player.xhtml") {
+  :root {
+    --border-radius-small: 4px !important;
+    --border-radius-medium: 5px !important;
+  }
+
+  #controls button:focus-visible, #controls input:focus-visible,
+  .switch > input:focus-visible + .slider {
+    outline: 1px solid var(--ox-focus) !important;
+    box-shadow: 0 0 3px var(--ox-focus) !important;
+  }
+
+  .control-button {
+    border: 1px solid transparent !important;
+    transition: border-color var(--ox-fade), box-shadow var(--ox-fade), background-color var(--ox-fade) !important;
+  }
+  .control-button:hover:enabled {
+    background-color: color-mix(in srgb, var(--ox-btn) 55%, transparent) !important;
+    border-color: var(--ox-hover) !important;
+    box-shadow: inset 0 1px rgb(255 255 255 / 0.15), 0 0 2px var(--ox-hover) !important;
+  }
+  .control-button:active:enabled { background-color: color-mix(in srgb, var(--ox-btn) 35%, black) !important; }
+  .control-button:disabled { opacity: 0.5 !important; }
+
+  /* The window's content policy only allows chrome:// images, so the icons
+   * stay Firefox's; they cannot load the system icon theme. Close and "back to
+   * tab" are always shown as raised buttons. */
+  #close, #unpip {
+    background-color: color-mix(in srgb, var(--ox-btn) 85%, transparent) !important;
+    border-color: var(--ox-frame-dark) !important;
+    box-shadow: inset 0 1px rgb(255 255 255 / 0.15), 0 1px 2px rgb(0 0 0 / 0.4) !important;
+    fill: var(--ox-btn-fg) !important;
+  }
+  #close:is(:hover, :focus-visible), #unpip:is(:hover, :focus-visible) {
+    background-color: var(--ox-btn) !important;
+    border-color: var(--ox-hover) !important;
+    box-shadow: inset 0 1px rgb(255 255 255 / 0.15), 0 0 2px var(--ox-hover) !important;
+  }
+
+  /* Tooltips. */
+  .control-item:focus-visible::after, .control-item:hover::after {
+    background: InfoBackground !important;
+    color: InfoText !important;
+    border: 1px solid var(--ox-frame-dark) !important;
+    border-radius: 4px !important;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.4) !important;
+  }
+
+  /* Sliders: a groove, an accent-coloured filled part and a raised handle. */
+  :is(#scrubber, #audio-scrubber)::-moz-range-track {
+    background-color: rgb(255 255 255 / 0.3) !important;
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.4) !important;
+  }
+  :is(#scrubber, #audio-scrubber)::-moz-range-progress { background-color: var(--ox-focus) !important; }
+  :is(#scrubber, #audio-scrubber)::-moz-range-thumb {
+    background: linear-gradient(to bottom, color-mix(in srgb, var(--ox-btn), white 12%), var(--ox-btn)) !important;
+    border: 1px solid var(--ox-frame-dark) !important;
+    box-shadow: inset 0 1px rgb(255 255 255 / 0.2), 0 1px 1px rgb(0 0 0 / 0.4) !important;
+  }
+  #scrubber::-moz-range-thumb { width: 10px !important; height: 10px !important; border-radius: 6px !important; }
+  #audio-scrubber::-moz-range-thumb { width: 8px !important; height: 8px !important; }
+  #playback-rate-slider::-moz-range-track { background-color: var(--ox-groove) !important; box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.3) !important; }
+  #playback-rate-slider::-moz-range-progress { background-color: var(--ox-focus) !important; }
+  #playback-rate-slider::-moz-range-thumb {
+    background: linear-gradient(to bottom, color-mix(in srgb, var(--ox-btn), white 12%), var(--ox-btn)) !important;
+    border: 1px solid var(--ox-frame-dark) !important;
+    box-shadow: inset 0 1px rgb(255 255 255 / 0.2), 0 1px 1px rgb(0 0 0 / 0.3) !important;
+  }
+
+  /* The subtitle and playback speed panels are Oxygen window-coloured panels. */
+  .box {
+    background: linear-gradient(to bottom, var(--ox-top), var(--ox-bg)) !important;
+    border: 1px solid var(--ox-frame-dark) !important;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.4) !important;
+    color: var(--ox-fg) !important;
+  }
+  .arrow { border-top-color: var(--ox-bg) !important; }
+  .box label:not(.switch), .panel-legend, .playback-rate-header { color: var(--ox-fg) !important; }
+  .grey-line { background: var(--ox-frame) !important; }
+  #playback-rate-value { color: var(--ox-fg) !important; }
+  .playback-rate-preset {
+    background: linear-gradient(to bottom, color-mix(in srgb, var(--ox-btn), white 8%), var(--ox-btn)) !important;
+    color: var(--ox-btn-fg) !important;
+    border: 1px solid var(--ox-frame-dark) !important;
+    box-shadow: inset 0 1px rgb(255 255 255 / 0.15), 0 1px 1px rgb(0 0 0 / 0.12) !important;
+  }
+  .playback-rate-preset:hover { border-color: var(--ox-hover) !important; box-shadow: inset 0 1px rgb(255 255 255 / 0.15), 0 0 2px var(--ox-hover) !important; }
+  .playback-rate-preset[aria-pressed="true"] {
+    background: var(--ox-groove) !important;
+    color: var(--ox-btn-fg) !important;
+    border-color: var(--ox-focus) !important;
+    box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.25) !important;
+  }
+  .font-size-selection-radio > input[type="radio"] { border-color: var(--ox-frame-dark) !important; background: var(--ox-base) !important; }
+  .font-size-selection-radio > input[type="radio"]:checked { border: 4px solid var(--ox-focus) !important; }
+  .slider { background-color: var(--ox-groove) !important; box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.3) !important; }
+  .slider::before { background: var(--ox-btn) !important; border: 1px solid var(--ox-frame-dark) !important; box-sizing: border-box !important; }
+  input:checked + .slider { background-color: var(--ox-focus) !important; }
+}
