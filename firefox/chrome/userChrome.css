@@ -442,6 +442,13 @@ panel-list {
   border-inline-start: none !important;
 }
 
+/* While a tab is dragged Firefox pads the strip by 15px (and pulls it back with
+ * a negative margin) to make dragging easier; the padding eats into the
+ * minimum height, so the bar shrank. */
+#tabbrowser-tabs[orient="horizontal"][movingtab] {
+  min-height: calc(var(--tabstrip-min-height) + 15px) !important;
+}
+
 #TabsToolbar:not([orient="vertical"]) {
   box-shadow: inset 0 -1px var(--ox-frame) !important;
 }
