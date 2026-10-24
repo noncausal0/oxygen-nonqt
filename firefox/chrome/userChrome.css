@@ -155,6 +155,14 @@
 #stop-button { list-style-image: url("moz-icon://stock/process-stop?size=16") !important; }
 #home-button { list-style-image: url("moz-icon://stock/go-home?size=16") !important; }
 #downloads-button { list-style-image: url("moz-icon://stock/download?size=16") !important; }
+/* The downloads button draws its icon on a nested indicator image with Firefox's
+ * own line-art SVG, so the icon is set there. It is dimmed while there is
+ * nothing to show, as a disabled button is. */
+#downloads-indicator-icon {
+  list-style-image: url("moz-icon://stock/download?size=16") !important;
+  -moz-context-properties: none !important;
+}
+#downloads-button[disabled] #downloads-indicator-icon, #downloads-button:not([attention]):not([progress]):not([paused]) #downloads-indicator-icon { opacity: 0.6 !important; }
 #PanelUI-menu-button { list-style-image: url("moz-icon://stock/application-menu?size=16") !important; }
 #sidebar-button { list-style-image: url("moz-icon://stock/view-split-left-right?size=16") !important; }
 #unified-extensions-button { list-style-image: url("moz-icon://stock/preferences-plugin?size=16") !important; }
