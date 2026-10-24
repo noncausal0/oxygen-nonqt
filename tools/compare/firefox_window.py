@@ -9,6 +9,7 @@ taken through Marionette so it does not depend on window focus.
 
   firefox_window.py PROFILE_DIR OUT.png [--vertical] [--stock] [--wait]
                     [--colors FILE.colors] [--height PX] [--newtab] [--hover-tab] [--hover ID] [--url URL]
+                    [--click SELECTOR]... [--theme NAME]
 
 --vertical switches to vertical tabs. --wait leaves the window open for
 interactive testing instead of quitting. --colors runs Firefox with its own
@@ -16,7 +17,9 @@ GTK config holding that KDE colour scheme (Firefox takes its colours from
 GTK); the user's config is not touched. --newtab shows Firefox's new tab page
 in the selected tab, --url loads the given page there instead, and
 --hover-tab holds an inactive tab in its hover state, and --hover ID holds
-the element with that id in its hover state.
+the element with that id in its hover state. --click clicks the element the
+CSS selector matches in the page (repeatable, in order; for opening the reader
+view's menus) and --theme NAME picks the reader view's colour theme.
 """
 import base64
 import json
@@ -206,6 +209,20 @@ def main():
         # robot icon, which only exist to warn the user; a real window has neither.
         m.js("Services.wm.getMostRecentWindow('navigator:browser').document.documentElement.removeAttribute('remotecontrol');")
         time.sleep(0.5)
+        selectors = [sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == "--click"]
+        theme = sys.argv[sys.argv.index("--theme") + 1] if "--theme" in sys.argv else None
+        if selectors or theme:
+            m("Marionette:SetContext", {"value": "content"})
+            m("WebDriver:SwitchToWindow", {"handle": m("WebDriver:GetWindowHandles")[1]})
+            if theme:
+                m.js(""
+                     "document.body.className = document.body.className.replace(/\\b(light|dark|sepia|gray|contrast)\\b/, arguments[0]);", theme)
+            for sel in selectors:
+                el = m("WebDriver:FindElement", {"using": "css selector", "value": sel})["value"]
+                m("WebDriver:ElementClick", {"id": list(el.values())[0]})
+                time.sleep(0.6)
+            m("Marionette:SetContext", {"value": "chrome"})
+            time.sleep(0.5)
         shot = m("WebDriver:TakeScreenshot", {"full": False})["value"]
         with open(out, "wb") as f:
             f.write(base64.b64decode(shot))

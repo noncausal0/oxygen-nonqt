@@ -152,3 +152,158 @@
     box-shadow: inset 0 1px rgb(255 255 255 / 0.15), 0 0 2px var(--ox-hover) !important;
   }
 }
+
+/* Firefox's reader view. Its themes are body classes that set a handful of
+ * variables, so the theme that matches the desktop (light or dark) is pointed
+ * at the KDE colours; the other themes stay as Firefox draws them. The page
+ * sits on the window gradient and the article is a view-coloured panel. */
+@-moz-document url-prefix("about:reader") {
+  @media (prefers-color-scheme: light) {
+    body.light {
+    --main-background: var(--ox-c-base) !important;
+    --main-foreground: var(--ox-c-text) !important;
+    --primary-color: var(--ox-c-focus) !important;
+    --outline-focus-color: var(--ox-c-focus) !important;
+    --link-foreground: var(--ox-c-link) !important;
+    --visited-link-foreground: var(--ox-c-visited) !important;
+    --selected-background: color-mix(in srgb, var(--ox-c-focus) 35%, transparent) !important;
+    --toolbar-border: hsl(from var(--ox-c-bg) h s calc(l * 0.8)) !important;
+    --toolbar-button-background-hover: transparent !important;
+    --toolbar-button-background-active: transparent !important;
+    --popup-background: var(--ox-c-bg) !important;
+    --popup-foreground: var(--ox-c-fg) !important;
+    --popup-border: hsl(from var(--ox-c-bg) h s calc(l * 0.7)) !important;
+    --popup-line: hsl(from var(--ox-c-bg) h s calc(l * 0.84)) !important;
+    --popup-button-background: var(--ox-c-btn) !important;
+    --popup-button-foreground: var(--ox-c-btn-fg) !important;
+    --popup-button-border: hsl(from var(--ox-c-btn) h s calc(l * 0.6)) !important;
+    --popup-button-background-hover: var(--ox-c-btn) !important;
+    --popup-button-background-active: hsl(from var(--ox-c-btn) h s calc(l * 0.9)) !important;
+    --icon-fill: var(--ox-c-fg) !important;
+    --icon-disabled-fill: color-mix(in srgb, var(--ox-c-fg) 40%, transparent) !important;
+    --border-radius-small: 4px !important;
+    --border-radius-xsmall: 3px !important;
+    --box-shadow-level-4: 0 1px 2px rgb(0 0 0 / 0.2) !important;
+    background: linear-gradient(to bottom, hsl(from var(--ox-c-bg) h s calc(l * 1.05)), hsl(from var(--ox-c-bg) h s calc(l * 0.92)) 300px) fixed !important;
+
+    /* The rules below only use these where the theme follows the desktop,
+     * so the other themes keep Firefox's own look. */
+    --ox-rd-edge: hsl(from var(--ox-c-bg) h s calc(l * 0.8));
+    --ox-rd-pad: 8px 32px 24px;
+    --ox-rd-bar: linear-gradient(to bottom, var(--ox-c-bg), hsl(from var(--ox-c-bg) h s calc(l * 0.94)));
+    --ox-rd-btn: color-mix(in srgb, var(--ox-c-btn), white 6%);
+    --ox-rd-btn-edge: hsl(from var(--ox-c-btn) h s calc(l * 0.62));
+    --ox-rd-raised: inset 0 1px rgb(255 255 255 / 0.15), 0 1px 1px rgb(0 0 0 / 0.12);
+    --ox-rd-hover: var(--ox-c-hover);
+    --ox-rd-focus: var(--ox-c-focus);
+    --ox-rd-checked-border: 1px solid var(--ox-c-focus);
+    --ox-rd-glow: inset 0 1px rgb(255 255 255 / 0.15), 0 0 2px var(--ox-c-hover);
+    --ox-rd-sunk: hsl(from var(--ox-c-btn) h s calc(l * 0.88));
+    --ox-rd-sunk-shadow: inset 0 1px 2px rgb(0 0 0 / 0.25);
+  }
+  }
+  @media (prefers-color-scheme: dark) {
+    body.dark {
+    --main-background: var(--ox-c-base) !important;
+    --main-foreground: var(--ox-c-text) !important;
+    --primary-color: var(--ox-c-focus) !important;
+    --outline-focus-color: var(--ox-c-focus) !important;
+    --link-foreground: var(--ox-c-link) !important;
+    --visited-link-foreground: var(--ox-c-visited) !important;
+    --selected-background: color-mix(in srgb, var(--ox-c-focus) 35%, transparent) !important;
+    --toolbar-border: hsl(from var(--ox-c-bg) h s calc(l * 0.8)) !important;
+    --toolbar-button-background-hover: transparent !important;
+    --toolbar-button-background-active: transparent !important;
+    --popup-background: var(--ox-c-bg) !important;
+    --popup-foreground: var(--ox-c-fg) !important;
+    --popup-border: hsl(from var(--ox-c-bg) h s calc(l * 0.7)) !important;
+    --popup-line: hsl(from var(--ox-c-bg) h s calc(l * 0.84)) !important;
+    --popup-button-background: var(--ox-c-btn) !important;
+    --popup-button-foreground: var(--ox-c-btn-fg) !important;
+    --popup-button-border: hsl(from var(--ox-c-btn) h s calc(l * 0.6)) !important;
+    --popup-button-background-hover: var(--ox-c-btn) !important;
+    --popup-button-background-active: hsl(from var(--ox-c-btn) h s calc(l * 0.9)) !important;
+    --icon-fill: var(--ox-c-fg) !important;
+    --icon-disabled-fill: color-mix(in srgb, var(--ox-c-fg) 40%, transparent) !important;
+    --border-radius-small: 4px !important;
+    --border-radius-xsmall: 3px !important;
+    --box-shadow-level-4: 0 1px 2px rgb(0 0 0 / 0.2) !important;
+    background: linear-gradient(to bottom, hsl(from var(--ox-c-bg) h s calc(l * 1.05)), hsl(from var(--ox-c-bg) h s calc(l * 0.92)) 300px) fixed !important;
+
+    /* The rules below only use these where the theme follows the desktop,
+     * so the other themes keep Firefox's own look. */
+    --ox-rd-edge: hsl(from var(--ox-c-bg) h s calc(l * 0.8));
+    --ox-rd-pad: 8px 32px 24px;
+    --ox-rd-bar: linear-gradient(to bottom, var(--ox-c-bg), hsl(from var(--ox-c-bg) h s calc(l * 0.94)));
+    --ox-rd-btn: color-mix(in srgb, var(--ox-c-btn), white 6%);
+    --ox-rd-btn-edge: hsl(from var(--ox-c-btn) h s calc(l * 0.62));
+    --ox-rd-raised: inset 0 1px rgb(255 255 255 / 0.15), 0 1px 1px rgb(0 0 0 / 0.12);
+    --ox-rd-hover: var(--ox-c-hover);
+    --ox-rd-focus: var(--ox-c-focus);
+    --ox-rd-checked-border: 1px solid var(--ox-c-focus);
+    --ox-rd-glow: inset 0 1px rgb(255 255 255 / 0.15), 0 0 2px var(--ox-c-hover);
+    --ox-rd-sunk: hsl(from var(--ox-c-btn) h s calc(l * 0.88));
+    --ox-rd-sunk-shadow: inset 0 1px 2px rgb(0 0 0 / 0.25);
+  }
+  }
+
+  body > .container {
+    background: var(--main-background) !important;
+    border: 1px solid var(--ox-rd-edge, transparent) !important;
+    border-radius: 5px !important;
+    padding: var(--ox-rd-pad, 0) !important;
+  }
+
+  /* The toolbar is an Oxygen tool bar: flat buttons that raise and glow on
+   * hover and sink when pressed, with Oxygen icons. */
+  .toolbar { background: var(--ox-rd-bar, none) !important; }
+  .toolbar-button {
+    background-size: 22px 22px !important;
+    transition: border-color 150ms ease-out, box-shadow 150ms ease-out !important;
+  }
+  .toolbar-button:hover {
+    background-color: var(--ox-rd-btn, var(--toolbar-button-background-hover)) !important;
+    border-color: var(--ox-rd-hover, var(--toolbar-button-border-hover)) !important;
+    box-shadow: var(--ox-rd-glow, none) !important;
+  }
+  :is(.open .toolbar-button, .toolbar-button:hover:active) {
+    background-color: var(--ox-rd-sunk, var(--toolbar-button-background-active)) !important;
+    border-color: var(--ox-rd-btn-edge, var(--toolbar-button-border-active)) !important;
+    box-shadow: var(--ox-rd-sunk-shadow, none) !important;
+  }
+  .close-button { background-image: var(--ox-icon-close, url("chrome://global/skin/icons/close.svg")) !important; }
+  .text-layout-button { background-image: var(--ox-icon-text, url("chrome://global/skin/reader/RM-Type-Controls-24x24.svg")) !important; }
+  .colors-button { background-image: var(--ox-icon-colors, url("chrome://mozapps/skin/extensions/category-themes.svg")) !important; }
+
+  .narrate-toggle { background-image: var(--ox-icon-listen, url("chrome://global/skin/narrate/headphone.svg")) !important; }
+
+  /* Buttons in the menus are Oxygen push buttons. */
+  :is(.text-size-buttons > button, .dropdown-selector > select, .text-alignment-buttons > label:not([checked]),
+      .color-scheme-buttons > label:not([checked]), .narrate-control button) {
+    background-color: var(--ox-rd-btn, var(--popup-button-background)) !important;
+    border: 1px solid var(--ox-rd-btn-edge, transparent) !important;
+    box-shadow: var(--ox-rd-raised, none) !important;
+    transition: border-color 150ms ease-out, box-shadow 150ms ease-out !important;
+  }
+  :is(.text-size-buttons > button, .dropdown-selector > select, .text-alignment-buttons > label,
+      .color-scheme-buttons > label):hover {
+    border-color: var(--ox-rd-hover, var(--popup-button-border)) !important;
+    box-shadow: var(--ox-rd-glow, none) !important;
+  }
+  .text-alignment-buttons > label[checked] {
+    background-color: var(--ox-rd-sunk, var(--primary-color)) !important;
+    border: 1px solid var(--ox-rd-focus, transparent) !important;
+    box-shadow: var(--ox-rd-sunk-shadow, none) !important;
+  }
+  .color-scheme-buttons > label[checked] {
+    background-color: var(--ox-rd-sunk, var(--popup-button-background)) !important;
+    border: var(--ox-rd-checked-border, 2px solid var(--link-selected-foreground)) !important;
+    box-shadow: var(--ox-rd-sunk-shadow, none) !important;
+  }
+  .text-size-buttons > .text-size-minus-button { background-image: var(--ox-icon-minus, url("chrome://global/skin/icons/minus.svg")) !important; }
+  .text-size-buttons > .text-size-plus-button { background-image: var(--ox-icon-plus, url("chrome://global/skin/icons/plus.svg")) !important; }
+  .text-alignment-buttons > .left-align-button { background-image: var(--ox-icon-left, url("chrome://global/skin/reader/align-left-20.svg")) !important; }
+  .text-alignment-buttons > .center-align-button { background-image: var(--ox-icon-center, url("chrome://global/skin/reader/align-center-20.svg")) !important; }
+  .text-alignment-buttons > .right-align-button { background-image: var(--ox-icon-right, url("chrome://global/skin/reader/align-right-20.svg")) !important; }
+  .text-alignment-buttons > .justify-align-button { background-image: var(--ox-icon-justify, url("chrome://global/skin/reader/align-justify-20.svg")) !important; }
+}

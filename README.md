@@ -11,7 +11,7 @@ The KDE Oxygen theme for non-Qt toolkits, so GTK apps and Firefox look consisten
 | GTK 3 apps | yes |
 | GTK 4 apps | yes |
 | libadwaita apps (Nautilus, Flatseal, …) | yes, with some per-app polish still to come |
-| Firefox toolbars, tabs, menus and new tab page | yes |
+| Firefox toolbars, tabs, menus, new tab page and reader view | yes |
 | Flatpak apps | yes, with one extra step |
 | Qt apps | already Oxygen, nothing to do |
 
@@ -127,7 +127,7 @@ KDE's GTK integration exports your colour scheme and accent to `~/.config/gtk-3.
 - `packaging/`: the install scripts and READMEs of the two release packages.
 - `gtk4/scss/_libadwaita.scss`: the libadwaita layer. libadwaita apps ignore GTK themes and only read `~/.config/gtk-4.0/gtk.css`, so installing the GTK package adds one `@import` line there that loads Oxygen on top of libadwaita, and uninstalling removes it. This layer relies on KDE's exported colours and has no fallbacks.
 - `common/`: colour handling, drawing recipes and image assets shared by GTK 3 and GTK 4.
-- `firefox/`: `userChrome.css` for the toolbars, tabs, address bar and menus, `userContent.css` for the new tab page, with Oxygen icons loaded from your system icon theme.
+- `firefox/`: `userChrome.css` for the toolbars, tabs, address bar and menus, `userContent.css` for the new tab page and reader view, with Oxygen icons loaded from your system icon theme.
 - `tools/compare/`: windows that render the same widgets in Qt Oxygen, GTK 3, GTK 4, libadwaita and Firefox with any KDE `.colors` scheme, for side-by-side checks. `tools/screenshots.sh` regenerates the screenshots above after `make install`.
 
 ### Firefox details
@@ -141,7 +141,7 @@ The Firefox install puts the theme in the profile's `chrome/oxygen/`, adds one `
 
 Prefs Firefox has already applied stay set in `prefs.js` after uninstalling; change them in `about:config` if you want them back.
 
-Firefox's own pages, like the new tab page, only get the real accent colour; the other system colours are replaced by fixed stand-ins so web pages cannot read them. So the install writes your current KDE colours for the new tab page. To keep them in step with your colour scheme automatically, install the optional watcher, a systemd user path unit on `~/.config/kdeglobals` (the new tab page picks the colours up at the next Firefox start):
+Firefox's own pages, like the new tab page and reader view, only get the real accent colour; the other system colours are replaced by fixed stand-ins so web pages cannot read them. So the install writes your current KDE colours for those pages, and the Oxygen icons the reader view's toolbar uses (they must be installed for those to show; otherwise it keeps Firefox's). In reader view, the light or dark theme that matches your desktop follows your colour scheme, while the sepia, gray, contrast and custom themes stay as Firefox draws them. To keep them in step with your colour scheme automatically, install the optional watcher, a systemd user path unit on `~/.config/kdeglobals` (the new tab page and reader view pick the colours up at the next Firefox start):
 
 ```
 oxygen-firefox-setup watch-enable
