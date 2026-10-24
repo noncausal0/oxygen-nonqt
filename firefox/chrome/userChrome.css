@@ -327,6 +327,26 @@
 
 /* The results list hangs from the field like a combo box popup, and the
  * selected result gets Oxygen's selection gradient. */
+/* --- Page actions in the address bar -------------------------------------------
+ *
+ * Reader mode, translate, picture-in-picture, share and the others get
+ * Oxygen's icons. Each draws its icon on its own image element. */
+
+#reader-mode-button-icon { list-style-image: url("moz-icon://stock/text-x-generic?size=16") !important; }
+#translations-button-icon { list-style-image: url("moz-icon://stock/preferences-desktop-locale?size=16") !important; }
+#picture-in-picture-button-icon { list-style-image: url("moz-icon://stock/video-display?size=16") !important; }
+#split-view-button-icon { list-style-image: url("moz-icon://stock/view-split-left-right?size=16") !important; }
+#share-button > image { list-style-image: url("moz-icon://stock/mail-send?size=16") !important; }
+#taskbar-tabs-button > image { list-style-image: url("moz-icon://stock/window-new?size=16") !important; }
+#reader-mode-button-icon, #translations-button-icon, #picture-in-picture-button-icon, #split-view-button-icon,
+#share-button > image, #taskbar-tabs-button > image {
+  -moz-context-properties: none !important;
+  fill-opacity: 1 !important;
+}
+/* Reader mode and translations show their state by brightening the icon. */
+#reader-mode-button:not([readeractive]) > #reader-mode-button-icon { opacity: 0.8; }
+#translations-button:not([translationsactive]) > #translations-button-icon { opacity: 0.8; }
+
 /* --- The address bar's results ---------------------------------------------------
  *
  * Compact rows (Firefox's are 34px), Oxygen's icons instead of the thin line
