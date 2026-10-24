@@ -643,6 +643,15 @@ menupopup, panel {
   --arrowpanel-border-radius: var(--ox-radius) !important;
 }
 
+/* The autoscroll marker is a round panel whose background holds its own
+ * image, so it keeps Firefox's values. */
+panel.autoscroller {
+  --panel-background-color: rgba(249, 249, 250, 0.8) no-repeat center url("chrome://global/skin/icons/autoscroll.svg") !important;
+  --panel-border-color: rgba(0, 0, 0, 0.4) !important;
+  --panel-border-radius: 100% !important;
+  --panel-shadow: none !important;
+}
+
 /* Slimmer menus: Firefox's items are 23px tall; Oxygen's are about 20px. */
 menupopup, panel {
   --menuitem-padding-block: 0.15em !important;
