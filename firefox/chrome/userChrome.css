@@ -327,6 +327,30 @@
 
 /* The results list hangs from the field like a combo box popup, and the
  * selected result gets Oxygen's selection gradient. */
+/* --- The address bar's results ---------------------------------------------------
+ *
+ * Compact rows (Firefox's are 34px), Oxygen's icons instead of the thin line
+ * art, square-cornered framed panel, and the go arrow as Oxygen's. */
+
+:is(#urlbar, #searchbar-new), .urlbarView {
+  --urlbarview-row-min-height: 26px;
+  --urlbarview-row-padding-block: 3px;
+}
+.urlbarView-background {
+  border-radius: 0 0 var(--ox-radius) var(--ox-radius) !important;
+  border-color: color-mix(in srgb, var(--ox-bg), CanvasText 30%) !important;
+}
+.urlbarView-favicon[src$="search-glass.svg"], .urlbarView-favicon[src$="search-glass-12.svg"] {
+  content: url("moz-icon://stock/edit-find?size=16") !important;
+  -moz-context-properties: none !important;
+}
+.urlbarView-favicon[src$="defaultFavicon.svg"] {
+  content: url("moz-icon://stock/text-html?size=16") !important;
+  -moz-context-properties: none !important;
+}
+.urlbar-go-button { content: url("moz-icon://stock/go-next?size=16") !important; }
+.search-go-button { list-style-image: url("moz-icon://stock/go-next?size=16") !important; }
+
 :is(#urlbar, #searchbar-new)[open] > .urlbarView {
   border-top: 1px solid var(--ox-frame) !important;
 }
