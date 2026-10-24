@@ -1164,3 +1164,91 @@ search-textbox .textbox-search-icon, .textbox-search-icon {
   .slider::before { background: var(--ox-btn) !important; border: 1px solid var(--ox-frame-dark) !important; box-sizing: border-box !important; }
   input:checked + .slider { background-color: var(--ox-focus) !important; }
 }
+
+/* The print dialog. It is built from Firefox's design tokens, so they are
+ * pointed at the palette, and its raised controls get Oxygen's gradients. */
+@-moz-document url("chrome://global/content/print.html") {
+  :root {
+    --background-color-canvas: var(--ox-bg) !important;
+    --background-color-box: var(--ox-base) !important;
+    --text-color: var(--ox-fg) !important;
+    --text-color-deemphasized: color-mix(in srgb, var(--ox-fg) 65%, transparent) !important;
+    --border-color: var(--ox-frame) !important;
+    --color-accent-primary: var(--ox-focus) !important;
+    --focus-outline-color: var(--ox-focus) !important;
+    --border-radius-small: 4px !important;
+    --border-radius-medium: 4px !important;
+    --button-border-radius: 4px !important;
+    --button-min-height: 24px !important;
+    --button-padding: 2px 10px !important;
+    --button-border: 1px solid var(--ox-frame-dark) !important;
+    --button-background-color: var(--ox-btn) !important;
+    --button-background-color-hover: var(--ox-btn) !important;
+    --button-background-color-active: hsl(from var(--ox-btn) h s calc(l * 0.9)) !important;
+    --button-text-color: var(--ox-btn-fg) !important;
+    --button-text-color-hover: var(--ox-btn-fg) !important;
+    --button-text-color-active: var(--ox-btn-fg) !important;
+    --button-border-color-hover: var(--ox-hover) !important;
+    --button-border-color-active: var(--ox-frame-dark) !important;
+    --button-background-color-primary: var(--ox-btn) !important;
+    --button-background-color-primary-hover: var(--ox-btn) !important;
+    --button-background-color-primary-active: hsl(from var(--ox-btn) h s calc(l * 0.9)) !important;
+    --button-text-color-primary: var(--ox-btn-fg) !important;
+    --button-text-color-primary-hover: var(--ox-btn-fg) !important;
+    --button-text-color-primary-active: var(--ox-btn-fg) !important;
+    --button-border-color-primary: var(--ox-focus) !important;
+    --button-border-color-primary-hover: var(--ox-hover) !important;
+    --button-border-color-primary-active: var(--ox-focus) !important;
+  }
+
+  :root {
+    --input-background-color: var(--ox-base) !important;
+    --input-text-color: var(--ox-text) !important;
+    --input-border-color: var(--ox-frame-dark) !important;
+    --segmented-control-border-color: var(--ox-frame-dark) !important;
+    --segmented-control-border-radius: 5px !important;
+  }
+
+  /* Push buttons are raised and glow when hovered; menus and the page range
+   * fields share the border and glow. */
+  button:not(:disabled) {
+    background-image: linear-gradient(to bottom, color-mix(in srgb, var(--ox-btn), white 8%), var(--ox-btn)) !important;
+  }
+  :is(button, select) {
+    box-shadow: inset 0 1px rgb(255 255 255 / 0.15), 0 1px 1px rgb(0 0 0 / 0.12) !important;
+    transition: border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
+  }
+  :is(button, select):enabled:hover {
+    box-shadow: inset 0 1px rgb(255 255 255 / 0.15), 0 0 2px var(--ox-hover) !important;
+  }
+  button:enabled:hover:active { background-image: none !important; box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.25) !important; }
+  button:disabled { box-shadow: none !important; }
+
+  /* Fields are sunken. */
+  input:is([type="text"], [type="number"]) {
+    background-color: var(--ox-base) !important;
+    color: var(--ox-text) !important;
+    border: 1px solid var(--ox-frame-dark) !important;
+    border-top-color: hsl(from var(--ox-bg) h s calc(l * 0.55)) !important;
+    border-radius: 4px !important;
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.08), 0 1px rgb(255 255 255 / 0.12) !important;
+    transition: border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
+  }
+  input:is([type="text"], [type="number"]):focus {
+    border-color: var(--ox-focus) !important;
+    box-shadow: 0 0 2px var(--ox-focus) !important;
+    outline: none !important;
+  }
+  input:is([type="radio"], [type="checkbox"]):not(:checked) {
+    background-color: var(--ox-base) !important;
+    border-color: var(--ox-frame-dark) !important;
+  }
+  moz-segmented-control {
+    background: var(--ox-base) !important;
+    box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.15) !important;
+  }
+  hr { border-color: var(--ox-frame) !important; }
+}
+
+/* The preview area is a darker, sunken surface around the page. */
+.previewStack { background-color: hsl(from var(--ox-bg) h s calc(l * 0.8)) !important; }

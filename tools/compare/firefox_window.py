@@ -9,7 +9,7 @@ taken through Marionette so it does not depend on window focus.
 
   firefox_window.py PROFILE_DIR OUT.png [--vertical] [--stock] [--wait]
                     [--colors FILE.colors] [--height PX] [--newtab] [--hover-tab] [--hover ID] [--url URL]
-                    [--click SELECTOR]... [--theme NAME] [--pip] [--pip-panels]
+                    [--click SELECTOR]... [--theme NAME] [--pip] [--pip-panels] [--print] [--print-more]
 
 --vertical switches to vertical tabs. --wait leaves the window open for
 interactive testing instead of quitting. --colors runs Firefox with its own
@@ -22,7 +22,7 @@ CSS selector matches in the page (repeatable, in order; for opening the reader
 view's menus) and --theme NAME picks the reader view's colour theme. --pip
 opens the page's video in a picture-in-picture window and saves a picture of
 that window instead, with its controls shown; --pip-panels also opens its
-subtitle and playback speed panels.
+subtitle and playback speed panels. --print opens the print dialog.
 """
 import base64
 import json
@@ -243,6 +243,20 @@ def main():
         # robot icon, which only exist to warn the user; a real window has neither.
         m.js("Services.wm.getMostRecentWindow('navigator:browser').document.documentElement.removeAttribute('remotecontrol');")
         time.sleep(0.5)
+        if "--print" in sys.argv:
+            m.js("""
+                const win = Services.wm.getMostRecentWindow('navigator:browser');
+                win.PrintUtils.startPrintWindow(win.gBrowser.selectedBrowser.browsingContext);
+            """)
+            time.sleep(5)
+            # --print-more opens "More settings".
+            if "--print-more" in sys.argv:
+                m.js("""
+                    const win = Services.wm.getMostRecentWindow('navigator:browser');
+                    const b = [...win.document.querySelectorAll('browser')].find(b => b.currentURI && b.currentURI.spec.includes('print.html'));
+                    b.contentDocument.querySelector('#more-settings').open = true;
+                """)
+                time.sleep(1)
         selectors = [sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == "--click"]
         theme = sys.argv[sys.argv.index("--theme") + 1] if "--theme" in sys.argv else None
         if selectors or theme:
