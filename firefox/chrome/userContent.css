@@ -307,3 +307,78 @@
   .text-alignment-buttons > .right-align-button { background-image: var(--ox-icon-right, url("chrome://global/skin/reader/align-right-20.svg")) !important; }
   .text-alignment-buttons > .justify-align-button { background-image: var(--ox-icon-justify, url("chrome://global/skin/reader/align-justify-20.svg")) !important; }
 }
+
+/* Firefox's settings pages. They are built from the same design tokens as the
+ * print dialog, so those are pointed at the KDE colours; the cards are Oxygen
+ * group boxes on the window colour. */
+@-moz-document url-prefix("about:preferences"), url-prefix("about:settings") {
+  :root {
+    --ox-bg: var(--ox-c-bg) !important;
+    --ox-top: hsl(from var(--ox-c-bg) h s calc(l * 1.05)) !important;
+    --ox-win: hsl(from var(--ox-c-bg) h s calc(l * 0.92)) !important;
+    --ox-fg: var(--ox-c-fg) !important;
+    --ox-base: var(--ox-c-base) !important;
+    --ox-text: var(--ox-c-text) !important;
+    --ox-btn: hsl(from var(--ox-c-btn) h s calc(l * 1.1)) !important;
+    --ox-btn-fg: var(--ox-c-btn-fg) !important;
+    --ox-focus: var(--ox-c-focus) !important;
+    --ox-hover: var(--ox-c-hover) !important;
+    --ox-frame: hsl(from var(--ox-c-bg) h s calc(l * 0.8)) !important;
+    --ox-frame-dark: hsl(from var(--ox-c-bg) h s calc(l * 0.6)) !important;
+
+    --background-color-canvas: var(--ox-bg) !important;
+    --background-color-box: var(--ox-base) !important;
+    --background-color-card: transparent !important;
+    --text-color: var(--ox-fg) !important;
+    --text-color-deemphasized: color-mix(in srgb, var(--ox-fg) 65%, transparent) !important;
+    --border-color: var(--ox-frame) !important;
+    --border-color-card: var(--ox-frame) !important;
+    --color-accent-primary: var(--ox-focus) !important;
+    --color-accent-primary-hover: var(--ox-hover) !important;
+    --color-accent-primary-active: var(--ox-focus) !important;
+    --focus-outline-color: var(--ox-focus) !important;
+    --border-radius-small: 4px !important;
+    --border-radius-medium: 4px !important;
+    --border-radius-large: 5px !important;
+    --border-radius-xlarge: 5px !important;
+    --button-border-radius: 4px !important;
+    --button-min-height: 24px !important;
+    --button-padding: 2px 10px !important;
+    --button-border: 1px solid var(--ox-frame-dark) !important;
+    --button-background-color: var(--ox-btn) !important;
+    --button-background-color-hover: var(--ox-btn) !important;
+    --button-background-color-active: hsl(from var(--ox-btn) h s calc(l * 0.9)) !important;
+    --button-text-color: var(--ox-btn-fg) !important;
+    --button-text-color-hover: var(--ox-btn-fg) !important;
+    --button-text-color-active: var(--ox-btn-fg) !important;
+    --button-border-color-hover: var(--ox-hover) !important;
+    --button-border-color-active: var(--ox-frame-dark) !important;
+    --button-background-color-primary: var(--ox-btn) !important;
+    --button-background-color-primary-hover: var(--ox-btn) !important;
+    --button-background-color-primary-active: hsl(from var(--ox-btn) h s calc(l * 0.9)) !important;
+    --button-text-color-primary: var(--ox-btn-fg) !important;
+    --button-text-color-primary-hover: var(--ox-btn-fg) !important;
+    --button-text-color-primary-active: var(--ox-btn-fg) !important;
+    --button-border-color-primary: var(--ox-focus) !important;
+    --button-border-color-primary-hover: var(--ox-hover) !important;
+    --button-border-color-primary-active: var(--ox-focus) !important;
+    --input-background-color: var(--ox-base) !important;
+    --input-text-color: var(--ox-text) !important;
+    --input-border-color: color-mix(in srgb, var(--ox-bg), CanvasText 28%) !important;
+    --input-border-radius: 4px !important;
+    --input-text-border-radius: 4px !important;
+    --input-search-border-radius: 4px !important;
+  }
+
+  body, :root { background: var(--ox-bg) !important; color: var(--ox-fg) !important; }
+
+  /* Cards are Oxygen group boxes. */
+  moz-card, .card, setting-group, groupbox {
+    --card-background-color: transparent !important;
+    background: linear-gradient(to bottom, hsl(from var(--ox-bg) h s calc(l * 1.2) / 0.45), hsl(from var(--ox-bg) h s calc(l * 1.2) / 0.08)) !important;
+    border: 1px solid hsl(from var(--ox-bg) h s calc(l * 1.25) / 0.8) !important;
+    border-bottom-color: hsl(from var(--ox-bg) h s calc(l * 0.8) / 0.6) !important;
+    border-radius: 5px !important;
+    box-shadow: 0 1px 1px rgb(0 0 0 / 0.08) !important;
+  }
+}

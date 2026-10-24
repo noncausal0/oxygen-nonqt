@@ -11,7 +11,7 @@ The KDE Oxygen theme for non-Qt toolkits, so GTK apps and Firefox look consisten
 | GTK 3 apps | yes |
 | GTK 4 apps | yes |
 | libadwaita apps (Nautilus, Flatseal, …) | yes, with some per-app polish still to come |
-| Firefox toolbars, tabs, menus, new tab page, reader view, picture-in-picture and print dialog | yes |
+| Firefox toolbars, tabs, menus, new tab page, reader view, picture-in-picture, print dialog and settings pages | yes |
 | Flatpak apps | yes, with one extra step |
 | Qt apps | already Oxygen, nothing to do |
 
