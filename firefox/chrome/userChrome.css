@@ -215,6 +215,31 @@
 }
 #urlbar-input, #searchbar .searchbar-textbox { color: var(--ox-text) !important; }
 
+/* The search engine picker at the left of the address bar is a tool button:
+ * flat until hovered, then a raised button with the hover colour around it,
+ * and pressed while its menu is open. Firefox's moz-button component draws it
+ * as an 8px pill inside its own shadow content, which only its --button-*
+ * variables on the host reach. */
+.searchmode-switcher {
+  --button-border-radius: 3px !important;
+  --button-border: 1px solid transparent !important;
+  --button-background-color-muted: transparent !important;
+  --button-border-color-muted: transparent !important;
+  --button-background-color-muted-hover: var(--ox-btn) !important;
+  --button-border-color-muted-hover: var(--ox-hover) !important;
+  --button-background-color-muted-active: hsl(from var(--ox-btn) h s calc(l * 0.9)) !important;
+  --button-border-color-muted-active: var(--ox-hover) !important;
+  --button-background-color-muted-selected: hsl(from var(--ox-btn) h s calc(l * 0.9)) !important;
+  --button-border-color-muted-selected: var(--ox-hover) !important;
+}
+.searchmode-switcher-dropmarker {
+  content: url("icons/chevron-down.svg") !important;
+  -moz-context-properties: fill !important;
+  fill: var(--ox-text) !important;
+  width: 12px !important;
+  height: 12px !important;
+}
+
 /* The security indicator uses Oxygen's shields, as Konqueror did: green when
  * verified, yellow for mixed content, red when not secure. */
 #identity-box.verifiedDomain #identity-icon,
