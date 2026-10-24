@@ -12,6 +12,27 @@
 
 @import url("palette.css");
 
+/* The palette is made of colour expressions on system colours. Registered as
+ * colours they are resolved once, on the root, instead of wherever they are
+ * used; popups resolve a system colour like Canvas differently inside their
+ * own shadow content, which turned their background white. */
+@property --ox-bg { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --ox-top { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --ox-win { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --ox-fg { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --ox-base { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --ox-text { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --ox-sel { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --ox-sel-fg { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --ox-focus { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --ox-hover { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --ox-btn { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --ox-btn-fg { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --ox-frame { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --ox-frame-dark { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --ox-groove { syntax: "<color>"; inherits: true; initial-value: transparent; }
+@property --ox-tab { syntax: "<color>"; inherits: true; initial-value: transparent; }
+
 /* Firefox's own theme variables, pointed at the palette. */
 :root {
   /* Firefox's design tokens: its accent follows the KDE one instead of
@@ -122,8 +143,10 @@
 #new-tab-button, #tabs-newtab-button, #vertical-tabs-newtab-button { list-style-image: url("moz-icon://stock/list-add?size=16") !important; }
 #alltabs-button { list-style-image: url("moz-icon://stock/arrow-down-double?size=16") !important; }
 #nav-bar-overflow-button { list-style-image: url("moz-icon://stock/arrow-right-double?size=16") !important; }
-#star-button { list-style-image: url("moz-icon://stock/bookmark-new?size=16") !important; }
-#star-button[starred] { list-style-image: url("moz-icon://stock/bookmarks?size=16") !important; }
+/* The bookmark star is Oxygen's gray star when the page is not bookmarked and
+ * its gold one when it is, so the two states read as the same icon. */
+#star-button { list-style-image: url("moz-icon://stock/non-starred?size=16") !important; }
+#star-button[starred] { list-style-image: url("moz-icon://stock/starred?size=16") !important; }
 .bookmark-item[container] { list-style-image: url("moz-icon://stock/folder-bookmark?size=16") !important; }
 /* Pages without a favicon get Oxygen's web page icon instead of Firefox's
  * globe. Firefox sets the globe as the tab icon's source, which only
@@ -445,6 +468,10 @@ sidebar-main, #sidebar-main, #sidebar-box {
  * Oxygen's selection gradient on the highlighted item. */
 
 menupopup, panel {
+  /* Firefox paints popups from --panel-background-color (the GTK theme's Menu
+   * colour, white with light schemes) through a `background` shorthand, so it
+   * can hold Oxygen's lit-top gradient. */
+  --panel-background-color: linear-gradient(to bottom, var(--ox-top), var(--ox-bg) 140px) !important;
   --panel-background: var(--ox-bg) !important;
   --panel-color: var(--ox-fg) !important;
   --panel-border-color: hsl(from var(--ox-bg) h s calc(l * 0.72)) !important;
@@ -581,4 +608,106 @@ toolbarseparator, menuseparator {
   width: 16px !important;
   height: 16px !important;
   margin-inline-end: 8px !important;
+}
+
+/* --- Bookmark panel ----------------------------------------------------------------
+ *
+ * Text fields are sunken with a focus glow, the folder picker and the expander
+ * buttons are raised push buttons, the check box is Oxygen's raised box, and
+ * Cancel and Save are push buttons. */
+
+#editBookmarkPanel {
+  --focus-outline-color: var(--ox-focus) !important;
+}
+
+/* Field frames blend towards the text colour, so they stay visible on dark
+ * panels (a shade of the panel colour would vanish there). */
+#editBookmarkPanel input:not([type="checkbox"]) {
+  background: var(--ox-base) !important;
+  color: var(--ox-text) !important;
+  border: 1px solid color-mix(in srgb, var(--ox-bg), CanvasText 28%) !important;
+  border-top-color: color-mix(in srgb, var(--ox-bg), CanvasText 38%) !important;
+  border-radius: var(--ox-radius) !important;
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.08), 0 1px rgb(255 255 255 / 0.12) !important;
+  outline: none !important;
+  transition: border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
+}
+#editBookmarkPanel input:not([type="checkbox"]):focus {
+  border-color: var(--ox-focus) !important;
+  box-shadow: 0 0 2px var(--ox-focus) !important;
+}
+#editBookmarkPanel input::selection {
+  background: var(--ox-sel) !important;
+  color: var(--ox-sel-fg) !important;
+}
+#editBookmarkPanel input::placeholder { color: color-mix(in srgb, var(--ox-text) 50%, transparent) !important; }
+#editBookmarkHeaderSeparator { border-color: var(--ox-frame) !important; }
+
+/* The folder picker and the buttons that expand the editor. */
+#editBMPanel_folderMenuList,
+#editBookmarkPanel button.panel-button,
+#editBookmarkPanelRemoveButton,
+#editBookmarkPanelDoneButton {
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--ox-btn), white 8%), var(--ox-btn)) !important;
+  color: var(--ox-btn-fg) !important;
+  border: 1px solid hsl(from var(--ox-btn) h s calc(l * 0.72)) !important;
+  border-bottom-color: hsl(from var(--ox-btn) h s calc(l * 0.56)) !important;
+  border-radius: var(--ox-radius) !important;
+  box-shadow: inset 0 1px color-mix(in srgb, var(--ox-btn), white 15%), 0 1px 1px rgb(0 0 0 / 0.12) !important;
+  outline: none !important;
+  transition: border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
+}
+#editBMPanel_folderMenuList:hover,
+#editBookmarkPanel button.panel-button:hover,
+#editBookmarkPanelRemoveButton:hover,
+#editBookmarkPanelDoneButton:hover,
+#editBMPanel_folderMenuList:focus-visible,
+#editBookmarkPanel button.panel-button:focus-visible,
+#editBookmarkPanelRemoveButton:focus-visible,
+#editBookmarkPanelDoneButton:focus-visible {
+  border-color: var(--ox-hover) !important;
+  box-shadow: inset 0 1px rgb(255 255 255 / 0.15), 0 0 2px var(--ox-hover) !important;
+}
+#editBMPanel_folderMenuList:is([open], :active),
+#editBookmarkPanel button.panel-button:is([open], :active),
+#editBookmarkPanelRemoveButton:active,
+#editBookmarkPanelDoneButton:active {
+  background: linear-gradient(to bottom, hsl(from var(--ox-btn) h s calc(l * 0.94)), var(--ox-btn)) !important;
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.2) !important;
+}
+
+/* The expander arrows are Oxygen's chevron. */
+#editBookmarkPanel button.expander-down {
+  list-style-image: url("icons/chevron-down.svg") !important;
+  -moz-context-properties: fill !important;
+  fill: var(--ox-btn-fg) !important;
+}
+#editBookmarkPanel button.expander-down > .button-icon,
+#editBookmarkPanel button.expander-down::before {
+  -moz-context-properties: fill !important;
+  fill: var(--ox-btn-fg) !important;
+}
+
+/* The check box is a small raised box with Oxygen's check mark. */
+#editBookmarkPanel .checkbox-check {
+  appearance: none !important;
+  width: 15px !important;
+  height: 15px !important;
+  border: 1px solid hsl(from var(--ox-btn) h s calc(l * 0.72)) !important;
+  border-bottom-color: hsl(from var(--ox-btn) h s calc(l * 0.56)) !important;
+  border-radius: 3px !important;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--ox-btn), white 8%), var(--ox-btn)) !important;
+  box-shadow: inset 0 1px color-mix(in srgb, var(--ox-btn), white 15%) !important;
+  -moz-context-properties: fill !important;
+  fill: var(--ox-btn-fg) !important;
+}
+#editBookmarkPanel .checkbox-check[checked] {
+  background-image: url("icons/check.svg"), linear-gradient(to bottom, color-mix(in srgb, var(--ox-btn), white 8%), var(--ox-btn)) !important;
+  background-size: 14px 14px, auto !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+#editBookmarkPanel checkbox:hover > .checkbox-check {
+  border-color: var(--ox-hover) !important;
+  box-shadow: inset 0 1px rgb(255 255 255 / 0.15), 0 0 2px var(--ox-hover) !important;
 }
