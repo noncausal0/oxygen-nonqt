@@ -122,7 +122,11 @@
   transition: border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
 }
 
-.bookmark-item { padding: 2px 6px !important; margin-inline: 1px !important; }
+/* Even spacing: 6px between an icon and its label, and 10px between items
+ * (their hover frame included), so each reads as a unit. */
+.bookmark-item { padding: 2px 4px !important; margin-inline: 0 !important; }
+.bookmark-item > .toolbarbutton-icon { margin-inline: 0 6px !important; }
+.bookmark-item > .toolbarbutton-text { margin: 0 !important; padding: 0 !important; }
 .bookmark-item > .toolbarbutton-text { border: none !important; box-shadow: none !important; background: none !important; }
 
 /* --- Oxygen icons ------------------------------------------------------------
@@ -487,6 +491,14 @@ menupopup, panel {
   --arrowpanel-border-radius: var(--ox-radius) !important;
 }
 
+/* Slimmer menus: Firefox's items are 23px tall; Oxygen's are about 20px. */
+menupopup, panel {
+  --menuitem-padding-block: 0.15em !important;
+}
+menuseparator {
+  padding-block: 2px !important;
+}
+
 menupopup > :is(menuitem, menu):not([disabled])[_moz-menuactive] {
   background: linear-gradient(to bottom, hsl(from var(--ox-sel) h s calc(min(l * 1.22, 92))), var(--ox-sel)) !important;
   color: var(--ox-sel-fg) !important;
@@ -524,11 +536,35 @@ menupopup > :is(menuitem, menu):not([disabled])[_moz-menuactive] {
 #context-print-selection { --menuitem-icon: url("moz-icon://stock/document-print?size=16") !important; }
 #context-sendpagetodevice { --menuitem-icon: url("moz-icon://stock/mail-send?size=16") !important; }
 #context-sendlinktodevice { --menuitem-icon: url("moz-icon://stock/mail-send?size=16") !important; }
+#context-copy-link-to-highlight { --menuitem-icon: url("moz-icon://stock/insert-link?size=16") !important; }
+#context-copy-clean-link-to-highlight { --menuitem-icon: url("moz-icon://stock/insert-link?size=16") !important; }
+#context-translate-selection { --menuitem-icon: url("moz-icon://stock/preferences-desktop-locale?size=16") !important; }
+#context-ask-chat { --menuitem-icon: url("moz-icon://stock/help-hint?size=16") !important; }
+#context-viewpartialsource-selection { --menuitem-icon: url("moz-icon://stock/code-context?size=16") !important; }
+#context-openlinkinsplitview { --menuitem-icon: url("moz-icon://stock/view-split-left-right?size=16") !important; }
+#context-openlinkinusercontext-menu { --menuitem-icon: url("moz-icon://stock/tab-new?size=16") !important; }
+#context-openlinkprivate { --menuitem-icon: url("moz-icon://stock/user-identity?size=16") !important; }
+#context-previewlink { --menuitem-icon: url("moz-icon://stock/view-preview?size=16") !important; }
+#context-stripOnShareLink { --menuitem-icon: url("moz-icon://stock/insert-link?size=16") !important; }
+#context-sendimage { --menuitem-icon: url("moz-icon://stock/mail-send?size=16") !important; }
+#context-searchlens { --menuitem-icon: url("moz-icon://stock/edit-find?size=16") !important; }
+#context-viewimageinfo { --menuitem-icon: url("moz-icon://stock/document-properties?size=16") !important; }
+#context-setDesktopBackground { --menuitem-icon: url("moz-icon://stock/preferences-desktop-wallpaper?size=16") !important; }
+#context-media-play { --menuitem-icon: url("moz-icon://stock/media-playback-start?size=16") !important; }
+#context-media-pause { --menuitem-icon: url("moz-icon://stock/media-playback-pause?size=16") !important; }
+#context-media-mute { --menuitem-icon: url("moz-icon://stock/player-volume?size=16") !important; }
+#context-media-unmute { --menuitem-icon: url("moz-icon://stock/player-volume?size=16") !important; }
+#context-savevideo { --menuitem-icon: url("moz-icon://stock/document-save-as?size=16") !important; }
+#context-saveaudio { --menuitem-icon: url("moz-icon://stock/document-save-as?size=16") !important; }
+#context-copyvideourl { --menuitem-icon: url("moz-icon://stock/insert-link?size=16") !important; }
+#context-copyaudiourl { --menuitem-icon: url("moz-icon://stock/insert-link?size=16") !important; }
 #context-bookmarkpage[starred] { --menuitem-icon: url("moz-icon://stock/bookmarks?size=16") !important; }
 /* Firefox only draws icons for items marked iconic; the others keep an empty
  * slot of the same size, so showing the icon there does not shift anything. */
 #contentAreaContextMenu :is(menuitem, menu) > .menu-icon {
-  content: var(--menuitem-icon) !important;
+  /* Items without an icon of their own keep a blank slot; without the
+   * fallback they would show a broken-image box. */
+  content: var(--menuitem-icon, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'/%3E")) !important;
   display: revert !important;
   visibility: inherit !important;
 }
