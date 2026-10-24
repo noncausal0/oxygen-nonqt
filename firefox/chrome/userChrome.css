@@ -745,11 +745,58 @@ toolbarseparator, menuseparator {
 #appMenu-more-button2 { list-style-image: url("moz-icon://stock/preferences-other?size=16") !important; }
 #appMenu-help-button2 { list-style-image: url("moz-icon://stock/help-contents?size=16") !important; }
 #appMenu-quit-button2 { list-style-image: url("moz-icon://stock/application-exit?size=16") !important; }
-#appMenu-protonMainView .subviewbutton > .toolbarbutton-icon {
+#appMenu-mainView .subviewbutton > .toolbarbutton-icon {
   -moz-context-properties: none !important;
   width: 16px !important;
   height: 16px !important;
   margin-inline-end: 8px !important;
+}
+
+/* A compact menu: rows are 22px instead of 28px, like Oxygen's menus and the
+ * context menu. The zoom row's small buttons keep their own size. */
+#appMenu-popup .subviewbutton:not(.subviewbutton-iconic) {
+  padding-block: 2px !important;
+}
+#appMenu-popup toolbarseparator, #appMenu-popup menuseparator {
+  margin-block: 2px !important;
+}
+#appMenu-popup .panel-subview-body { padding-block: 2px !important; }
+
+/* Firefox's "zap" separator under the sign-in card is a purple gradient; it
+ * becomes an ordinary separator. */
+toolbarseparator.proton-zap, #appMenu-fxa-separator {
+  border-image: none !important;
+  background: none !important;
+  border-block: none !important;
+  border-top: 1px solid hsl(from var(--ox-bg) h s calc(l * 0.78)) !important;
+  margin-block: 2px 0 !important;
+  box-shadow: none !important;
+  height: 0 !important;
+}
+#appMenu-fxa-separator + * { margin-top: 0 !important; padding-top: 0 !important; }
+toolbarseparator.proton-zap::before, toolbarseparator.proton-zap::after { display: none !important; }
+
+/* The sign-in card is an Oxygen info bar instead of Firefox's purple banner:
+ * the window colour tinted with the accent, a frame, and square corners. */
+#appMenu-fxa-sign-in-promo {
+  background: color-mix(in srgb, var(--ox-bg) 80%, var(--ox-sel)) !important;
+  color: var(--ox-fg) !important;
+  border: 1px solid color-mix(in srgb, var(--ox-bg), CanvasText 25%) !important;
+  border-radius: var(--ox-radius) !important;
+  margin: 2px 6px 4px !important;
+  padding-block: 6px !important;
+}
+#appMenu-fxa-sign-in-promo a, #appMenu-fxa-sign-in-promo .text-link { color: var(--ox-link, var(--ox-sel)) !important; }
+#appMenu-fxa-sign-in-promo-dismiss-button {
+  --button-border-radius: 3px !important;
+  --button-border: 1px solid transparent !important;
+  --button-background-color: transparent !important;
+  --button-border-color: transparent !important;
+  --button-background-color-hover: var(--ox-btn) !important;
+  --button-border-color-hover: var(--ox-hover) !important;
+  --button-background-color-active: hsl(from var(--ox-btn) h s calc(l * 0.9)) !important;
+  --button-border-color-active: var(--ox-hover) !important;
+  --button-text-color: var(--ox-fg) !important;
 }
 
 /* --- Bookmark panel ----------------------------------------------------------------
