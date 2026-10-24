@@ -853,3 +853,51 @@ toolbarseparator, menuseparator {
   border-color: var(--ox-hover) !important;
   box-shadow: inset 0 1px rgb(255 255 255 / 0.15), 0 0 2px var(--ox-hover) !important;
 }
+
+/* --- Library window and download lists -----------------------------------------
+ *
+ * Firefox's line-art icons in the Library's side tree, the download list
+ * buttons, the Organize button and the search field are replaced by Oxygen's. */
+
+/* The side tree and the bookmarks and history sidebars. Firefox sets these
+ * icons by tree item type, so the same selectors are used. */
+treechildren::-moz-tree-image {
+  -moz-context-properties: none !important;
+  fill-opacity: 1 !important;
+}
+treechildren::-moz-tree-image(title) { list-style-image: url("moz-icon://stock/text-html?size=16") !important; }
+treechildren::-moz-tree-image(title, container),
+treechildren::-moz-tree-image(title, query, folder),
+treechildren::-moz-tree-image(title, query, hostContainer) { list-style-image: url("moz-icon://stock/folder?size=16") !important; }
+treechildren::-moz-tree-image(title, open) { list-style-image: url("moz-icon://stock/folder-open?size=16") !important; }
+treechildren::-moz-tree-image(container, queryFolder_toolbar_____) { list-style-image: url("moz-icon://stock/bookmark-toolbar?size=16") !important; }
+treechildren::-moz-tree-image(container, queryFolder_menu________) { list-style-image: url("moz-icon://stock/view-list-details?size=16") !important; }
+treechildren::-moz-tree-image(query) { list-style-image: url("moz-icon://stock/edit-find?size=16") !important; }
+treechildren::-moz-tree-image(query, OrganizerQuery_allbms_____v) { list-style-image: url("moz-icon://stock/favorites?size=16") !important; }
+treechildren::-moz-tree-image(query, OrganizerQuery_downloads__v) { list-style-image: url("moz-icon://stock/folder-downloads?size=16") !important; }
+treechildren::-moz-tree-image(title, query, tagContainer),
+treechildren::-moz-tree-image(query, OrganizerQuery_tags_______v) { list-style-image: url("moz-icon://stock/tag?size=16") !important; }
+treechildren::-moz-tree-image(title, query, dayContainer) { list-style-image: url("moz-icon://stock/view-calendar-day?size=16") !important; }
+treechildren::-moz-tree-image(query, OrganizerQuery_history____v) { list-style-image: url("moz-icon://stock/view-history?size=16") !important; }
+
+/* Buttons on each download: show in folder, retry, cancel. */
+.downloadButton > .button-box > .button-icon {
+  -moz-context-properties: none !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+.downloadIconShow > .button-box > .button-icon { list-style-image: url("moz-icon://stock/document-open-folder?size=16") !important; }
+.downloadIconRetry > .button-box > .button-icon { list-style-image: url("moz-icon://stock/view-refresh?size=16") !important; }
+.downloadIconCancel > .button-box > .button-icon { list-style-image: url("moz-icon://stock/process-stop?size=16") !important; }
+.downloadIconSubviewArrow > .button-box > .button-icon { list-style-image: url("moz-icon://stock/go-next?size=16") !important; }
+
+/* The Organize button and the search fields. */
+#organizeButton { --menuitem-icon: url("moz-icon://stock/configure?size=16") !important; }
+#organizeButton > .toolbarbutton-icon, #organizeButton .button-icon {
+  list-style-image: url("moz-icon://stock/configure?size=16") !important;
+  -moz-context-properties: none !important;
+}
+search-textbox .textbox-search-icon, .textbox-search-icon {
+  list-style-image: url("moz-icon://stock/edit-find?size=16") !important;
+  -moz-context-properties: none !important;
+}
