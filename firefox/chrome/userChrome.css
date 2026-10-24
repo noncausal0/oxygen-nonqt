@@ -201,11 +201,11 @@
  * dark toolbars. Firefox 158 paints the address bar on .urlbar-background and
  * rounds the input container to 8px, so both are set. */
 
-#urlbar, #searchbar {
+#urlbar, #searchbar-new, #searchbar {
   --urlbar-container-height: 32px !important;
   --urlbar-inner-border-radius: 3px !important;
 }
-#urlbar > .urlbar-background, #searchbar {
+#urlbar > .urlbar-background, #searchbar-new > .urlbar-background, #searchbar {
   background-color: var(--ox-base) !important;
   background-image: linear-gradient(to bottom, color-mix(in srgb, var(--ox-base), black 8%), var(--ox-base) 7px) !important;
   border: 1px solid color-mix(in srgb, var(--ox-bg), CanvasText 30%) !important;
@@ -215,13 +215,25 @@
   outline: none !important;
   transition: border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
 }
-#urlbar .urlbar-input-container, #urlbar .urlbar-background { border-radius: var(--ox-radius) !important; }
-#urlbar:is([focused], [open]) > .urlbar-background, #searchbar:focus-within {
+:is(#urlbar, #searchbar-new) :is(.urlbar-input-container, .urlbar-background) { border-radius: var(--ox-radius) !important; }
+:is(#urlbar, #searchbar-new):is([focused], [open]) > .urlbar-background, #searchbar:focus-within {
   border-color: var(--ox-focus) !important;
   box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.18), 0 0 2px var(--ox-focus) !important;
   outline: none !important;
 }
-#urlbar-input, #searchbar .searchbar-textbox { color: var(--ox-text) !important; }
+#urlbar-input, #searchbar-new .urlbar-input, #searchbar .searchbar-textbox { color: var(--ox-text) !important; }
+
+/* The go button at the right of the search bar is a tool button too. */
+#searchbar-new .urlbar-go-button {
+  border-radius: 3px !important;
+  border: 1px solid transparent !important;
+  transition: border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
+}
+#searchbar-new .urlbar-go-button:hover {
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--ox-btn), white 8%), var(--ox-btn)) !important;
+  border-color: var(--ox-hover) !important;
+  box-shadow: inset 0 1px rgb(255 255 255 / 0.15), 0 0 2px var(--ox-hover) !important;
+}
 
 /* The search engine picker at the left of the address bar is a tool button:
  * flat until hovered, then a raised button with the hover colour around it,
@@ -315,7 +327,7 @@
 
 /* The results list hangs from the field like a combo box popup, and the
  * selected result gets Oxygen's selection gradient. */
-#urlbar[open] > .urlbarView {
+:is(#urlbar, #searchbar-new)[open] > .urlbarView {
   border-top: 1px solid var(--ox-frame) !important;
 }
 .urlbarView-row[selected] > .urlbarView-row-inner,
