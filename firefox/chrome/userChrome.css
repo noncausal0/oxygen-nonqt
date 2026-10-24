@@ -558,13 +558,63 @@ menupopup > :is(menuitem, menu):not([disabled])[_moz-menuactive] {
 #context-saveaudio { --menuitem-icon: url("moz-icon://stock/document-save-as?size=16") !important; }
 #context-copyvideourl { --menuitem-icon: url("moz-icon://stock/insert-link?size=16") !important; }
 #context-copyaudiourl { --menuitem-icon: url("moz-icon://stock/insert-link?size=16") !important; }
+#context-visual-search { --menuitem-icon: url("moz-icon://stock/edit-find?size=16") !important; }
 #context-bookmarkpage[starred] { --menuitem-icon: url("moz-icon://stock/bookmarks?size=16") !important; }
-/* Firefox only draws icons for items marked iconic; the others keep an empty
- * slot of the same size, so showing the icon there does not shift anything. */
-#contentAreaContextMenu :is(menuitem, menu) > .menu-icon {
-  /* Items without an icon of their own keep a blank slot; without the
-   * fallback they would show a broken-image box. */
-  content: var(--menuitem-icon, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'/%3E")) !important;
+/* Oxygen's icon is drawn for the items mapped above, whether or not Firefox
+ * marks them iconic. Everything else is left exactly as Firefox draws it:
+ * extension items keep their own icons and the rest keep an empty slot. */
+  #contentAreaContextMenu #context-back > .menu-icon,
+  #contentAreaContextMenu #context-forward > .menu-icon,
+  #contentAreaContextMenu #context-reload > .menu-icon,
+  #contentAreaContextMenu #context-stop > .menu-icon,
+  #contentAreaContextMenu #context-bookmarkpage > .menu-icon,
+  #contentAreaContextMenu #context-savepage > .menu-icon,
+  #contentAreaContextMenu #context-selectall > .menu-icon,
+  #contentAreaContextMenu #context-take-screenshot > .menu-icon,
+  #contentAreaContextMenu #context-viewsource > .menu-icon,
+  #contentAreaContextMenu #context-inspect > .menu-icon,
+  #contentAreaContextMenu #context-inspect-a11y > .menu-icon,
+  #contentAreaContextMenu #context-undo > .menu-icon,
+  #contentAreaContextMenu #context-redo > .menu-icon,
+  #contentAreaContextMenu #context-cut > .menu-icon,
+  #contentAreaContextMenu #context-copy > .menu-icon,
+  #contentAreaContextMenu #context-paste > .menu-icon,
+  #contentAreaContextMenu #context-delete > .menu-icon,
+  #contentAreaContextMenu #context-openlinkintab > .menu-icon,
+  #contentAreaContextMenu #context-openlink > .menu-icon,
+  #contentAreaContextMenu #context-bookmarklink > .menu-icon,
+  #contentAreaContextMenu #context-savelink > .menu-icon,
+  #contentAreaContextMenu #context-copylink > .menu-icon,
+  #contentAreaContextMenu #context-viewimage > .menu-icon,
+  #contentAreaContextMenu #context-copyimage-contents > .menu-icon,
+  #contentAreaContextMenu #context-copyimage > .menu-icon,
+  #contentAreaContextMenu #context-saveimage > .menu-icon,
+  #contentAreaContextMenu #context-searchselect > .menu-icon,
+  #contentAreaContextMenu #context-print-selection > .menu-icon,
+  #contentAreaContextMenu #context-sendpagetodevice > .menu-icon,
+  #contentAreaContextMenu #context-sendlinktodevice > .menu-icon,
+  #contentAreaContextMenu #context-copy-link-to-highlight > .menu-icon,
+  #contentAreaContextMenu #context-copy-clean-link-to-highlight > .menu-icon,
+  #contentAreaContextMenu #context-translate-selection > .menu-icon,
+  #contentAreaContextMenu #context-ask-chat > .menu-icon,
+  #contentAreaContextMenu #context-viewpartialsource-selection > .menu-icon,
+  #contentAreaContextMenu #context-openlinkinsplitview > .menu-icon,
+  #contentAreaContextMenu #context-openlinkinusercontext-menu > .menu-icon,
+  #contentAreaContextMenu #context-openlinkprivate > .menu-icon,
+  #contentAreaContextMenu #context-previewlink > .menu-icon,
+  #contentAreaContextMenu #context-sendimage > .menu-icon,
+  #contentAreaContextMenu #context-searchlens > .menu-icon,
+  #contentAreaContextMenu #context-viewimageinfo > .menu-icon,
+  #contentAreaContextMenu #context-media-play > .menu-icon,
+  #contentAreaContextMenu #context-media-pause > .menu-icon,
+  #contentAreaContextMenu #context-media-mute > .menu-icon,
+  #contentAreaContextMenu #context-media-unmute > .menu-icon,
+  #contentAreaContextMenu #context-savevideo > .menu-icon,
+  #contentAreaContextMenu #context-saveaudio > .menu-icon,
+  #contentAreaContextMenu #context-copyvideourl > .menu-icon,
+  #contentAreaContextMenu #context-copyaudiourl > .menu-icon,
+  #contentAreaContextMenu #context-visual-search > .menu-icon {
+  content: var(--menuitem-icon) !important;
   display: revert !important;
   visibility: inherit !important;
 }
