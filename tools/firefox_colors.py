@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Write the KDE colours for Firefox's new tab page.
+"""Write KDE colours that Firefox cannot read for itself.
 
 Inside its own pages Firefox replaces the window, text and button system
 colours with fixed stand-ins (only the accent is real), so userContent.css
-cannot follow the KDE scheme live the way userChrome.css does. Instead
-`make firefox-install` writes the current scheme's colours here, from
-kdeglobals or a .colors file, as --ox-c-* variables.
+cannot follow the KDE scheme live the way userChrome.css does. KDE's focus
+and hover decoration colours (the Oxygen focus ring and hover glow) are not
+system colours at all. So the install, and the colour watcher, write the
+current scheme's colours here, from kdeglobals or a .colors file, as
+--ox-c-* variables.
 
   firefox_colors.py SCHEME OUT.css
 """
@@ -24,6 +26,8 @@ COLORS = {
     "text": ("View", "ForegroundNormal"),
     "btn": ("Button", "BackgroundNormal"),
     "btn-fg": ("Button", "ForegroundNormal"),
+    "focus": ("Button", "DecorationFocus"),
+    "hover": ("Button", "DecorationHover"),
 }
 
 

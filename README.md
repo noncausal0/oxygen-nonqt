@@ -111,7 +111,7 @@ The comparison windows from `tools/compare/`, in KDE's stock Oxygen and Oxygen D
 | **Firefox, vertical tabs** | <a href="docs/screenshots/firefox-vertical-light.png"><img src="docs/screenshots/firefox-vertical-light.png" width="380"></a> | <a href="docs/screenshots/firefox-vertical-dark.png"><img src="docs/screenshots/firefox-vertical-dark.png" width="380"></a> |
 | **Firefox, new tab page** | <a href="docs/screenshots/firefox-newtab-light.png"><img src="docs/screenshots/firefox-newtab-light.png" width="380"></a> | <a href="docs/screenshots/firefox-newtab-dark.png"><img src="docs/screenshots/firefox-newtab-dark.png" width="380"></a> |
 
-The Qt and GTK 3 windows are shown without a titlebar, since KWin draws theirs. The libadwaita window is a gallery of real libadwaita widgets in a test window, not an actual app. The striped address bar in the Firefox shots is Firefox marking the window as remote-controlled by the screenshot script, and the third tab is held in its hover state.
+The Qt and GTK 3 windows are shown without a titlebar, since KWin draws theirs. The libadwaita window is a gallery of real libadwaita widgets in a test window, not an actual app. In the Firefox shots the third tab is held in its hover state.
 
 ## Details
 

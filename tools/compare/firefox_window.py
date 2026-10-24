@@ -202,6 +202,10 @@ def main():
             "--hover-tab" in sys.argv,
             sys.argv[sys.argv.index("--hover") + 1] if "--hover" in sys.argv else None)
         time.sleep(6 if "--newtab" in sys.argv or "--url" in sys.argv else 2.5)
+        # Firefox marks a remote-controlled window with a striped address bar and a
+        # robot icon, which only exist to warn the user; a real window has neither.
+        m.js("Services.wm.getMostRecentWindow('navigator:browser').document.documentElement.removeAttribute('remotecontrol');")
+        time.sleep(0.5)
         shot = m("WebDriver:TakeScreenshot", {"full": False})["value"]
         with open(out, "wb") as f:
             f.write(base64.b64decode(shot))

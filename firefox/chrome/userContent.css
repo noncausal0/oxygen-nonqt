@@ -27,6 +27,8 @@
     --ox-text: var(--ox-c-text) !important;
     --ox-btn: hsl(from var(--ox-c-btn) h s calc(l * 1.1)) !important;
     --ox-btn-fg: var(--ox-c-btn-fg) !important;
+    --ox-focus: var(--ox-c-focus) !important;
+    --ox-hover: var(--ox-c-hover) !important;
     --ox-frame: hsl(from var(--ox-c-bg) h s calc(l * 0.8)) !important;
 
     /* Oxygen's corners are 4-5px, not Firefox's 8-24px. */

@@ -40,4 +40,12 @@ def gtk_css(path):
         "link_color_breeze": c("View", "ForegroundLink"),
         "link_visited_color_breeze": c("View", "ForegroundVisited"),
     }
-    return "".join("@define-color %s %s;\n" % (k, hexa(v)) for k, v in names.items())
+    css = "".join("@define-color %s %s;\n" % (k, hexa(v)) for k, v in names.items())
+    # Firefox reads the plain GTK names, which KDE's export defines as well.
+    for k, v in names.items():
+        if k.endswith("_breeze"):
+            css += "@define-color %s %s;\n" % (k[:-len("_breeze")], hexa(v))
+    # libadwaita-style accent names, which Firefox also looks at.
+    accent = hexa(c("Button", "DecorationFocus"))
+    css += "@define-color accent_color %s;\n@define-color accent_bg_color %s;\n" % (accent, accent)
+    return css
