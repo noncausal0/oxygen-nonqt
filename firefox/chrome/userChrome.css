@@ -362,8 +362,48 @@
   background: linear-gradient(to bottom, hsl(from var(--ox-sel) h s calc(min(l * 1.22, 92))), var(--ox-sel)) !important;
   color: var(--ox-sel-fg) !important;
 }
+/* Hovering a result tints it like an Oxygen item view does: a gradient of the
+ * hover colour with a thin outline, rather than a flat wash. */
 .urlbarView-row:not([selected]):hover > .urlbarView-row-inner {
-  background: color-mix(in srgb, var(--ox-hover) 18%, transparent) !important;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--ox-hover) 30%, transparent), color-mix(in srgb, var(--ox-hover) 14%, transparent)) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ox-hover) 45%, transparent) !important;
+}
+
+/* The three-dot button on a result: a small tool button, raised on hover, with
+ * Oxygen's menu icon instead of Firefox's dots. */
+.urlbarView-button-menu {
+  background-color: transparent !important;
+  background-image: url("moz-icon://stock/application-menu?size=16") !important;
+  background-size: 16px 16px !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  -moz-context-properties: none !important;
+  border: 1px solid transparent !important;
+  border-radius: 3px !important;
+  transition: border-color var(--ox-fade), box-shadow var(--ox-fade) !important;
+}
+.urlbarView-button-menu:hover, .urlbarView-button-menu[open] {
+  background-image: url("moz-icon://stock/application-menu?size=16"), linear-gradient(to bottom, color-mix(in srgb, var(--ox-btn), white 8%), var(--ox-btn)) !important;
+  background-size: 16px 16px, auto !important;
+  background-position: center, center !important;
+  border-color: var(--ox-hover) !important;
+  box-shadow: inset 0 1px rgb(255 255 255 / 0.15), 0 0 2px var(--ox-hover) !important;
+}
+
+/* The menu that button opens (and Firefox's other panel lists): the window
+ * colour in a thin frame, and Oxygen's selection on the highlighted item. */
+panel-list {
+  --panel-list-background-color: var(--ox-bg) !important;
+  --panel-list-text-color: var(--ox-fg) !important;
+  --panel-list-border-color: color-mix(in srgb, var(--ox-bg), CanvasText 30%) !important;
+  --panel-list-border-radius: var(--ox-radius) !important;
+  --panel-list-box-shadow: 0 2px 6px rgb(0 0 0 / 0.3) !important;
+  --panel-separator-color: color-mix(in srgb, var(--ox-bg), CanvasText 25%) !important;
+  --panel-item-button-border-radius: 3px !important;
+  --button-background-color-menu-hover: var(--ox-sel) !important;
+  --button-text-color-menu-hover: var(--ox-sel-fg) !important;
+  --button-background-color-menu-active: hsl(from var(--ox-sel) h s calc(l * 0.9)) !important;
+  --button-text-color-menu-active: var(--ox-sel-fg) !important;
 }
 #urlbar .urlbar-page-action, #identity-box > box, #tracking-protection-icon-container {
   border-radius: 3px !important;
