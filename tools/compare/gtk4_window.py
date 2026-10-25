@@ -224,13 +224,24 @@ def files_window(app):
     selection.set_selected(1)
     view = Gtk.Box()
     if "--list" in sys.argv:
+        # Nautilus's own style sheet (padding, row radius), when it is installed,
+        # so the list view is laid out as in the real app.
+        try:
+            import subprocess
+            css = subprocess.run(["gresource", "extract", "/usr/bin/nautilus", "/org/gnome/nautilus/style.css"],
+                                 capture_output=True, check=True).stdout
+            add_css(data=css.decode(), priority=Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        except (OSError, subprocess.CalledProcessError):
+            pass
         columns = Gtk.ColumnView(model=selection)
-        columns.add_css_class("nautilus-list-view")
+        view.add_css_class("nautilus-list-view")
         sizes = ("4 items", "3 items", "11 items", "9 items", "2 items", "1 item", "0 items", "5 items", "56.8 kB", "1.2 kB")
         for title, text in (("Name", None), ("Size", sizes), ("Modified", ("Last week",) * 10)):
             f = Gtk.SignalListItemFactory()
             def lsetup(_f, item):
-                item.set_child(Gtk.Label(xalign=0))
+                label = Gtk.Label(xalign=0)
+                label.add_css_class("nautilus-view-cell")
+                item.set_child(label)
             def lbind(_f, item, text=text):
                 label = item.get_child()
                 label.set_label(item.get_item().get_string() if text is None else text[item.get_position()])

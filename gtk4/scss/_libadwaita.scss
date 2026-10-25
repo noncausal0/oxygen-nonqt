@@ -197,6 +197,25 @@ overlay-split-view.collapsed .navigation-sidebar, navigation-split-view.collapse
   .view, gridview, columnview, columnview > listview, listview, scrolledwindow, viewport { background-color: transparent; }
 }
 
+// Nautilus pads the list view by 24px on both sides, which leaves the column
+// header as a small boxed strip. As in Dolphin's details view, the header is
+// a raised band across the whole view, with its sections divided by lines.
+.nautilus-list-view columnview > header {
+  @include raised($bg);
+  margin: 0 -24px;
+  padding: 0 24px;
+  border-width: 0 0 1px 0;
+  border-radius: 0;
+  box-shadow: none;
+  > button, > button:backdrop {
+    background: none;
+    border-width: 0 1px 0 0;
+    box-shadow: none;
+    &:hover { background-color: galpha($hover, 0.18); }
+    &:active { @include sunken($bg); border-width: 0 1px 0 0; }
+  }
+}
+
 // The path bar is a sunken field holding flat crumb buttons.
 .nautilus-pathbar {
   @include hole;
