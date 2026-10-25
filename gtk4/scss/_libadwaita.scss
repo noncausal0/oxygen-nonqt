@@ -173,9 +173,13 @@ navigation-split-view > widget.sidebar-pane, overlay-split-view > widget.sidebar
   margin: 0 0 6px 6px;
   padding: 3px;
   color: $text;
+  // libadwaita's rows are 36px tall with generous padding; Oxygen's Places
+  // rows are about 26px.
   > row {
     border-radius: 3px;
     margin: 1px 0;
+    min-height: 24px;
+    padding: 2px 6px;
     &:selected { @include selection; }
   }
 }
