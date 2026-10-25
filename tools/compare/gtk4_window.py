@@ -3,7 +3,7 @@
 """GTK 4 counterpart of qt_window.py, plus a libadwaita page.
 
 --files shows a mock of Nautilus's window (same widget types and style
-classes) instead of the widget gallery. --adw loads the built libadwaita.css from build/Oxygen as user CSS on top of
+classes) instead of the widget gallery; --list makes it the list view. --adw loads the built libadwaita.css from build/Oxygen as user CSS on top of
 libadwaita, so nothing has to be installed. Without it the window uses the
 GTK theme, so run it with GTK_THEME=Oxygen after `make install`. --colors FILE.colors applies a KDE
 colour scheme to this process only (otherwise KDE's exported colours are
@@ -222,10 +222,27 @@ def files_window(app):
     factory.connect("bind", bind)
     selection = Gtk.SingleSelection(model=model)
     selection.set_selected(1)
-    grid = Gtk.GridView(model=selection, factory=factory, max_columns=6)
     view = Gtk.Box()
-    view.add_css_class("nautilus-grid-view")
-    view.append(Gtk.ScrolledWindow(child=grid, hexpand=True, vexpand=True))
+    if "--list" in sys.argv:
+        columns = Gtk.ColumnView(model=selection)
+        columns.add_css_class("nautilus-list-view")
+        sizes = ("4 items", "3 items", "11 items", "9 items", "2 items", "1 item", "0 items", "5 items", "56.8 kB", "1.2 kB")
+        for title, text in (("Name", None), ("Size", sizes), ("Modified", ("Last week",) * 10)):
+            f = Gtk.SignalListItemFactory()
+            def lsetup(_f, item):
+                item.set_child(Gtk.Label(xalign=0))
+            def lbind(_f, item, text=text):
+                label = item.get_child()
+                label.set_label(item.get_item().get_string() if text is None else text[item.get_position()])
+            f.connect("setup", lsetup)
+            f.connect("bind", lbind)
+            col = Gtk.ColumnViewColumn(title=title, factory=f, expand=title == "Name", resizable=True)
+            columns.append_column(col)
+        view.append(Gtk.ScrolledWindow(child=columns, hexpand=True, vexpand=True))
+    else:
+        grid = Gtk.GridView(model=selection, factory=factory, max_columns=6)
+        view.add_css_class("nautilus-grid-view")
+        view.append(Gtk.ScrolledWindow(child=grid, hexpand=True, vexpand=True))
     content.set_content(view)
     split.set_content(content)
 

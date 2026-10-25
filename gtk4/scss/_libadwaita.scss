@@ -274,3 +274,21 @@ statuspage > scrolledwindow > viewport > box > clamp > box > .title { font-weigh
 // Title buttons drawn like Oxygen's window decoration (see common/_decorations.scss).
 // They come last so they also beat libadwaita's own round title buttons.
 @include decoration-buttons(("windowcontrols > button.image-button",), "window.maximized", "> image");
+
+// libadwaita dims the text of list view column headers and draws them flat;
+// Oxygen's are raised buttons with the normal text colour.
+columnview > header { background: none; }
+columnview > header > button, columnview > header > button:backdrop {
+  @include raised($bg);
+  color: $fg;
+  border-radius: 0;
+  border-width: 0 1px 1px 0;
+  box-shadow: none;
+  font-weight: normal;
+  min-height: 0;
+  padding: 3px 8px;
+  &:hover { color: $hover; border-color: shade($bg, 0.8); box-shadow: none; }
+  &:active { @include sunken($bg); }
+  &:last-child { border-right-width: 0; }
+  * { color: inherit; opacity: 1; font-weight: normal; }
+}
