@@ -237,7 +237,7 @@ def files_window(app):
         except (OSError, subprocess.CalledProcessError):
             pass
         # Classic scroll bars, which Oxygen uses, take space from the list.
-        Gtk.Settings.get_default().set_property("gtk-overlay-scrolling", False)
+        Gtk.Settings.get_default().set_property("gtk-overlay-scrolling", "--overlay" in sys.argv)
         columns = Gtk.ColumnView(model=selection)
         view.add_css_class("nautilus-list-view")
         sizes = ("4 items", "3 items", "11 items", "9 items", "2 items", "1 item", "0 items", "5 items", "56.8 kB", "1.2 kB")
