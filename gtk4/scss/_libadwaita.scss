@@ -197,22 +197,29 @@ overlay-split-view.collapsed .navigation-sidebar, navigation-split-view.collapse
   .view, gridview, columnview, columnview > listview, listview, scrolledwindow, viewport { background-color: transparent; }
 }
 
-// Nautilus pads the list view by 24px on both sides, which leaves the column
+// Nautilus pads the list view by 24px on both sides, which left the column
 // header as a small boxed strip. As in Dolphin's details view, the header is
-// a raised band across the whole view, with its sections divided by lines.
-.nautilus-list-view columnview > header {
-  @include raised($bg);
-  margin: 0 -24px;
-  padding: 0 24px;
-  border-width: 0 0 1px 0;
-  border-radius: 0;
-  box-shadow: none;
-  > button, > button:backdrop {
+// a raised band across the whole view, with its sections divided by lines. GTK
+// does not stretch the header over the padding on the right, so the band is
+// drawn as the background of the list view itself, and the header sits on it.
+.nautilus-list-view columnview {
+  background-image: linear-gradient(to bottom, shade($bg, 1.17), shade($bg, 1.05)),
+                    linear-gradient(to bottom, shade($bg, 0.62), shade($bg, 0.62));
+  background-size: 100% 25px, 100% 1px;
+  background-position: 0 0, 0 25px;
+  background-repeat: no-repeat;
+  border-radius: $radius $radius 0 0;
+  > header {
+    min-height: 25px;
     background: none;
-    border-width: 0 1px 0 0;
-    box-shadow: none;
-    &:hover { background-color: galpha($hover, 0.18); }
-    &:active { @include sunken($bg); border-width: 0 1px 0 0; }
+    > button, > button:backdrop {
+      background: none;
+      border-width: 0 1px 0 0;
+      border-radius: 0;
+      box-shadow: none;
+      &:hover { background-color: galpha($hover, 0.18); }
+      &:active { @include sunken($bg); border-width: 0 1px 0 0; }
+    }
   }
 }
 

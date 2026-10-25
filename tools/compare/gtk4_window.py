@@ -205,8 +205,11 @@ def files_window(app):
     hb.set_title_widget(path)
     hb.pack_end(Gtk.MenuButton(icon_name="view-more-symbolic"))
     content.add_top_bar(hb)
-    model = Gtk.StringList.new(["Applications", "Documents", "Downloads", "Music", "Pictures",
-                                "Public", "Templates", "Videos", "cat.jpg", "notes.txt"])
+    names = ["Applications", "Documents", "Downloads", "Music", "Pictures",
+             "Public", "Templates", "Videos", "cat.jpg", "notes.txt"]
+    if "--list" in sys.argv:
+        names *= 3  # enough rows for a scroll bar, as in a real folder
+    model = Gtk.StringList.new(names)
     factory = Gtk.SignalListItemFactory()
     def setup(_f, item):
         cell = vbox(4)
@@ -233,10 +236,12 @@ def files_window(app):
             add_css(data=css.decode(), priority=Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         except (OSError, subprocess.CalledProcessError):
             pass
+        # Classic scroll bars, which Oxygen uses, take space from the list.
+        Gtk.Settings.get_default().set_property("gtk-overlay-scrolling", False)
         columns = Gtk.ColumnView(model=selection)
         view.add_css_class("nautilus-list-view")
         sizes = ("4 items", "3 items", "11 items", "9 items", "2 items", "1 item", "0 items", "5 items", "56.8 kB", "1.2 kB")
-        for title, text in (("Name", None), ("Size", sizes), ("Modified", ("Last week",) * 10)):
+        for title, text in (("Name", None), ("Size", sizes * 3), ("Modified", ("Last week",) * 30)):
             f = Gtk.SignalListItemFactory()
             def lsetup(_f, item):
                 label = Gtk.Label(xalign=0)
