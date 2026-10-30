@@ -15,7 +15,23 @@ The KDE Oxygen theme for non-Qt toolkits, so GTK apps and Firefox look consisten
 | Flatpak apps | yes, with one extra step |
 | Qt apps | already Oxygen, nothing to do |
 
-Early stage: expect rough edges. Screenshots are [further down](#screenshots).
+Early stage: expect rough edges.
+
+## Screenshots
+
+The comparison windows from `tools/compare/`, in KDE's stock Oxygen and Oxygen Dark schemes. Click for full size.
+
+| | Oxygen | Oxygen Dark |
+|---|---|---|
+| **Qt (reference)** | <a href="docs/screenshots/qt-light.png"><img src="docs/screenshots/qt-light.png" width="380"></a> | <a href="docs/screenshots/qt-dark.png"><img src="docs/screenshots/qt-dark.png" width="380"></a> |
+| **GTK 3** | <a href="docs/screenshots/gtk3-light.png"><img src="docs/screenshots/gtk3-light.png" width="380"></a> | <a href="docs/screenshots/gtk3-dark.png"><img src="docs/screenshots/gtk3-dark.png" width="380"></a> |
+| **GTK 4** | <a href="docs/screenshots/gtk4-light.png"><img src="docs/screenshots/gtk4-light.png" width="380"></a> | <a href="docs/screenshots/gtk4-dark.png"><img src="docs/screenshots/gtk4-dark.png" width="380"></a> |
+| **libadwaita** | <a href="docs/screenshots/libadwaita-light.png"><img src="docs/screenshots/libadwaita-light.png" width="380"></a> | <a href="docs/screenshots/libadwaita-dark.png"><img src="docs/screenshots/libadwaita-dark.png" width="380"></a> |
+| **Firefox** | <a href="docs/screenshots/firefox-light.png"><img src="docs/screenshots/firefox-light.png" width="380"></a> | <a href="docs/screenshots/firefox-dark.png"><img src="docs/screenshots/firefox-dark.png" width="380"></a> |
+| **Firefox, vertical tabs** | <a href="docs/screenshots/firefox-vertical-light.png"><img src="docs/screenshots/firefox-vertical-light.png" width="380"></a> | <a href="docs/screenshots/firefox-vertical-dark.png"><img src="docs/screenshots/firefox-vertical-dark.png" width="380"></a> |
+| **Firefox, new tab page** | <a href="docs/screenshots/firefox-newtab-light.png"><img src="docs/screenshots/firefox-newtab-light.png" width="380"></a> | <a href="docs/screenshots/firefox-newtab-dark.png"><img src="docs/screenshots/firefox-newtab-dark.png" width="380"></a> |
+
+The Qt and GTK 3 windows are shown without a titlebar, since KWin draws theirs. The libadwaita window is a gallery of real libadwaita widgets in a test window, not an actual app. In the Firefox shots the third tab is held in its hover state.
 
 ## Installation
 
@@ -96,22 +112,6 @@ DESTDIR="$pkgdir" PREFIX=/usr ./install.sh
 - **GTK package:** installs the theme to `$PREFIX/share/themes/Oxygen` and the `oxygen-gtk-setup` command to `$PREFIX/bin`. libadwaita apps only read each user's own config, so a package can't hook them up system-wide: each user runs `oxygen-gtk-setup enable` once. With `DESTDIR` set, the scripts never touch any user's home.
 - **Firefox package:** installs its files to `$PREFIX/share/oxygen-firefox` and `oxygen-firefox-setup` to `$PREFIX/bin`. Profiles are per-user, so each user runs `oxygen-firefox-setup install PROFILE`.
 - Tarballs are reproducible (`SOURCE_DATE_EPOCH` is honoured) and come with a `SHA256SUMS` file. Releases are tagged `vX.Y.Z`, and the version is in `VERSION`.
-
-## Screenshots
-
-The comparison windows from `tools/compare/`, in KDE's stock Oxygen and Oxygen Dark schemes. Click for full size.
-
-| | Oxygen | Oxygen Dark |
-|---|---|---|
-| **Qt (reference)** | <a href="docs/screenshots/qt-light.png"><img src="docs/screenshots/qt-light.png" width="380"></a> | <a href="docs/screenshots/qt-dark.png"><img src="docs/screenshots/qt-dark.png" width="380"></a> |
-| **GTK 3** | <a href="docs/screenshots/gtk3-light.png"><img src="docs/screenshots/gtk3-light.png" width="380"></a> | <a href="docs/screenshots/gtk3-dark.png"><img src="docs/screenshots/gtk3-dark.png" width="380"></a> |
-| **GTK 4** | <a href="docs/screenshots/gtk4-light.png"><img src="docs/screenshots/gtk4-light.png" width="380"></a> | <a href="docs/screenshots/gtk4-dark.png"><img src="docs/screenshots/gtk4-dark.png" width="380"></a> |
-| **libadwaita** | <a href="docs/screenshots/libadwaita-light.png"><img src="docs/screenshots/libadwaita-light.png" width="380"></a> | <a href="docs/screenshots/libadwaita-dark.png"><img src="docs/screenshots/libadwaita-dark.png" width="380"></a> |
-| **Firefox** | <a href="docs/screenshots/firefox-light.png"><img src="docs/screenshots/firefox-light.png" width="380"></a> | <a href="docs/screenshots/firefox-dark.png"><img src="docs/screenshots/firefox-dark.png" width="380"></a> |
-| **Firefox, vertical tabs** | <a href="docs/screenshots/firefox-vertical-light.png"><img src="docs/screenshots/firefox-vertical-light.png" width="380"></a> | <a href="docs/screenshots/firefox-vertical-dark.png"><img src="docs/screenshots/firefox-vertical-dark.png" width="380"></a> |
-| **Firefox, new tab page** | <a href="docs/screenshots/firefox-newtab-light.png"><img src="docs/screenshots/firefox-newtab-light.png" width="380"></a> | <a href="docs/screenshots/firefox-newtab-dark.png"><img src="docs/screenshots/firefox-newtab-dark.png" width="380"></a> |
-
-The Qt and GTK 3 windows are shown without a titlebar, since KWin draws theirs. The libadwaita window is a gallery of real libadwaita widgets in a test window, not an actual app. In the Firefox shots the third tab is held in its hover state.
 
 ## Details
 
